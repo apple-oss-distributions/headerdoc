@@ -5,7 +5,7 @@
 #		folder and creates a top-level HTML page to them
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/03 00:08:51 $
+# Last Updated: $Date: 2004/11/29 23:40:28 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -28,7 +28,7 @@
 #
 # @APPLE_LICENSE_HEADER_END@
 #
-# $Revision: 1.8.4.30 $
+# $Revision: 1.8.4.39 $
 ######################################################################
 my $pathSeparator;
 my $isMacOS;
@@ -93,6 +93,7 @@ my $localConfigFileName = "headerDoc2HTML.config";
 my $preferencesConfigFileName = "com.apple.headerDoc2HTML.config";
 my $homeDir;
 my $usersPreferencesPath;
+my $systemPreferencesPath;
 #added WD-rpw 07/30/01 to support running on MacPerl
 #modified WD-rpw 07/01/02 to support the MacPerl 5.8.0
 if ($^O =~ /MacOS/i) {
@@ -106,12 +107,17 @@ if ($^O =~ /MacOS/i) {
 		$homeDir = Mac::Files::FindFolder(kOnSystemDisk(), kDesktopFolderType());
 		$usersPreferencesPath = Mac::Files::FindFolder(kOnSystemDisk(), kPreferencesFolderType());
 	}
+	$systemPreferencesPath = $usersPreferencesPath;
 } else {
 	$homeDir = (getpwuid($<))[7];
 	$usersPreferencesPath = $homeDir.$pathSeparator."Library".$pathSeparator."Preferences";
+	$systemPreferencesPath = "/Library/Preferences";
 }
 
-my @configFiles = ($Bin.$pathSeparator.$localConfigFileName, $usersPreferencesPath.$pathSeparator.$preferencesConfigFileName);
+my $CWD = getcwd();
+my @configFiles = ($systemPreferencesPath.$pathSeparator.$preferencesConfigFileName, $usersPreferencesPath.$pathSeparator.$preferencesConfigFileName, $Bin.$pathSeparator.$localConfigFileName, $CWD.$pathSeparator.$localConfigFileName);
+
+# ($Bin.$pathSeparator.$localConfigFileName, $usersPreferencesPath.$pathSeparator.$preferencesConfigFileName);
 
 # default configuration, which will be modified by assignments found in config files.
 # The default values listed in this hash must be the same as those in the identical 
@@ -135,6 +141,7 @@ my $stripDotH = 0;
 my $gather_functions = 0;
 my $gather_types = 0;
 my $gather_globals_and_constants = 0;
+my $gather_man_pages = 0;
 my $apiUIDPrefix = "apple_ref";
 
 if (defined $config{"defaultFrameName"}) {
@@ -162,12 +169,17 @@ if (defined $config{"TOCTemplateFile"}) {
 		print "Searching for $file\n";
 		my @templateFiles = ($Bin.$pathSeparator.$file, $usersPreferencesPath.$pathSeparator.$file, $file);
 		my $TOCTemplate = "";
+		my $found = 0;
 
 		foreach my $filename (@templateFiles) {
 			if (open(TOCFILE, "<$filename")) {
 				$TOCTemplate = <TOCFILE>;
 				close(TOCFILE);
+				$found = 1;
 			}
+		}
+		if (!$found) {
+			die("Template file $file not found.\n");
 		}
 		push(@TOCTemplateList, $TOCTemplate);
 		push(@TOCNames, basename($file));
@@ -180,6 +192,9 @@ if (defined $config{"TOCTemplateFile"}) {
 		}
 		if (!$gather_functions && $TOCTemplate =~ /\$\$\s*functionlist/) {
 			$gather_functions = 1;
+		}
+		if (!$gather_man_pages && $TOCTemplate =~ /\$\$\s*manpagelist/) {
+			$gather_man_pages = 1;
 		}
 
 	}
@@ -237,11 +252,17 @@ sub getFiles {
     my $filePath = $File::Find::name;
     my $fileName = $_;
     my $localDebug = 0;
+    my $basePath = dirname($filePath);
+    my $dirName = basename($basePath);
     
     print "$fileName ($filePath): " if ($localDebug);
     if ($fileName =~ /$framesetFileName/) {
 	print "HTML frameset\n" if ($localDebug);
         push(@inputFiles, $filePath);
+    } elsif ($dirName =~ /^(man|cat)[\w\d]+$/ && $gather_man_pages) {
+	print "Man Page\n" if ($localDebug);
+        push(@inputFiles, $filePath);
+        push(@contentFiles, $filePath);
     } elsif ($fileName =~ /Constants\.html$/ && $gather_globals_and_constants) {
 	print "Constants\n" if ($localDebug);
         push(@inputFiles, $filePath);
@@ -288,6 +309,7 @@ my @headerFramesetRefs;
 my @dataFramesetRefs;
 my @typeFramesetRefs;
 my @classFramesetRefs;
+my @manpageFramesetRefs;
 my @categoryFramesetRefs;
 my @protocolFramesetRefs;
 my @functionRefs;
@@ -299,6 +321,10 @@ my $oldRecSep = $/;
 undef $/; # read in files as strings
 
 my $localDebug = 0;
+
+my %groups = ();
+
+$groups{" "}="";
 
 $| = 1;
 print "Processing...";
@@ -312,16 +338,46 @@ foreach my $file (@inputFiles) {
 	my $tail = $2;
 	my $inDiscussion = 0;
 	my $inAbstract = 0;
-        my @pairs = split(/;/, $fullComment);
+        my @stockpairs = split(/;/, $fullComment);
+	my @pairs = ();
+
+	my $temp = "";
+	foreach my $stockpair (@stockpairs) {
+		if (length($temp)) {
+			$temp .= $stockpair;
+			if ($temp !~ /\\$/) {
+				push(@pairs, $temp);
+				$temp = "";
+			}
+		} else {
+			if ($stockpair =~ /\\$/) {
+				$temp = $stockpair;
+			} else {
+				push(@pairs, $stockpair);
+				$temp = "";
+			}
+		}
+	}
+
         my $docRef = HeaderDoc::DocReference->new;
         $docRef->path($file);
 	# print "PATH: $file\n";
 	print ".";
         foreach my $pair (@pairs) {
-            my ($key, $value) = split(/=/, $pair);
+            my ($key, $value) = split(/=/, $pair, 2);
             $key =~ s/^\s+|\s+$//;
             $value =~ s/^\s+|\s+$//;
             SWITCH: {
+		($key =~ /indexgroup/) && do
+		    {
+			my $group = $value;
+			$group =~ s/^\s*//sg;
+			$group =~ s/\s*$//sg;
+			$group =~ s/\\;/;/sg;
+			$docRef->group($group);
+			$groups{$group}=1;
+			# print "SAW $group\n";
+		    };
                 ($key =~ /headerDoc/) && 
                     do {
                         $docRef->type($value);
@@ -370,6 +426,8 @@ foreach my $file (@inputFiles) {
             push (@typeFramesetRefs, $docRef);
         } elsif ($tmpType eq "cl"){
             push (@classFramesetRefs, $docRef);
+        } elsif ($tmpType eq "man"){
+            push (@manpageFramesetRefs, $docRef);
         } elsif ($tmpType eq "intf"){
             push (@protocolFramesetRefs, $docRef);
         } elsif ($tmpType eq "cat"){
@@ -399,8 +457,12 @@ $/ = $oldRecSep;
 print "\ndone.\n";
 $| = 0;
 
+# foreach my $key (sort keys (%groups)) {
+	# print "GROUPNAME: $key\n";
+# }
+
 # create master TOC if we have any framesets
-if (scalar(@headerFramesetRefs) + scalar(@classFramesetRefs) + scalar(@protocolFramesetRefs) + scalar(@categoryFramesetRefs) + scalar(@functionRefs)) {
+if (scalar(@headerFramesetRefs) + scalar(@classFramesetRefs) + scalar(@manpageFramesetRefs) + scalar(@protocolFramesetRefs) + scalar(@categoryFramesetRefs) + scalar(@functionRefs)) {
     &printMasterTOC();
     &addTopLinkToFramesetTOCs();
     if ($has_resolver) {
@@ -473,83 +535,132 @@ sub generate_book_xml
 sub printMasterTOC {
     my $outputDir = $inputDir;
     my $masterTOC = $outputDir.$pathSeparator.$masterTOCFileName;
-    my $headersLinkString= '';
-    my $typeLinkString = '';
-    my $dataLinkString = '';
-    my $classesLinkString = '';
-    my $protocolsLinkString = '';
-    my $categoriesLinkString = '';
-    my $functionsLinkString = '';
+    my %headersLinkString= ();
+    my %typeLinkString = ();
+    my %dataLinkString = ();
+    my %classesLinkString = ();
+    my %manpagesLinkString = ();
+    my %protocolsLinkString = ();
+    my %categoriesLinkString = ();
+    my %functionsLinkString = ();
+
+    my $seenHeaders = 0;
+    my $seenType = 0;
+    my $seenData = 0;
+    my $seenClasses = 0;
+    my $seenManPages = 0;
+    my $seenProtocols = 0;
+    my $seenCategories = 0;
+    my $seenFunctions = 0;
+
     my $localDebug = 0;
+
+    foreach my $group (sort keys (%groups)) {
+	$headersLinkString{$group} = "";
+	$typeLinkString{$group} = "";
+	$dataLinkString{$group} = "";
+	$classesLinkString{$group} = "";
+	$manpagesLinkString{$group} = "";
+	$protocolsLinkString{$group} = "";
+	$categoriesLinkString{$group} = "";
+	$functionsLinkString{$group} = "";
 
     # get the HTML links to each header 
     foreach my $ref (sort objName @headerFramesetRefs) {
         my $name = $ref->name();
         my $path = $ref->path();        
+	if ($ref->group() ne $group) {
+		# print "GROUP \"".$ref->group()."\" ne \"$group\".\n";
+		next;
+	}
 
 	if ($stripDotH) {
 		$name =~ s/\.h$//;
 	}
 
         my $tmpString = &getLinkToFramesetFrom($masterTOC, $path, $name);
-        $headersLinkString .= $tmpString;
+        $headersLinkString{$group} .= $tmpString; $seenHeaders = 1;
     }
-    print "\$headersLinkString is '$headersLinkString'\n" if ($localDebug);
+    print "\$headersLinkString is '".$headersLinkString{$group}."'\n" if ($localDebug);
     
     # get the HTML links to each variable/constant 
     foreach my $ref (sort objName @dataFramesetRefs) {
         my $name = $ref->name();
         my $path = $ref->path();        
+	if ($ref->group() ne $group) { next; }
+
         my $tmpString = &getLinkToFramesetFrom($masterTOC, $path, $name);
-        $dataLinkString .= $tmpString;
+        $dataLinkString{$group} .= $tmpString; $seenData = 1;
     }
-    if (($localDebug) && length($dataLinkString)) {print "\$dataLinkString is '$dataLinkString'\n";};
+    if (($localDebug) && length($dataLinkString{$group})) {print "\$dataLinkString is '".$dataLinkString{$group}."'\n";};
     
     # get the HTML links to each type 
     foreach my $ref (sort objName @typeFramesetRefs) {
         my $name = $ref->name();
         my $path = $ref->path();        
+	if ($ref->group() ne $group) { next; }
+
         my $tmpString = &getLinkToFramesetFrom($masterTOC, $path, $name);
-        $typeLinkString .= $tmpString;
+        $typeLinkString{$group} .= $tmpString; $seenType = 1;
     }
-    if (($localDebug) && length($typeLinkString)) {print "\$typeLinkString is '$typeLinkString'\n";};
+    if (($localDebug) && length($typeLinkString{$group})) {print "\$typeLinkString is '".$typeLinkString{$group}."'\n";};
+    
+    # get the HTML links to each man page 
+    foreach my $ref (sort objName @manpageFramesetRefs) {
+        my $name = $ref->name();
+        my $path = $ref->path();        
+	if ($ref->group() ne $group) { next; }
+
+        my $tmpString = &getLinkToFramesetFrom($masterTOC, $path, $name);
+        $manpagesLinkString{$group} .= $tmpString; $seenManPages = 1;
+    }
+    if (($localDebug) && length($manpagesLinkString{$group})) {print "\$manpagesLinkString is '".$manpagesLinkString{$group}."'\n";};
     
     # get the HTML links to each class 
     foreach my $ref (sort objName @classFramesetRefs) {
         my $name = $ref->name();
         my $path = $ref->path();        
+	if ($ref->group() ne $group) { next; }
+
         my $tmpString = &getLinkToFramesetFrom($masterTOC, $path, $name);
-        $classesLinkString .= $tmpString;
+        $classesLinkString{$group} .= $tmpString; $seenClasses = 1;
     }
-    if (($localDebug) && length($classesLinkString)) {print "\$classesLinkString is '$classesLinkString'\n";};
+    if (($localDebug) && length($classesLinkString{$group})) {print "\$classesLinkString is '".$classesLinkString{$group}."'\n";};
     
     # get the HTML links to each protocol 
     foreach my $ref (sort objName @protocolFramesetRefs) {
         my $name = $ref->name();
         my $path = $ref->path();        
+	if ($ref->group() ne $group) { next; }
+
         my $tmpString = &getLinkToFramesetFrom($masterTOC, $path, $name);
-        $protocolsLinkString .= $tmpString;
+        $protocolsLinkString{$group} .= $tmpString; $seenProtocols = 1;
     }
-    if (($localDebug) && length($protocolsLinkString)) {print "\$protocolsLinkString is '$protocolsLinkString'\n";};
+    if (($localDebug) && length($protocolsLinkString{$group})) {print "\$protocolsLinkString is '".$protocolsLinkString{$group}."'\n";};
     
     # get the HTML links to each category 
     foreach my $ref (sort objName @categoryFramesetRefs) {
         my $name = $ref->name();
         my $path = $ref->path();        
+	if ($ref->group() ne $group) { next; }
+
         my $tmpString = &getLinkToFramesetFrom($masterTOC, $path, $name);
-        $categoriesLinkString .= $tmpString;
+        $categoriesLinkString{$group} .= $tmpString; $seenCategories = 1;
     }
-    if (($localDebug) && length($categoriesLinkString)) {print "\$categoriesLinkString is '$categoriesLinkString'\n";};
+    if (($localDebug) && length($categoriesLinkString{$group})) {print "\$categoriesLinkString is '".$categoriesLinkString{$group}."'\n";};
     
     # get the HTML links to each function 
     foreach my $ref (sort objName @functionRefs) {
         my $name = $ref->name();
         my $path = $ref->path();        
 	my $uid = $ref->uid();
+	if ($ref->group() ne $group) { next; }
+
         my $tmpString = &getLinkToFunctionFrom($masterTOC, $path, $name, $uid);
-        $functionsLinkString .= $tmpString;
+        $functionsLinkString{$group} .= $tmpString; $seenFunctions = 1;
     }
-    if (($localDebug) && length($functionsLinkString)) {print "\$functionsLinkString is '$functionsLinkString'\n";};
+    if (($localDebug) && length($functionsLinkString{$group})) {print "\$functionsLinkString is '".$functionsLinkString{$group}."'\n";};
+  }
 
     my $template_number = 0;
     foreach my $TOCTemplate (@TOCTemplateList) {
@@ -576,21 +687,27 @@ sub printMasterTOC {
 	SWITCH: {
 		($field =~ /^\s*title/) && do {
 
-			$out .= $title;
+			if ($include_in_output) {
+				$out .= $title;
+			}
 
 			$keep =~ s/.*?\@\@//s;
 			last SWITCH;
 			};
 		($field =~ /^\s*frameworkdiscussion/) && do {
 
-			$out .= $frameworkdiscussion;
+			if ($include_in_output) {
+				$out .= $frameworkdiscussion;
+			}
 
 			$keep =~ s/.*?\@\@//s;
 			last SWITCH;
 			};
 		($field =~ /^\s*frameworkabstract/) && do {
 
-			$out .= $frameworkabstract;
+			if ($include_in_output) {
+				$out .= $frameworkabstract;
+			}
 
 			$keep =~ s/.*?\@\@//s;
 			last SWITCH;
@@ -598,35 +715,45 @@ sub printMasterTOC {
 		($field =~ /^\s*tocname/) && do {
 			my $tn = basename($masterTOC);
 
-			$out .= "$tn";
+			if ($include_in_output) {
+				$out .= "$tn";
+			}
 
 			$keep =~ s/.*?\@\@//s;
 			last SWITCH;
 			};
 		($field =~ /^\s*frameworkdir/) && do {
 
-			$out .= "$frameworkShortName";
+			if ($include_in_output) {
+				$out .= "$frameworkShortName";
+			}
 
 			$keep =~ s/.*?\@\@//s;
 			last SWITCH;
 			};
 		($field =~ /^\s*frameworkuid/) && do {
 
-			$out .= "<a name=\"$landingPageUID\" title=\"$framework\"></a>";
+			if ($include_in_output) {
+				$out .= "<a name=\"$landingPageUID\" title=\"$framework\"></a>";
+			}
 
 			$keep =~ s/.*?\@\@//s;
 			last SWITCH;
 			};
 		($field =~ /^\s*framework/) && do {
 
-			$out .= "$framework";
+			if ($include_in_output) {
+				$out .= "$framework";
+			}
 
 			$keep =~ s/.*?\@\@//s;
 			last SWITCH;
 			};
 		($field =~ /^\s*headersection/) && do {
 
-			$include_in_output = 1;
+			if (!$seenHeaders) {
+				$include_in_output = 0;
+			}
 
 			$keep =~ s/.*?\@\@//s;
 			last SWITCH;
@@ -640,9 +767,39 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*headerlist/) && do {
 
-			if (length($headersLinkString)) {
+			if ($seenHeaders) {
 				$field =~ s/\@\@.*//s;
-				$out .= genTable($headersLinkString, $field);
+				foreach my $group (sort keys(%groups)) {
+					$out .= genTable($headersLinkString{$group}, $field, $group);
+				}
+			}
+
+			$keep =~ s/.*?\@\@//s;
+			last SWITCH;
+			};
+		($field =~ /^\s*manpagesection/) && do {
+
+			if (!$seenManPages) {
+				$include_in_output = 0;
+			}
+
+			$keep =~ s/.*?\@\@//s;
+			last SWITCH;
+			};
+		($field =~ /^\s*\/manpagesection/) && do {
+
+			$include_in_output = 1;
+
+			$keep =~ s/.*?\@\@//s;
+			last SWITCH;
+			};
+		($field =~ /^\s*manpagelist/) && do {
+
+			if ($seenManPages) {
+				$field =~ s/\@\@.*//s;
+				foreach my $group (sort keys(%groups)) {
+					$out .= genTable($manpagesLinkString{$group}, $field, $group);
+				}
 			}
 
 			$keep =~ s/.*?\@\@//s;
@@ -650,7 +807,7 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*classsection/) && do {
 
-			if (!length($classesLinkString)) {
+			if (!$seenClasses) {
 				$include_in_output = 0;
 			}
 
@@ -666,9 +823,11 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*classlist/) && do {
 
-			if (length($classesLinkString)) {
+			if ($seenClasses) {
 				$field =~ s/\@\@.*//s;
-				$out .= genTable($classesLinkString, $field);
+				foreach my $group (sort keys(%groups)) {
+					$out .= genTable($classesLinkString{$group}, $field, $group);
+				}
 			}
 
 			$keep =~ s/.*?\@\@//s;
@@ -676,7 +835,7 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*categorysection/) && do {
 
-			if (!length($categoriesLinkString)) {
+			if (!$seenCategories) { # @@@
 				$include_in_output = 0;
 			}
 
@@ -692,9 +851,11 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*categorylist/) && do {
 
-			if (length($categoriesLinkString)) {
+			if ($seenCategories) {
 				$field =~ s/\@\@.*//s;
-				$out .= genTable($categoriesLinkString, $field);
+				foreach my $group (sort keys(%groups)) {
+					$out .= genTable($categoriesLinkString{$group}, $field, $group);
+				}
 			}
 
 			$keep =~ s/.*?\@\@//s;
@@ -702,7 +863,7 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*protocolsection/) && do {
 
-			if (!length($protocolsLinkString)) {
+			if (!$seenProtocols) { # @@@
 				$include_in_output = 0;
 			}
 
@@ -718,9 +879,11 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*protocollist/) && do {
 
-			if (length($protocolsLinkString)) {
+			if ($seenProtocols) {
 				$field =~ s/\@\@.*//s;
-				$out .= genTable($protocolsLinkString, $field);
+				foreach my $group (sort keys(%groups)) {
+					$out .= genTable($protocolsLinkString{$group}, $field, $group);
+				}
 			}
 
 			$keep =~ s/.*?\@\@//s;
@@ -728,7 +891,7 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*datasection/) && do {
 
-			if (!length($dataLinkString)) {
+			if (!$seenData) { # @@@
 				$include_in_output = 0;
 			}
 
@@ -744,9 +907,11 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*datalist/) && do {
 
-			if (length($dataLinkString)) {
+			if ($seenData) {
 				$field =~ s/\@\@.*//s;
-				$out .= genTable($dataLinkString, $field);
+				foreach my $group (sort keys(%groups)) {
+					$out .= genTable($dataLinkString{$group}, $field, $group);
+				}
 			}
 
 			$keep =~ s/.*?\@\@//s;
@@ -754,7 +919,7 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*typesection/) && do {
 
-			if (!length($typeLinkString)) {
+			if (!$seenType) { # @@@
 				$include_in_output = 0;
 			}
 
@@ -770,9 +935,11 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*typelist/) && do {
 
-			if (length($typeLinkString)) {
+			if ($seenType) {
 				$field =~ s/\@\@.*//s;
-				$out .= genTable($typeLinkString, $field);
+				foreach my $group (sort keys(%groups)) {
+					$out .= genTable($typeLinkString{$group}, $field, $group);
+				}
 			}
 
 			$keep =~ s/.*?\@\@//s;
@@ -780,7 +947,7 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*functionsection/) && do {
 
-			if (!length($functionsLinkString)) {
+			if (!$seenFunctions) { # @@@
 				$include_in_output = 0;
 			}
 
@@ -796,9 +963,11 @@ sub printMasterTOC {
 			};
 		($field =~ /^\s*functionlist/) && do {
 
-			if (length($functionsLinkString)) {
+			if ($seenFunctions) {
 				$field =~ s/\@\@.*//s;
-				$out .= genTable($functionsLinkString, $field);
+				foreach my $group (sort keys(%groups)) {
+					$out .= genTable($functionsLinkString{$group}, $field, $group);
+				}
 			}
 
 			$keep =~ s/.*?\@\@//s;
@@ -929,8 +1098,12 @@ sub getLinkToFunctionFrom {
     my $noClassName = $name;
     $noClassName =~ s/.*\:\://s;
     my $urlname = sanitize($noClassName);
-    if (length($uid)) { $urlname = $uid; }
-    $linkString = "<a href=\"$relPath#$urlname\" target =\"_top\">$name</a><br>\n"; 
+    my $lp = "";
+    if ($uid && length($uid)) {
+	$urlname = $uid;
+	$lp = " logicalPath=\"$uid\"";
+    }
+    $linkString = "<a $lp href=\"$relPath#$urlname\" retarget=\"yes\" target =\"_top\">$name</a><br>\n"; 
     return $linkString;
 }
 
@@ -960,10 +1133,24 @@ sub genTable
 {
     my $inputstring = shift;
     my $settings = shift;
+    my $groupname = shift;
     my $ncols = 0;
     my $order = "down";
     my $attributes = "border=0 width=\"100%\"";
     my $localDebug = 0;
+
+    my $ngroups = scalar(keys(%groups));
+
+    my $groupnamestring = "";
+    if ($groupname =~ /\S/) {
+	$groupnamestring = "<p><i>$groupname</i></p>\n";
+    }
+    my $groupheadstring = "<blockquote>\n";
+    my $grouptailstring = "</blockquote>\n";
+    if (!$ngroups) {
+	$groupheadstring = "";
+	$grouptailstring = "";
+    }
 
     $settings =~ s/^\s*(\w+list)\s*//;
     my $name = $1;
@@ -1054,9 +1241,9 @@ sub genTable
 	}
 	$outstring .= "</tr></table>\n";
 
-	return $outstring;
+	return $groupnamestring.$groupheadstring.$outstring.$grouptailstring;
     } else {
-	return $inputstring;
+	return $groupnamestring.$groupheadstring.$inputstring.$grouptailstring;
     }
 }
 

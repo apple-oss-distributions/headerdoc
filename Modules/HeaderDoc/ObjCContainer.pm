@@ -5,7 +5,7 @@
 #
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/10 22:12:16 $
+# Last Updated: $Date: 2004/10/04 23:11:25 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -44,7 +44,7 @@ use HeaderDoc::APIOwner;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.4.2.5.2.16 $';
 
 ################ Portability ###################################
 my $isMacOS;
@@ -164,7 +164,7 @@ sub objName { # used for sorting
     my $obj1 = $a;
     my $obj2 = $b;
 
-    return ($obj1->name() cmp $obj2->name());
+    return (lc($obj1->name()) cmp lc($obj2->name()));
 }
 
 sub byMethodType { # used for sorting
@@ -180,14 +180,14 @@ sub byMethodType { # used for sorting
 sub byAccessControl { # used for sorting
     my $obj1 = $a;
     my $obj2 = $b;
-    return ($obj1->accessControl() cmp $obj2->accessControl());
+    return (lc($obj1->accessControl()) cmp lc($obj2->accessControl()));
 }
 
 sub objGroup { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
    # if ($HeaderDoc::sort_entries) {
-        return ($obj1->group() cmp $obj2->group());
+        return (lc($obj1->group()) cmp lc($obj2->group()));
    # } else {
         # return (1 cmp 2);
    # }

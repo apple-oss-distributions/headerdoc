@@ -49,6 +49,7 @@ usage_t usage_head = NULL, usage_tail = NULL;
 int seen_name = 0;
 
 char *striplines(char *line);
+char *man_section = NULL;
 
 #define MAX(a, b) ((a<b) ? b : a)
 
@@ -77,18 +78,29 @@ int main(int argc, char *argv[])
 {
     xmlDocPtr dp;
     int counter = 0, i;
+    int first_arg = 1;
 
     if (argc < 1) {
 	fprintf(stderr, "hdxml2manxml: No arguments given.\n");
 	exit(-1);
     }
 
+    if (!strcmp(argv[1], "-M")) {
+	if (argc < 3) {
+		fprintf(stderr, "hdxml2manxml: You must specify a man page section for -M.\n");
+		exit(-1);
+	}
+	man_section = argv[2];
+	first_arg += 2;
+    }
+
     LIBXML_TEST_VERSION;
 
     xmlSubstituteEntitiesDefault(0);
+// printf("%d %d\n", argc, first_arg);
 
-    if (argc >= 2) {
-	for (i=1; i < argc; i++) {
+    if (argc > (first_arg)) {
+	for (i=first_arg; i < argc; i++) {
 	    void *addr;
 	    struct stat sb;
 	    int fd = open(argv[i], O_RDONLY, 0);
@@ -181,18 +193,24 @@ void write_crossrefs(xmlDocPtr dp, FILE *fp, xmlNode *root);
 
 int hdxml2man(xmlDocPtr dp,xmlNode *root, char *output_filename)
 {
-    int section;
+    // int section;
     char datebuf[22];
     char *docdate = NULL;
     char *doctitle = "UNKNOWN MANPAGE";
     char *os = "";
     char *temp;
+    char *sectionstring = NULL;
     FILE *fp;
 
     temp = textmatching(dp, "section", root->children, 1, 0);
 
-    if (temp) section = atoi(temp);
-    else { fprintf(stderr, "Assuming section 3.\n"); section = 3; }
+    if (temp) {
+	sectionstring = temp;
+    } else if (man_section && strlen(man_section)) {
+	sectionstring = man_section;
+    } else {
+	fprintf(stderr, "Assuming section 3.\n"); sectionstring = "3";
+    }
 
     temp = textmatching(dp, "updated", root->children, 1, 0);
     if (temp) docdate = temp;
@@ -234,7 +252,7 @@ int hdxml2man(xmlDocPtr dp,xmlNode *root, char *output_filename)
     fprintf(fp, "<manpage>\n\n");
     if (docdate) fprintf(fp, "<docdate>%s</docdate>\n", docdate);
     if (doctitle) fprintf(fp, "<doctitle>%s</doctitle>\n", doctitle);
-    fprintf(fp, "<section>%d</section>\n", section);
+    fprintf(fp, "<section>%s</section>\n", sectionstring);
 
     temp = textmatching(dp, "abstract", root->children, 0, 0);
     if (!temp) temp = "";
@@ -305,7 +323,7 @@ void write_arguments(xmlDocPtr dp, FILE *fp, xmlNode *root)
 
 	if (strcmp(node->name, "parameter")) continue;
 	name = textmatching(dp, "name", node->children, 0, 0);
-	desc = textmatching(dp, "desc", node->children, 0, 0);
+	desc = textmatching(dp, "desc", node->children, 1, 0);
 	if (!name) continue;
 	for (p = p_head; p; p=p->next) {
 		if (p->name && strlen(p->name)) {
@@ -448,7 +466,11 @@ char *textmatching(xmlDocPtr dp, char *name, xmlNode *node, int missing_ok, int 
 		ret = xmlNodeListGetRawString(dp, cur, 0);
 		// ret = cur->content;
     } else {
-	fprintf(stderr, "Missing/invalid contents for %s.\n", name);
+	if (!missing_ok) {
+		fprintf(stderr, "Missing/invalid contents for %s.\n", name);
+	} else {
+		return NULL;
+	}
     }
 
     return ret;

@@ -17,3 +17,8 @@
 */
     virtual IOReturn varargs_test(const char *foo,...);
 
+/*! @function arrayparam_test
+    @param someArray This is a test of array parameters.
+ */
+    void testFunc(char someArray[32]);
+

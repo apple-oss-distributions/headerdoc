@@ -25,7 +25,7 @@
     @abstract Test of vararg.
     @param foo Format string.
     @param ... additional parameters. */
-    virtual IOReturn test(const char *foo,...);
+    virtual IOReturn test1(const char *foo,...);
 
 /*! @functiongroup group_2
 */
@@ -39,7 +39,7 @@
     @abstract Test of vararg.
     @param foo Format string.
     @param ... additional parameters. */
-    virtual IOReturn test(const char *foo,...);
+    virtual IOReturn test2(const char *foo,...);
 
 /*! @functiongroup group_0 */
 
@@ -52,7 +52,7 @@
     @abstract Test of vararg.
     @param foo Format string.
     @param ... additional parameters. */
-    virtual IOReturn test(const char *foo,...);
+    virtual IOReturn test3(const char *foo,...);
 
 /*! @functiongroup group_1
 */
@@ -66,5 +66,5 @@
     @abstract Test of vararg.
     @param foo Format string.
     @param ... additional parameters. */
-    virtual IOReturn test(const char *foo,...);
+    virtual IOReturn test4(const char *foo,...);
 

@@ -4,7 +4,7 @@
 # Synopsis: 	Used by gatherHeaderDoc.pl to hold references to doc 
 #		for individual headers and classes
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/02 22:39:14 $
+# Last Updated: $Date: 2004/10/04 23:11:16 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -32,7 +32,8 @@ package HeaderDoc::DocReference;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.00';
+$VERSION = '$Revision: 1.2.4.1.2.6 $';
+
 ################ General Constants ###################################
 my $debugging = 0;
 
@@ -57,6 +58,7 @@ sub _initialize {
     $self->{OUTPUTFORMAT} = undef;
     $self->{UID} = undef;
     $self->{NAME} = undef;
+    $self->{GROUP} = " ";
     $self->{TYPE} = undef; # Header, CPPClass, etc
     $self->{PATH} = undef;
     $self->{LANGUAGE} = "";
@@ -109,6 +111,18 @@ sub name {
         $self->{NAME} = shift;
     }
     return $self->{NAME};
+}
+
+
+sub group {
+    my $self = shift;
+
+    if (@_) {
+	my $newgroupname = shift;
+	if (!length($newgroupname)) { $newgroupname = " "; }
+        $self->{GROUP} = $newgroupname;
+    }
+    return $self->{GROUP};
 }
 
 

@@ -4,7 +4,7 @@
 # Synopsis: Holds function info parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/13 04:59:12 $
+# Last Updated: $Date: 2004/12/04 00:22:52 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -37,7 +37,7 @@ use HeaderDoc::APIOwner;
 
 @ISA = qw( HeaderDoc::HeaderElement );
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.10.2.10.2.29 $';
 
 use strict;
 
@@ -95,17 +95,38 @@ sub getParamSignature
 {
     my $self = shift;
 
+    my $localDebug = 0;
+
+    print "Function name: ".$self->name()."\n" if ($localDebug);
+
     my @params = $self->parsedParameters();
     my $signature = "";
+    my $returntype = $self->returntype();
+
+    $returntype =~ s/\s*//sg;
 
     foreach my $param (@params) {
 	bless($param, "HeaderDoc::HeaderElement");
 	bless($param, $param->class());
 	my $name = $param->name();
 	my $type = $param->type();
+
+	print "PARAM NAME: $name\nTYPE: $type\n" if ($localDebug);
+
 	$type =~ s/\s//sgo;
-	$signature .= $type;
+	if (!length($type)) {
+		# Safety valve, just in case
+		$type = $name;
+		$type =~ s/\s//sgo;
+	}
+	if (length($type)) {
+		$signature .= ",".$type;
+	}
     }
+    $signature =~ s/^,//s;
+    $signature = $returntype.'/('.$signature.')';
+
+    print "RETURN TYPE WAS $returntype\n" if ($localDebug);
 
     return $signature;
 }
@@ -120,7 +141,14 @@ sub processComment {
 
 	foreach my $field (@fields) {
 		SWITCH: {
-			($field =~ /^\/\*\!/o)&& do {last SWITCH;}; # ignore opening /*!
+            		($field =~ /^\/\*\!/o)&& do {
+                                my $copy = $field;
+                                $copy =~ s/^\/\*\!\s*//s;
+                                if (length($copy)) {
+                                        $self->discussion($copy);
+                                }
+                        last SWITCH;
+                        };
 			($field =~ s/^method(\s+)/$1/o) && 
 			do {
 				my ($name, $disc);

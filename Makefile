@@ -9,11 +9,17 @@ bindir  = /usr/bin
 program1 = headerdoc2html
 program2 = gatherheaderdoc
 
+os := $(shell uname -s)
+osmajor := $(shell uname -r | sed 's/\..*//')
 perl_libdir := $(shell perl -e 'require Config; print "$$Config::Config{'privlib'}\n";')
+ifeq ($(os),Darwin)
+ifeq ($(shell test $(osmajor) -ge 8 && echo yes),yes)
+perl_libdir := $(subst Perl,Perl/Extras,$(perl_libdir))
+endif
+endif
 startperl   := $(shell perl -e 'require Config; print "$$Config::Config{'startperl'}\n";')
 
 all:
-	echo ${perl_libdir}
 	cd xmlman ; make all
 
 clean:
@@ -32,7 +38,7 @@ clean:
 test:
 	cd testsuite ; make ; make runtests ; cd ..
 
-realinstall:
+realinstall: all
 	DSTROOT="" make installsub
 
 install: all

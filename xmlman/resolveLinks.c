@@ -13,6 +13,7 @@
 #include <libgen.h>
 #include <string.h>
 #include <pthread.h>
+#include <errno.h>
 
 typedef struct _xrefnode {
     char *filename;
@@ -54,7 +55,7 @@ int stderrfd = -1;
 int nullfd = -1;
 
 char *xmlNodeGetRawString(htmlDocPtr dp, xmlNode *node, int whatever);
-char *resolve(char *xref, char *filename);
+char *resolve(char *xref, char *filename, int retarget);
 static void *resolve_main(void *ref);
 void setup_redirection(void);
 
@@ -81,6 +82,7 @@ void resolveLinks(xmlNode *node, htmlDocPtr dp, char *filename);
 char *proptext(char *name, struct _xmlAttr *prop);
 void parseUsage(xmlNode *node);
 char *getLogicalPath(char *commentString);
+char *getTargetAttFromString(char *commentString);
 void addAttribute(xmlNode *node, char *attname, char *attstring);
 char *propString(xmlNode *node);
 fileref_t getFiles(char *curPath);
@@ -93,6 +95,11 @@ void writeFile_sub(xmlNode *node, htmlDocPtr dp, FILE *fp, int this_node_and_chi
 void addXRefSub(xrefnode_t newnode, xrefnode_t tree);
 char *relpath(char *origPath, char *filename);
 char *fixpath(char *name);
+int has_target(xmlNode *node);
+char *ts_basename(char *path);
+char *ts_dirname(char *path);
+
+int exists(char *filename);
 
 //void *malloc_long(size_t length) { return malloc(length * 30); }
 //#define malloc malloc_long
@@ -170,10 +177,10 @@ int main(int argc, char *argv[])
     if (argc == 3) { nthreads = atoi(argv[2]); }
 
     {
-      char *mydirname = dirname(argv[1]);
-      char *allyourbase = basename(argv[1]);
-      chdir(mydirname);
-      chdir(allyourbase);
+      chdir(argv[1]);
+      char *newdir = getcwd(NULL, 0);
+      char *allyourbase = basename(newdir);
+      free(newdir);
       printf("Finding files.\n");
       if (!((files = getFiles(fixpath(allyourbase))))) {
 	fprintf(ERRS, "No HTML files found.\n");
@@ -199,7 +206,7 @@ int main(int argc, char *argv[])
 	if (debugging) {printf("FILE: %s\n", filename);fflush(stdout);}
 
 	redirect_stderr_to_null();
-	if (!(dp = htmlParseFile(filename, "UTF-8")))
+	if (!(dp = htmlParseFile(filename, "")))
 	{
 	    restore_stderr();
 	    fprintf(ERRS, "resolveLinks: could not parse XML file %s\n", filename);
@@ -315,11 +322,11 @@ int resolve_mainsub(int pos)
 
 #endif
 
-    if (nthreads > 0) {
-	sprintf(tempname, "/tmp/resolveLinks.%d.%d", getpid(), (int)pthread_self());
-    } else {
-	sprintf(tempname, "/tmp/resolveLinks.%d", getpid());
-    }
+    // if (nthreads > 0) {
+	// sprintf(tempname, "/tmp/resolveLinks.%d.%d", getpid(), (int)pthread_self());
+    // } else {
+	snprintf(tempname, MAXNAMLEN, "%s-temp%d", filename, getpid());
+    // }
 
     files = threadfiles[pos];
     thread_processed_files[pos] = 0;
@@ -335,11 +342,11 @@ int resolve_mainsub(int pos)
 #ifdef OLD_LIBXML
 	if (!(dp = htmlParseFile(filename, "")))
 #else
-	ctxt = htmlCreateFileParserCtxt(filename, "UTF-8");
+	ctxt = htmlCreateFileParserCtxt(filename, "");
 
 	if (!ctxt) { fprintf(ERRS, "Could not create context\n"); exit(-1); }
 
-	// if (!(dp = htmlCtxtReadFile(ctxt, filename, "UTF-8", options)))
+	// if (!(dp = htmlCtxtReadFile(ctxt, filename, "", options)))
 	ctxt->options = options;
 	ctxt->space = &ks;
 	ctxt->sax->ignorableWhitespace = NULL;
@@ -683,7 +690,10 @@ void resolveLinks(xmlNode *node, htmlDocPtr dp, char *filename)
 		if (close) {
 			/* Link Request. */
 			char *lp = getLogicalPath(node->content);
-			char *target = resolve(lp, filename);
+			char *frametgt = getTargetAttFromString(node->content);
+			int retarget = (!frametgt || !strlen(frametgt));
+			char *target = resolve(lp, filename, retarget);
+			if (debugging) printf("RETARGET SHOULD HAVE BEEN %d (frametgt is 0x%p)\n", retarget, frametgt);
 			if (debugging) printf("EOLR\n");
 
 			if (debugging) {printf("LP: \"%s\"\n", lp);}
@@ -778,11 +788,31 @@ void resolveLinks(xmlNode *node, htmlDocPtr dp, char *filename)
 					node->type = XML_ELEMENT_NODE;
 					addAttribute(node, "href", target);
 					addAttribute(node, "logicalPath", lp);
+					if (frametgt) {
+						if (debugging) printf("FRAMETGT FOUND\n");
+						addAttribute(node, "target", frametgt);
+					} else {
+						if (debugging) printf("NO FRAMETGT FOUND\n");
+						char *pos;
+						int index = 1;
+
+						pos = target;
+						while (*pos && *pos != '?' && *pos != '#') pos++;
+						if (pos < target + 10) {
+							index = 0;
+						} else {
+							pos -= 10;
+							if (strncmp(pos, "index.html", 10)) index = 0;
+						}
+						if (index) {
+							addAttribute(node, "target", "_top");
+						}
+					}
 					node->content = NULL; /* @@@ LEAK? @@@ */
 					/* Reparent everything from the open comment to the close comment under an anchor tag. */
 					node->children = node->next;
 					node->children->prev = NULL;
-					for (iter = node->children; iter != lastnode; iter = iter->next) {
+					for (iter = node->children; iter && iter != lastnode; iter = iter->next) {
 						
 						iter->parent = node;
 						if (debug_reparent) {
@@ -790,6 +820,9 @@ void resolveLinks(xmlNode *node, htmlDocPtr dp, char *filename)
 							writeFile_sub(node, dp, stdout, 1);
 							printf("DONE REPARENTING\n");
 						}
+					}
+					if (iter != lastnode) {
+						fprintf(stderr, "Warning: reparenting failed.\n");
 					}
 					lastnode->parent = node;
 					if (lastnode->next) {
@@ -811,12 +844,13 @@ void resolveLinks(xmlNode *node, htmlDocPtr dp, char *filename)
 	}
     } else if (node->name && !strcmp(node->name, "a")) {
 		/* Handle the already-live link */
+		int retarget = (!has_target(node));
 		char *lp = proptext("logicalPath", node->properties);
 		// char *name = proptext("name", node->properties);
 		char *href = proptext("href", node->properties);
 
 		if (lp && href) {
-			char *target = resolve(lp, filename);
+			char *target = resolve(lp, filename, retarget);
 
 			if (target) {
 				if (debugging) printf("FOUND!\n");
@@ -1148,6 +1182,60 @@ char *getLogicalPath(char *commentString)
     return NULL;
 }
 
+/*! getTargetAttFromString gets a target attribute from a commented-out
+    link request. */
+char *getTargetAttFromString(char *commentString)
+{
+    char *retptr = NULL;
+    char *ptr = commentString;
+
+    if (!commentString) return NULL;
+
+// printf("commentString: %s\n", commentString);
+
+    while (*ptr == ' ') ptr++;
+    if (*ptr != 'a') return NULL;
+    ptr++;
+    if (*ptr != ' ') return NULL;
+    while (*ptr == ' ') ptr++;
+    if (strncasecmp(ptr, "logicalPath", 11)) {
+	return NULL;
+    }
+    ptr += strlen("logicalPath");
+    while (*ptr && (*ptr != '"')) ptr++;
+    ptr++;
+    while (*ptr && (*ptr != '"')) ptr++;
+    ptr++;
+    while (*ptr && (*ptr != ' ')) ptr++;
+    while (*ptr && (*ptr == ' ')) ptr++;
+
+    if (!strncasecmp(ptr, "target", 11)) {
+	char *startptr; int count=0;
+
+	if (debugging) printf("STARTTARGET\n");
+
+	ptr += 11;
+	while (*ptr == ' ') ptr++;
+	if (*ptr != '=') return NULL;
+	ptr++;
+	while (*ptr == ' ') ptr++;
+	if (*ptr != '"') return NULL;
+	ptr++;
+	startptr = ptr;
+	// printf("STARTPTR: %s\n", startptr);
+	while (*ptr && *ptr != '"') { ptr++; count++; }
+	retptr = malloc((count + 1024) * sizeof(char));
+	strncpy(retptr, startptr, count);
+	retptr[count] = '\0';
+	return retptr;
+    }
+
+    if (debugging) printf("TARGETFIND RETURNING NULL\n");
+    return NULL;
+}
+
+
+
 /*! This function gets the raw text (with entities intact) for a
     single node.  This is similar to xmlNodeListGetRawString (part of
     libxml), only it does not traverse the node tree.
@@ -1245,15 +1333,65 @@ char *refLangChange(char *ref, char *lang)
 /*! This function takes a filename and an anchor within that file
     and concatenates them into a full URL.
  */
-char *makeurl(char *filename, char *offset)
+char *makeurl(char *filename, char *offset, int retarget)
 {
 #if 1
-    char *buf = malloc((strlen(filename)+strlen(offset)+2) * sizeof(char));
+    char *buf = NULL;
+    char *dir = ts_dirname(filename);
+    char *base = ts_basename(filename);
+    char *updir = ts_dirname(dir);
+    char *upbase = ts_basename(dir);
+    char *indexpath = malloc(strlen(updir) + 1 /*/*/ + strlen("index.html") + 1);
+
+    int len = (strlen(filename)+strlen(offset)+2) * sizeof(char);
+
+if (debugging) printf("RETARGET (INITIAL): %d\n", retarget);
+
+    sprintf(indexpath, "%s/index.html", updir);
+    if (!strcmp(base, "index.html") || !strcmp(base, "CompositePage.html")) {
+	if (debugging) printf("Going to an index.html file.  Not retargetting.\n");
+	if (debugging) printf("FILENAME: %s\nOFFSET: %s\n", filename, offset);
+	retarget = 0;
+	free(dir);
+	free(base);
+	free(updir);
+	free(upbase);
+	free(indexpath);
+    }
+
+    if (retarget && !exists(indexpath)) {
+	fprintf(stderr, "No index found at %s.\n", indexpath);
+	fprintf(stderr, "DIR: %s\nBASE: %s\nUPDIR: %s\nUPBASE: %s\nORIG_FILENAME: %s\n", dir, base, updir, upbase, filename);
+	retarget = 0;
+	free(dir);
+	free(base);
+	free(updir);
+	free(upbase);
+	free(indexpath);
+    }
+
+    if (retarget) {
+	len = strlen(indexpath) + 1 /*?*/ + strlen(upbase) + 1 /*/*/ + strlen(base) + 1 /*#*/ + strlen(offset) + 1 /*NULL*/;
+    }
+
+    buf = malloc(len);
 
     if (!buf) return "BROKEN";
-    strcpy(buf, filename);
-    strcat(buf, "#");
-    strcat(buf, offset);
+
+if (debugging) printf("RETARGET: %d\n", retarget);
+
+    if (retarget) {
+	sprintf(buf, "%s?%s/%s#%s", indexpath, upbase, base, offset);
+	free(dir);
+	free(base);
+	free(updir);
+	free(upbase);
+	free(indexpath);
+    } else {
+	strcpy(buf, filename);
+	strcat(buf, "#");
+	strcat(buf, offset);
+    }
 
     return buf;
 #else
@@ -1265,7 +1403,7 @@ char *makeurl(char *filename, char *offset)
     returning the filename and anchor within that file, concatenated with
     makeurl.
  */
-char *searchref(char *xref, xrefnode_t tree)
+char *searchref(char *xref, xrefnode_t tree, int retarget)
 {
     int pos;
 
@@ -1275,13 +1413,13 @@ char *searchref(char *xref, xrefnode_t tree)
 
     if (!pos) {
 	/* We found it. */
-	return makeurl(tree->filename, tree->xref);
+	return makeurl(tree->filename, tree->xref, retarget);
     } else if (pos < 0) {
         /* We go left */
-        return searchref(xref, tree->left);
+        return searchref(xref, tree->left, retarget);
     } else {
         /* We go right */
-        return searchref(xref, tree->right);
+        return searchref(xref, tree->right, retarget);
     }
 }
 
@@ -1289,7 +1427,7 @@ char *searchref(char *xref, xrefnode_t tree)
     cross-references, allowing language fallback (c++ to C, etc.),
     and returns the URL associated with it.
  */
-char *resolve(char *xref, char *filename)
+char *resolve(char *xref, char *filename, int retarget)
 {
     char *curref = xref;
     char *writeptr = xref;
@@ -1318,9 +1456,12 @@ char *resolve(char *xref, char *filename)
 
 		if (altLangRef && debugging) { printf("ALSO SEARCHING FOR \"%s\"\n", altLangRef); }
 
-		target = searchref(curref, nodehead);
-		if (!target && altLangRef) target = searchref(altLangRef, nodehead);
-		if (target) return relpath(target, filename);
+		target = searchref(curref, nodehead, retarget);
+		if (!target && altLangRef) target = searchref(altLangRef, nodehead, retarget);
+		if (target) {
+			if (debugging) printf("Mapping %s to %s\n", xref, target);
+			return relpath(target, filename);
+		}
 	}
 
 	if (writeptr) {
@@ -1330,6 +1471,7 @@ char *resolve(char *xref, char *filename)
 	}
     }
 
+    if (debugging) printf("Ref not found\n");
     return NULL;
 }
 
@@ -1717,6 +1859,64 @@ char *fixpath(char *name)
     }
 
     return name;
+}
+
+int has_target(xmlNode *node)
+{
+    char *target = proptext("target", node->properties);
+    char *retarget = proptext("retarget", node->properties);
+
+    if (retarget && !strcasecmp(retarget, "yes")) return 0;
+    if (target && strlen(target)) return 1;
+
+    return 0;
+}
+
+// Thread-safe dirname function.  Yuck.
+char *ts_dirname(char *path)
+{
+    static pthread_mutex_t mylock = PTHREAD_MUTEX_INITIALIZER;
+    char *orig, *copy, *junk;
+
+    while (pthread_mutex_lock(&mylock));
+
+    junk = malloc((strlen(path) + 1) * sizeof(char));
+    strcpy(junk, path);
+    orig = dirname(junk);
+    copy = malloc((strlen(orig) + 1) * sizeof(char));
+    strcpy(copy, orig);
+    free(junk);
+    while (pthread_mutex_unlock(&mylock));
+
+    return copy;
+}
+
+// Thread-safe basename function.  Yuck.
+char *ts_basename(char *path)
+{
+    static pthread_mutex_t mylock = PTHREAD_MUTEX_INITIALIZER;
+    char *orig, *copy, *junk;
+
+    while (pthread_mutex_lock(&mylock));
+
+    junk = malloc((strlen(path) + 1) * sizeof(char));
+    strcpy(junk, path);
+    orig = basename(junk);
+    copy = malloc((strlen(orig) + 1) * sizeof(char));
+    strcpy(copy, orig);
+    free(junk);
+    while (pthread_mutex_unlock(&mylock));
+
+    return copy;
+}
+
+int exists(char *filename)
+{
+    FILE *fp;
+
+    if (!(fp = fopen(filename, "r"))) return 0;
+    fclose(fp);
+    return 1;
 }
 
 // #if ((LIBXML_VERSION < 20609) || ((LIBXML_VERSION == 20609) && !defined(__APPLE__)))

@@ -4,7 +4,7 @@
 # Synopsis: Holds struct info parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/13 04:59:12 $
+# Last Updated: $Date: 2004/10/13 00:09:33 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -38,7 +38,7 @@ use HeaderDoc::APIOwner;
 @ISA = qw( HeaderDoc::HeaderElement );
 
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.11.2.10.2.25 $';
 
 use strict;
 
@@ -121,7 +121,14 @@ sub processComment {
 
 	print "FIELD WAS $field\n" if ($localDebug);
 	SWITCH: {
-            ($field =~ /^\/\*\!/o)&& do {last SWITCH;}; # ignore opening /*!
+            ($field =~ /^\/\*\!/o)&& do {
+                                my $copy = $field;
+                                $copy =~ s/^\/\*\!\s*//s;
+                                if (length($copy)) {
+                                        $self->discussion($copy);
+                                }
+                        last SWITCH;
+                        };
             (($field =~ s/^struct(\s+)/$1/o)  || ($field =~ s/^union(\s+)/$1/o))&& 
             do {
                 my ($name, $disc);

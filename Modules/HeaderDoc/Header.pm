@@ -4,7 +4,7 @@
 # Synopsis: Holds header-wide comments parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/13 04:59:12 $
+# Last Updated: $Date: 2004/10/04 23:11:19 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -41,7 +41,7 @@ use HeaderDoc::APIOwner;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.11.2.9.2.20 $';
 
 # Inheritance
 @ISA = qw( HeaderDoc::APIOwner );
@@ -132,27 +132,6 @@ sub classes {
         @{ $self->{CLASSES} } = @_;
     }
     ($self->{CLASSES}) ? return @{ $self->{CLASSES} } : return ();
-}
-
-sub currentClass {
-    my $self = shift;
-
-    if (@_) {
-        @{ $self->{CURRENTCLASS} } = @_;
-    }
-    return @{ $self->{CURRENTCLASS} };
-}
-
-sub addToClasses {
-    my $self = shift;
-
-    if (@_) {
-        foreach my $item (@_) {
-            $self->currentClass($item);
-            push (@{ $self->{CLASSES} }, $item);
-        }
-    }
-    return @{ $self->{CLASSES} };
 }
 
 sub protocolsDir {
@@ -376,8 +355,13 @@ sub HTMLmeta {
 		$self->{HTMLMETA} .= "<meta name=\"$name\" content=\"$text\">\n";
 	}
     }
-    
-    return $self->{HTMLMETA};
+
+    my $extendedmeta = $self->{HTMLMETA};
+    my $encoding = $self->encoding();
+
+    $extendedmeta .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=$encoding\">\n";
+
+    return $extendedmeta;
 }
 
 sub metaFileText {
@@ -461,29 +445,6 @@ sub writeHeaderElementsToCompositePage {
     }
 }
 
-sub writeClasses {
-    my $self = shift;
-    my @classObjs = $self->classes();
-    my $classRootDir = $self->classesDir();
-
-    my @tempobjs = ();
-    if ($HeaderDoc::sort_entries) {
-	@tempobjs = sort objName @classObjs;
-    } else {
-	@tempobjs = @classObjs;
-    }
-    foreach my $obj (@tempobjs) {
-        my $className = $obj->name();
-        # for now, always shorten long names since some files may be moved to a Mac for browsing
-        if (1 || $isMacOS) {$className = &safeName(filename => $className);};
-        $obj->outputDir("$classRootDir$pathSeparator$className");
-        $obj->createFramesetFile();
-        $obj->createContentFile() if (!$HeaderDoc::ClassAsComposite);
-        $obj->createTOCFile();
-        $obj->writeHeaderElements(); 
-    }
-}
-
 sub writeProtocols {
     my $self = shift;
     my @protocolObjs = $self->protocols();
@@ -554,7 +515,7 @@ sub docNavigatorComment {
 sub objName { # used for sorting
     my $obj1 = $a;
     my $obj2 = $b;
-    return ($obj1->name() cmp $obj2->name());
+    return (lc($obj1->name()) cmp lc($obj2->name()));
 }
 
 ##################### Debugging ####################################

@@ -2,7 +2,7 @@
 # Utilities.pm
 # 
 # Common subroutines
-# Last Updated: $Date: 2004/06/14 17:18:26 $
+# Last Updated: $Date: 2005/01/15 01:41:55 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -36,7 +36,7 @@ foreach (qw(Mac::Files Mac::MoreFiles)) {
     eval "use $_";
 }
 
-$VERSION = 1.02;
+$VERSION = '$Revision: 1.11.2.4.2.35 $';
 @ISA = qw(Exporter);
 @EXPORT = qw(findRelativePath safeName safeNameNoCollide linesFromFile makeAbsolutePath
              printHash printArray fileNameFromPath folderPathForFile convertCharsForFileMaker 
@@ -44,7 +44,8 @@ $VERSION = 1.02;
              getAPINameAndDisc openLogs
              logMsg logMsgAndWarning logWarning logToAllFiles closeLogs
              registerUID resolveLink quote parseTokens isKeyword html2xhtml
-             resolveLinks stringToFields sanitize);
+             resolveLinks stringToFields sanitize warnHDComment
+             classTypeFromFieldAndBPinfo get_super casecmp unregisterUID);
 
 my %uid_list = ();
 my %uid_conflict = ();
@@ -451,16 +452,17 @@ sub resolveLink
     return $ret;
 }
 
-sub registerUID
+sub registerUID($$)
 {
     # This is now classless.
     # my $self = shift;
     my $uid = shift;
+    my $name = shift;
     my $localDebug = 0;
 
     print "registered UID $uid\n" if ($localDebug);
-    my $name = $uid;
-    $name =~ s/.*\///so;
+    # my $name = $uid;
+    # $name =~ s/.*\///so;
 
     my $old_uid = $uid_list{$name};
     if ($old_uid && length($old_uid) && $old_uid ne $uid) {
@@ -469,6 +471,20 @@ sub registerUID
     }
     $uid_list{$name} = $uid;
     # push(@uid_list, $uid);
+}
+
+sub unregisterUID
+{
+    my $uid = shift;
+    my $name = shift;
+    my $old_uid = $uid_list{$name};
+
+    if ($uid_list{$name} eq $uid) {
+	$uid_list{$name} = undef;
+	return 1;
+    }
+
+    return 0;
 }
 
 sub quote
@@ -509,6 +525,7 @@ sub parseTokens
     my $lang = shift;
     my $sublang = shift;
 
+    my $localDebug = 0;
     my $sotemplate = "";
     my $eotemplate = "";
     my $soc = "";
@@ -527,6 +544,12 @@ sub parseTokens
     my $constname = "";
     my $structisbrace = 0;
     my %macronames = ();
+    my $classregexp = "";
+    my $classbraceregexp = "";
+    my $classclosebraceregexp = "";
+    my $accessregexp = "";
+
+    print "PARSETOKENS FOR lang: $lang sublang: $sublang\n" if ($localDebug);
 
     if ($lang eq "perl" || $lang eq "shell") {
 	$sotemplate = "";
@@ -564,13 +587,27 @@ sub parseTokens
 	$structisbrace = 1;
     } else {
 	# C and derivatives, plus PHP and Java(script)
-	if ($lang eq "C") {
-		if ($sublang eq "cpp") {
+	$classregexp = "^(class)\$";
+	if ($lang eq "C" && $sublang ne "php") {
+		# if ($sublang eq "cpp" || $sublang eq "C") {
 			$sotemplate = "<";
 			$eotemplate = ">";
-		}
+			$accessregexp = "^(public|private|protected)\$";
+		# }
 		$operator = "operator";
 		$sopreproc = "#";
+	} elsif ($lang eq "MIG") {
+		$sopreproc = "#";
+	}
+	if ($lang eq "C" && $sublang ne "php") { # if ($sublang eq "occ" || $sublang eq "C") {
+		$classregexp = "^(class|\@class|\@interface|\@protocol)\$";
+		$classbraceregexp = "^(\@interface|\@protocol)\$";
+		$classclosebraceregexp = "^(\@end)\$";
+	}
+	if ($lang eq "java" && $sublang eq "java") {
+		$accessregexp = "^(public|private|protected|package)\$";
+	} elsif ($sublang eq "php") {
+		$accessregexp = "^(public|private|protected)\$";
 	}
 	$soc = "/*";
 	$eoc = "*/";
@@ -596,9 +633,18 @@ sub parseTokens
 		%macronames = ( "#if" => 1, "#ifdef" => 1, "#ifndef" => 1, "#endif" => 1, "#else" => 1, "#pragma" => 1, "#import" => 1, "#include" => 1, "#define"  => 1);
 	}
     }
+
+    $HeaderDoc::socquot = $soc;
+    $HeaderDoc::socquot =~ s/(\W)/\\$1/sg;
+    $HeaderDoc::eocquot = $eoc;
+    $HeaderDoc::eocquot =~ s/(\W)/\\$1/sg;
+    $HeaderDoc::ilcquot = $ilc;
+    $HeaderDoc::ilcquot =~ s/(\W)/\\$1/sg;
+
     return ($sotemplate, $eotemplate, $operator, $soc, $eoc, $ilc, $sofunction,
 	$soprocedure, $sopreproc, $lbrace, $rbrace, $unionname, $structname,
-	$typedefname, $varname, $constname, $structisbrace, \%macronames);
+	$typedefname, $varname, $constname, $structisbrace, \%macronames,
+	$classregexp, $classbraceregexp, $classclosebraceregexp, $accessregexp);
 }
 
 sub isKeyword
@@ -752,21 +798,25 @@ sub stringToFields($$$)
 	my $filename = shift;
 	my $linenum = shift;
 
-	my @fields = split(/\@/, $line);
+	my $localDebug = 0;
+
+	print "LINE WAS: \"$line\"\n" if ($localDebug);
+
+	my @fields = split(/\@/s, $line);
 	my @newfields = ();
 	my $lastappend = "";
 	my $in_textblock = 0;
 	my $in_link = 0;
-	my $localDebug = 0;
+	my $lastlinkfield = "";
 
 	foreach my $field (@fields) {
 	  print "processing $field\n" if ($localDebug);
 	  if ($in_textblock) {
-	    if ($field =~ /^\/textblock/o) {
+	    if ($field =~ /^\/textblock/so) {
 		print "out of textblock\n" if ($localDebug);
 		if ($in_textblock == 1) {
 		    my $cleanfield = $field;
-		    $cleanfield =~ s/^\/textblock//io;
+		    $cleanfield =~ s/^\/textblock//sio;
 		    $lastappend .= $cleanfield;
 		    push(@newfields, $lastappend);
 		    print "pushed \"$lastappend\"\n" if ($localDebug);
@@ -775,24 +825,25 @@ sub stringToFields($$$)
 		$in_textblock = 0;
 	    } else {
 		# clean up text block
-		$field =~ s/\</\&lt\;/go;
-		$field =~ s/\>/\&gt\;/go;
+		$field =~ s/\</\&lt\;/sgo;
+		$field =~ s/\>/\&gt\;/sgo;
 		$lastappend .= "\@$field";
 		print "new field is \"$lastappend\"\n" if ($localDebug);
 	    }
 	  } else {
-	    # if ($field =~ /value/o) { warn "field was $field\n"; }
+	    # if ($field =~ /value/so) { warn "field was $field\n"; }
 	    if ($field =~ s/^value/<hd_value\/>/sio) {
 		$lastappend = pop(@newfields);
 	    }
 	    if ($field =~ s/^inheritDoc/<hd_ihd\/>/sio) {
 		$lastappend = pop(@newfields);
 	    }
-	    # if ($field =~ /value/o) { warn "field now $field\n"; }
-	    if ($field =~ s/^\/link/<\/hd_link>/io) {
+	    # if ($field =~ /value/so) { warn "field now $field\n"; }
+	    if ($field =~ s/^\/link/<\/hd_link>/sio) {
 		$in_link = 0;
 	    }
-	    if ($field =~ s/^link\s+//io) {
+	    if ($field =~ s/^link\s+//sio) {
+		$lastlinkfield = $field;
 		$in_link = 1;
 		my $target = "";
 		my $lastfield;
@@ -804,7 +855,7 @@ sub stringToFields($$$)
 		}
 		# print "lastfield is $lastfield";
 		$lastappend .= $lastfield; 
-		if ($field =~ /^(\S*?)\s/o) {
+		if ($field =~ /^(\S*?)\s/so) {
 		    $target = $1;
 		} else {
 		    # print "$filename:$linenum:MISSING TARGET FOR LINK!\n";
@@ -813,12 +864,12 @@ sub stringToFields($$$)
 		my $localDebug = 0;
 		print "target $target\n" if ($localDebug);
 		my $qtarget = quote($target);
-		$field =~ s/^$qtarget//g;
-		$field =~ s/\\$/\@/o;
+		$field =~ s/^$qtarget//sg;
+		$field =~ s/\\$/\@/so;
 		print "name $field\n" if ($localDebug);
 		$lastappend .= "<hd_link posstarget=\"$target\">";
 		$lastappend .= "$field";
-	    } elsif ($field =~ /^textblock\s/io) {
+	    } elsif ($field =~ /^textblock\s/sio) {
 		if ($lastappend eq "") {
 		    $in_textblock = 1;
 		    print "in textblock\n" if ($localDebug);
@@ -827,13 +878,13 @@ sub stringToFields($$$)
 		    $in_textblock = 2;
 		    print "in textblock (continuation)\n" if ($localDebug);
 		}
-		$field =~ s/^textblock\s+//io;
+		$field =~ s/^textblock\s+//sio;
 		# clean up text block
-		$field =~ s/\</\&lt\;/go;
-		$field =~ s/\>/\&gt\;/go;
+		$field =~ s/\</\&lt\;/sgo;
+		$field =~ s/\>/\&gt\;/sgo;
 		$lastappend .= "$field";
 		print "in textblock.\n" if ($localDebug);
-	    } elsif ($field =~ s/\\$/\@/o) {
+	    } elsif ($field =~ s/\\$/\@/so) {
 		$lastappend .= $field;
 	    } elsif ($lastappend eq "") {
 		push(@newfields, $field);
@@ -848,12 +899,20 @@ sub stringToFields($$$)
 	    push(@newfields, $lastappend);
 	}
 	if ($in_link) {
-		warn "$filename:$linenum:Unterminated \@link tag\n";
+		warn "$filename:$linenum:Unterminated \@link tag (starting field was: $lastlinkfield)\n";
 	}
 	if ($in_textblock) {
 		warn "$filename:$linenum:Unterminated \@textblock tag\n";
 	}
 	@fields = @newfields;
+
+	if ($localDebug) {
+		print "FIELDS:\n";
+		for my $field (@fields) {
+			print "$field\n";
+		}
+	}
+
 	return \@fields;
 }
 
@@ -884,7 +943,7 @@ if ($string =~ /^\w*$/o) { return $string; }
 		$newstring .= $part;
 	# } elsif ($part =~ /\s/o) {
 		# $newstring .= $part;
-	} elsif ($part =~ /[\-\_\+\!\*\(\)]/o) {
+	} elsif ($part =~ /[\~\:\,\.\-\_\+\!\*\(\)\/]/o) {
 		# We used to exclude '$' as well, but this
 		# confused libxml2's HTML parser.
 		$newstring .= $part;
@@ -898,6 +957,287 @@ if ($string =~ /^\w*$/o) { return $string; }
 
     return $prepart.$newstring.$postpart;
 }
+
+# /*! @function nestignore
+#     This function includes a list of headerdoc tags that are legal
+#     within a headerdoc documentation block (e.g. a C struct)
+#     such as parameters, etc.
+#
+#     The block parser support aspects of this function are
+#     deprecated, as the calls to warnHDComment within the block
+#     parser no longer exists.  Most calls to warnHDComment from
+#     headerDoc2HTML.pl should always result in an error (since
+#     they only occur outside the context of a declaration.
+#
+#     The exception is test point 12, which can cause false
+#     positives for \@defineblock blocks.
+#  */
+sub nestignore
+{
+    my $tag = shift;
+    my $dectype = shift;
+
+# print "DT: $dectype TG: $tag\n";
+
+    # defineblock can only be passed in for debug point 12, so
+    # this can't break anything.
+
+    if ($dectype =~ /defineblock/o && $tag =~ /^\@define/o) {
+	$HeaderDoc::nodec = 1;
+	return 1;
+    }
+
+
+    return 0;
+
+    # Old blockparser support logic.  Removed, since it broke other things.
+    # if ($dectype =~ /(function|method|typedef)/o && $tag =~ /^\@param/o) {
+	# return 1;
+    # } elsif ($dectype =~ /\#define/o && $tag =~ /^\@define/o) {
+	# return 1;
+    # } elsif ($dectype !~ /(typedef|struct)/o && $tag =~ /^\@callback/o) {
+	# return 1;
+    # } elsif ($dectype !~ /(class|function|method|define)/o && $tag =~ /^\@field/o) {
+	# return 1;
+    # } elsif ($dectype !~ /(class|function|method|define)/o && $tag =~ /^\@constant/o) {
+	# return 1;
+    # }
+
+    # return 0;
+}
+
+# /*! @function warnHDComment
+#     @param teststring string to be checked for headerdoc markup
+#     @param linenum line number
+#     @param dectype declaration type
+#     @param dp debug point string
+#  */
+sub warnHDComment
+{
+    my $linearrayref = shift;
+    my $blocklinenum = shift;
+    my $blockoffset = shift;
+    my $dectype = shift;
+    my $dp = shift;
+    my $optional_lastComment = shift;
+
+    my $filename = $HeaderDoc::headerObject->filename();
+    my $localDebug = 2; # Set to 2 so I wouldn't keep turning this off.
+    my $rawLocalDebug = 0;
+    my $maybeblock = 0;
+
+print "DT: $dectype\n" if ($rawLocalDebug);
+
+    if ($dectype =~ /blockMode:\#define/) {
+	# print "DEFBLOCK?\n";
+	$maybeblock = 1;
+    }
+    # if ($dectype =~ /blockMode:#define/ && ($tag =~ /^\@define/i || $tag !~ /^\@/)) {
+	# return 2;
+    # }
+
+    my $line = ${$linearrayref}[$blocklinenum];
+    my $linenum = $blocklinenum + $blockoffset;
+
+	print "LINE WAS $line\n" if ($rawLocalDebug);
+
+    my $isshell = 0;
+
+    my $socquot = $HeaderDoc::socquot;
+    my $ilcquot = $HeaderDoc::ilcquot;
+    my $indefineblock = 0;
+
+    if ($optional_lastComment =~ /\s*\/\*\!\s*\@define(d)?block\s+/) {
+	print "INBLOCK\n" if ($rawLocalDebug);
+	$indefineblock = 1;
+	$dectype = "defineblock";
+    } else {
+	print "optional_lastComment: $optional_lastComment\n" if ($rawLocalDebug);
+    }
+
+    if (($HeaderDoc::lang eq "shell") || ($HeaderDoc::lang eq "perl")) {
+	$isshell = 1;
+    }
+
+    my $debugString = "";
+    if ($localDebug) { $debugString = " [debug point $dp]"; }
+
+    if ((!$isshell && $line =~ /$socquot\!(.*)$/o) || ($isshell && $line =~ /$ilcquot\s*\/\*\!(.*)$/o)) {
+	my $rest = $1;
+
+	$rest =~ s/^\s*//so;
+	$rest =~ s/\s*$//so;
+
+	while (!length($rest) && ($blocklinenum < scalar(@{$linearrayref}))) {
+		$blocklinenum++;
+		$rest = ${$linearrayref}[$blocklinenum];
+		$rest =~ s/^\s*//so;
+		$rest =~ s/\s*$//so;
+	}
+
+	print "REST: $rest\nDECTYPE: $dectype\n" if ($rawLocalDebug);
+
+	if ($rest =~ /^\@/o) {
+		 if (nestignore($rest, $dectype)) {
+#print "IGNORE\n" if ($rawLocalDebug);
+			return 0;
+		}
+	} else {
+		printf("Nested headerdoc markup with no tag.\n") if ($rawLocalDebug);
+	}
+
+	if (!$HeaderDoc::ignore_apiuid_errors) {
+		warn("$filename:$linenum: WARNING: Unexpected headerdoc markup found in $dectype declaration$debugString.  Output may be broken.\n");
+	}
+	if ($maybeblock) {
+		if ($rest =~ /^\s*\@define(d?)\s+/) {
+			return 2;
+		}
+		if ($rest =~ /^\s*[^\@\s]/) {
+			return 2;
+		}
+	}
+	return 1;
+    }
+#print "OK\n";
+    return 0;
+}
+
+sub get_super {
+    my $classType = shift;
+    my $dec = shift;
+    my $super = "";
+    my $localDebug = 0;
+
+    print "GS: $dec EGS\n" if ($localDebug);
+
+    $dec =~ s/\n/ /smgo;
+
+    if ($classType =~ /^occ/o) {
+	if ($dec !~ s/^\s*\@interface\s*//so) {
+	    if ($dec !~ s/^\s*\@protocol\s*//so) {
+	    	$dec =~ s/^\s*\@class\s*//so;
+	    }
+	}
+	if ($dec =~ /(\w+)\s*\(\s*(\w+)\s*\)/o) {
+	    $super = $1; # delegate is $2
+        } elsif (!($dec =~ s/.*?://so)) {
+	    $super = "";
+	} else {
+	    $dec =~ s/\(.*//sgo;
+	    $dec =~ s/\{.*//sgo;
+	    $super = $dec;
+	}
+    } elsif ($classType =~ /^cpp$/o) {
+	$dec =~ s/^\s*\class\s*//so;
+        if (!($dec =~ s/.*?://so)) {
+	    $super = "";
+	} else {
+	    $dec =~ s/\(.*//sgo;
+	    $dec =~ s/\{.*//sgo;
+	    $dec =~ s/^\s*//sgo;
+	    $dec =~ s/^public//go;
+	    $dec =~ s/^private//go;
+	    $dec =~ s/^protected//go;
+	    $dec =~ s/^virtual//go;
+	    $super = $dec;
+	}
+    }
+
+    $super =~ s/^\s*//o;
+    $super =~ s/\s.*//o;
+
+    print "$super is super\n" if ($localDebug);
+    return $super;
+}
+
+# /*!
+#      <code>classTypeFromFieldAndBPinfo</code> takes the type requested
+#      in the headerdoc comment (or "auto" if none requested), the
+#      type returned by the block parser, and the declaration (or the
+#      first few bytes thereof) and determines what HeaderDoc object
+#      should be created.
+# 
+# <pre>
+#      Matching list:
+#        HD                    CODE                    Use
+#        @class                @class                  ObjCCategory (gross)
+#                                                      /|\ should be ObjCClass?
+#        @class                class                   CPPClass
+#        @class                typedef struct          CPPClass
+#        @class                @interface              ObjCClass
+#        @category             @interface              ObjCCategory
+#        @protocol             @protocol               ObjCProtocol
+#        auto                  @interface name : ...   ObjCClass
+#        auto                  @interface name(...)    ObjCCategory
+#        auto                  @protocol               ObjCProtocol
+#        auto                  class                   CPPClass
+# </pre>
+#  */
+sub classTypeFromFieldAndBPinfo
+{
+	my $classKeyword = shift;
+	my $classBPtype = shift;
+	my $classBPdeclaration = shift;
+	my $filename = shift;
+	my $linenum = shift;
+	my $sublang = shift;
+
+	my $deccopy = $classBPdeclaration;
+	$deccopy =~ s/[\n\r]/ /s;
+	$deccopy =~ s/\{.*$//sg;
+	$deccopy =~ s/\).*$//sg;
+	$deccopy =~ s/;.*$//sg;
+
+	# print "DC: $deccopy\n";
+	# print "CBPT: $classBPtype\n";
+
+	SWITCH: {
+		($classBPtype =~ /^\@protocol/) && do { return "intf"; };
+		($classKeyword =~ /category/) && do { return "occCat"; };
+		# ($classBPtype =~ /^\@class/) && do { return "occCat"; };
+		($classBPtype =~ /^\@class/) && do { return "occ"; };
+		($classBPtype =~ /^\@interface/) && do {
+				if ($classKeyword =~ /class/) {
+					return "occ";
+				} elsif ($deccopy =~ /\:/s) {
+					# print "CLASS: $deccopy\n";
+					return "occ";
+				} elsif ($deccopy =~ /\(/s) {
+					# print "CATEGORY: $deccopy\n";
+					return "occCat";
+				} else {
+					last SWITCH;
+				}
+			};
+		($classKeyword =~ /class/) && do { return $sublang; };
+		($classBPtype =~ /typedef/) && do { return "C"; };
+		($classBPtype =~ /struct/) && do { return "C"; };
+		($classBPtype =~ /class/) && do { return $sublang; };
+	}
+	warn "$filename:$linenum:Unable to determine class type.\n";
+	warn "KW: $classKeyword\n";
+	warn "BPT: $classBPtype\n";
+	warn "DEC: $deccopy\n";
+	return "cpp";
+}
+
+sub casecmp
+{
+    my $a = shift;
+    my $b = shift;
+    my $case = shift;
+
+    if ($case) {
+	if (($a eq $b) && ($a ne "") && ($b ne "")) { return 1; }
+    } else {
+	my $bquot = quote($b);
+	if (($a =~ /^$bquot$/) && ($a ne "") && ($b ne "")) { return 1; }
+    }
+
+    return 0;
+}
+
 
 1;
 

@@ -1687,9 +1687,7 @@ typedef struct IOFireWireCommandInterface_t
 		@param self The command object interface of interest
 		@result An IOReturn error code indicating the completion error (if any) returned the last
 			time this command object was executed	*/
-		/*
 		IOReturn (*GetStatus)(IOFireWireLibCommandRef	self) ;
-		*/
 
 	/*!	@function GetTransferredBytes
 		@abstract Return number of bytes transferred by this command object when it last completed
@@ -1734,9 +1732,7 @@ typedef struct IOFireWireCommandInterface_t
 		</table>
 		@param self The command object interface of interest
 		@result A UInt32 containing the bytes transferred value	*/
-		/*
 		UInt32				(*GetTransferredBytes)(IOFireWireLibCommandRef self) ;
-		*/
 		
 	/*!	@function GetTargetAddress
 		@abstract Get command target address.
@@ -1780,9 +1776,7 @@ typedef struct IOFireWireCommandInterface_t
 		</table>
 		@param self The command object interface of interest
 		@param outAddr A pointer to an FWAddress to contain the function result. */
-		/*
 		void				(*GetTargetAddress)(IOFireWireLibCommandRef self, FWAddress* outAddr) ;
-		*/
 	
 	/*!	@function SetTarget
 		@abstract Set command target address
@@ -1826,9 +1820,7 @@ typedef struct IOFireWireCommandInterface_t
 		</table>
 		@param self The command object interface of interest
 		@param addr A pointer to an FWAddress. */
-		/*
 		void				(*SetTarget)(IOFireWireLibCommandRef self, const FWAddress* addr) ;
-		*/
 
 	/*!	@function SetGeneration
 		@abstract Set FireWire bus generation for which the command object shall be valid.
@@ -1875,9 +1867,7 @@ typedef struct IOFireWireCommandInterface_t
 		@param self The command object interface of interest
 		@param generation A bus generation. The current bus generation can be obtained
 			from IOFireWireDeviceInterface::GetGenerationAndNodeID().	*/
-		/*
 		void				(*SetGeneration)(IOFireWireLibCommandRef self, UInt32 generation) ;
-		*/
 		
 	/*!	@function SetCallback
 		@abstract Set the completion handler to be called once the command completes
@@ -1923,9 +1913,7 @@ typedef struct IOFireWireCommandInterface_t
 		@param self The command object interface of interest
 		@param inCallback A callback handler. Passing nil forces the command object to 
 			execute synchronously. */
-		/*
 		void				(*SetCallback)(IOFireWireLibCommandRef self, IOFireWireLibCommandCallback inCallback) ;
-		*/
 		
 	/*!	@function SetRefCon
 		@abstract Set the user refCon value. This is the user defined value that will be passed
@@ -1968,9 +1956,7 @@ typedef struct IOFireWireCommandInterface_t
 				<td>YES</td>
 			</tr>
 		</table> */
-		/*
 		void				(*SetRefCon)(IOFireWireLibCommandRef self, void* refCon) ;
-		*/
 		
 	/*!	@function IsExecuting
 		@abstract Is this command object currently executing?
@@ -2014,9 +2000,7 @@ typedef struct IOFireWireCommandInterface_t
 		</table>
 		@param self The command object interface of interest
 		@result Returns true if the command object is executing.	*/
-		/*
 		const Boolean		(*IsExecuting)(IOFireWireLibCommandRef self) ;
-		*/
 		
 	/*!	@function Submit
 		@abstract Submit this command object to FireWire for execution.
@@ -2061,9 +2045,7 @@ typedef struct IOFireWireCommandInterface_t
 		@param self The command object interface of interest
 		@result An IOReturn result code indicating whether or not the command was successfully
 			submitted */
-		/*
 		IOReturn			(*Submit)(IOFireWireLibCommandRef self) ;
-		*/
 		
 	/*!	@function SubmitWithRefconAndCallback
 		@abstract Set the command refCon value and callback handler, and submit the command
@@ -2109,9 +2091,7 @@ typedef struct IOFireWireCommandInterface_t
 		@param self The command object interface of interest
 		@result An IOReturn result code indicating whether or not the command was successfully
 			submitted	*/
-		/*
 		IOReturn			(*SubmitWithRefconAndCallback)(IOFireWireLibCommandRef self, void* refCon, IOFireWireLibCommandCallback inCallback) ;
-		*/
 		
 	/*!	@function Cancel
 		@abstract Cancel command execution
@@ -2155,9 +2135,7 @@ typedef struct IOFireWireCommandInterface_t
 		</table>
 		@param self The command object interface of interest
 		@result An IOReturn result code	*/
-		/*
 		IOReturn			(*Cancel)(IOFireWireLibCommandRef self, IOReturn reason) ;
-		*/
 		
 	IOFIREWIRELIBCOMMAND_C_GUTS ;
 
@@ -2205,9 +2183,7 @@ typedef struct IOFireWireCommandInterface_t
 		@param self The command object interface of interest
 		@param size Size in bytes of the receive buffer.
 		@param buf A pointer to the receive buffer. */
-		/*
 		void 				(*SetBuffer)(IOFireWireLibCommandRef self, UInt32 size, void* buf) ;
-		*/
 		
 	/*!	@function GetBuffer
 		@abstract Set the command refCon value and callback handler, and submit the command
@@ -2251,9 +2227,7 @@ typedef struct IOFireWireCommandInterface_t
 			</tr>
 		</table>
 		@param self The command object interface of interest */
-		/*
 		void 				(*GetBuffer)(IOFireWireLibCommandRef self, UInt32* outSize, void** outBuf) ;
-		*/
 		
 	/*!	@function SetMaxPacket
 		@abstract Set the maximum size in bytes of packets transferred by this command.
@@ -2300,9 +2274,7 @@ typedef struct IOFireWireCommandInterface_t
 			by this command.
 		@result An IOReturn result code indicating whether or not the command was successfully
 			submitted	*/
-		/*
 		IOReturn			(*SetMaxPacket)(IOFireWireLibCommandRef self, IOByteCount maxPacketSize) ;
-		*/
 		
 	/*!	@function SetFlags
 		@abstract Set flags governing this command's execution.
@@ -2364,9 +2336,7 @@ typedef struct IOFireWireCommandInterface_t
 					can avoid kernel transitions associated with asynchronous completion and often
 					remove the need for a state machine.</li>
 			</ul>*/
-		/*
 		void				(*SetFlags)(IOFireWireLibCommandRef self, UInt32 inFlags) ;
-		*/
 	IOFIREWIRELIBCOMMAND_C_GUTS_v2 ;
 
 } IOFireWireCommandInterface ;

@@ -1,5 +1,6 @@
 /*! @header TypeDefTest.h
     @discussion This header tests the supported types of typedef declarations, along with their corresponding HeaderDoc tags.    
+    @charset iso-8859-1
 */
 
 /*!

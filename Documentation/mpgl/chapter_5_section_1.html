@@ -1,10 +1,12 @@
 <html>
     <head>
         <META NAME="Generator" CONTENT="Gutenberg">
-		<META NAME="GeneratorVersion" CONTENT="v100.1">
+		<META NAME="GeneratorVersion" CONTENT="v103.5
+">
         <META http-equiv="content-type" CONTENT="text/html;charset=iso-8859-1">
         <META NAME = "Copyright" CONTENT="Copyright 2004 Apple Computer, Inc. All Rights Reserved.">
-        <TITLE>Tools: HeaderDoc Unfettered: Using the MPGL Suite</TITLE>
+        <META NAME="IndexTitle" CONTENT="Using the MPGL Suite">
+        <TITLE>Tools: HeaderDoc User's Guide: Using the MPGL Suite</TITLE>
         <base target="content">
 
         <LINK REL="stylesheet" TYPE="text/css" HREF="../Resources/CSS/frameset_styles.css">
@@ -19,7 +21,7 @@
         <!-- end of header -->
         
         <!-- start of path -->
-<div class="breadcrumb"><a href="http://developer.apple.com/" target="_top">ADC Home</a> &gt; <!--a logicalPath="//apple_ref/doc/uid/TP30000943"  -->Reference Library<!--/a--> &gt; <!--a logicalPath="//apple_ref/doc/uid/TP30000440"  -->Documentation<!--/a--> &gt; <!--a logicalPath="//apple_ref/doc/uid/TP30000436"  -->Tools<!--/a--> &gt; <a logicalPath="//apple_ref/doc/uid/TP40001215-CH345" href="../intro/chapter_1_section_1.html#//apple_ref/doc/uid/TP40001215-CH345">HeaderDoc Unfettered</a> &gt; </div><br>
+<div class="breadcrumb"><a href="http://developer.apple.com/" target="_top">ADC Home</a> &gt; <!--a logicalPath="//apple_ref/doc/uid/TP30000943"  -->Reference Library<!--/a--> &gt; <!--a logicalPath="//apple_ref/doc/uid/TP30000440"  -->Documentation<!--/a--> &gt; <!--a logicalPath="//apple_ref/doc/uid/TP30000436"  -->Tools<!--/a--> &gt; <!--a logicalPath="//apple_ref/doc/uid/TP30000436-TP30000502"  -->Darwin<!--/a--> &gt; <a logicalPath="//apple_ref/doc/uid/TP40001215-CH345" href="../intro/chapter_1_section_1.html#//apple_ref/doc/uid/TP40001215-CH345">HeaderDoc User's Guide</a> &gt; </div><br>
 <!-- end of path -->
         
         <table width="100%" cellpadding=0 cellspacing=0 border=0 class="mini_nav_text"><tr>
@@ -48,8 +50,8 @@
         
         <hr>
         
-        <a name="//apple_ref/doc/uid/TP40001215-CH357-CDEBBJJA" turn_anchor="no"></a><a name="CDEBBJJA" turn_anchor="no"></a><h1 class="page_title">Using the MPGL
-Suite</h1><p>In addition to the main <code>headerDoc2HTML</code> and <code>gatherHeaderDoc</code> scripts,
+        <a name="//apple_ref/doc/uid/TP40001215-CH357-CDEBBJJA" turn_anchor="no"></a><a name="CDEBBJJA" turn_anchor="no"></a><span class="page_title">Using the MPGL
+Suite</span><p>In addition to the main <code>headerDoc2HTML</code> and <code>gatherHeaderDoc</code> scripts,
 the HeaderDoc suite contains additional utilities for generating
 manual pages (using the mdoc macro set).</p>
 <p>The Man Page Generation Language (MPGL) suite contains two
@@ -60,7 +62,7 @@ The <code>hdxml2manxml</code> utility converts HeaderDoc
 XML output into a series of files that can then be processed using <code>xml2man</code>.</p>
 <p>Both commands have a very simple syntax. Neither takes any
 arguments.</p>
-<table><table cellpadding="8" width="100%" bgcolor="#F1F5F9" style="border: 1px solid #C9D1D7;"><tr><td scope="row"><table bgcolor="#F1F5F9" width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td><pre><code>hdxml2manxml filename1 filename2 ... filenameN</code></pre></td><td><code><pre></pre></code></td></tr><tr><td scope="row"><pre><code>xml2man inputfile.mxml [ outputfile.1 ]</code></pre></td><td><code><pre></pre></code></td></tr></table></td></tr></table></table>
+<table><table cellpadding="8" width="100%" bgcolor="#F1F5F9" style="border: 1px solid #C9D1D7;"><tr><td scope="row"><table bgcolor="#F1F5F9" width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td><pre><code>hdxml2manxml filename1 filename2 ... filenameN</code></pre></td><td><code><pre></pre></code></td></tr><tr><td scope="row"><pre><code>xml2man inputfile.mxml [ outputfile.1 ]</code></pre></td><td><code><pre></pre></code></td></tr></table></td></tr></table><br></table>
 <p>In the case of <code>xml2man</code>, the output filename
 is generally left blank.</p>
 <p>The remainder of this chapter describes the XML dialect used
@@ -70,27 +72,27 @@ by these utilities.</p>
 
 
 
-    <h4><b>Contents:</b></h4>
+    <h4>Contents:</h4>
     
     <blockquote class="content_text">
         
-            <a logicalPath="//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_1082" href="chapter_5_section_2.html#//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_1082">Man Page Generation Language (MPGL) Dialect</a>
+            <a logicalPath="//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_13" href="chapter_5_section_2.html#//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_13">Man Page Generation Language (MPGL) Dialect</a>
             
         <br>
 
-            <a logicalPath="//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_1083" href="chapter_5_section_3.html#//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_1083">A Simple Function Example</a>
+            <a logicalPath="//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_14" href="chapter_5_section_3.html#//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_14">A Simple Function Example</a>
             
         <br>
 
-            <a logicalPath="//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_1084" href="chapter_5_section_4.html#//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_1084">A Simple Command Example</a>
+            <a logicalPath="//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_15" href="chapter_5_section_4.html#//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_15">A Simple Command Example</a>
             
         <br>
 
-            <a logicalPath="//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_1085" href="chapter_5_section_5.html#//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_1085">A Multi-Command Example</a>
+            <a logicalPath="//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_16" href="chapter_5_section_5.html#//apple_ref/doc/uid/TP40001215-CH357-DontLinkElementID_16">A Multi-Command Example</a>
             
         <br>
 
-    </blockquote>
+    </blockquote><br>
 
 
 
@@ -122,7 +124,7 @@ by these utilities.</p>
         </td>
         </tr></table>
 
-        <br><hr><p class="content_text"> <!--#if expr="0=1" -->&#169; 1999, 2004 Apple Computer, Inc. All Rights Reserved. (<!--#endif -->Last updated: 2004-05-27<!--#if expr="0=1" -->)<!--#endif --></p>
+        <br><hr><div align="center"><p class="content_text"> <!--#if expr="0=1" -->&#169; 1999, 2004 Apple Computer, Inc. All Rights Reserved. &#40;<!--#endif -->Last updated: 2004-10-27<!--#if expr="0=1" -->&#041;<!--#endif --></p></div>
 
         
         <!-- start of footer -->

@@ -58,7 +58,7 @@ for frameworkline in $FRAMEWORKS ; do
 		fi
 		# ls $frameworkDir
 
-		./headerDoc2HTML.pl -H -O -o $outputDir $frameworkDir
+		./headerDoc2HTML.pl -H -O -p -o $outputDir $frameworkDir
 		./gatherHeaderDoc.pl $outputDir $frameworkName.html
 
 		if [ $delete == 1 ] ; then

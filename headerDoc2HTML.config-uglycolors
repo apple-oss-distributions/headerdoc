@@ -1,5 +1,5 @@
 # Configuration file for HeaderDoc
-# $Revision: 1.1.2.1 $
+# $Revision: 1.1.2.2 $
 ###########################################################
 copyrightOwner =>
 defaultFrameName => index.html
@@ -7,7 +7,7 @@ masterTOCName => masterTOC.html
 apiUIDPrefix => apple_ref
 ignorePrefixes =>
 htmlHeader => 
-dateFormat => M/D/Y
+dateFormat => %A, %B %d, %Y
 textStyle =>
 commentStyle => background:#ff00ff; color:#236e25
 preprocessorStyle => background:#ffffff; color:#236e25

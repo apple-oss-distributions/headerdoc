@@ -4,7 +4,7 @@
 # Synopsis: Abstract superclass for Header and OO structures
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/13 04:59:12 $
+# Last Updated: $Date: 2004/11/29 23:40:29 $
 # 
 # Method additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -40,12 +40,13 @@ BEGIN {
 use HeaderDoc::HeaderElement;
 use HeaderDoc::DBLookup;
 use HeaderDoc::Utilities qw(findRelativePath safeName getAPINameAndDisc convertCharsForFileMaker printArray printHash resolveLink quote sanitize);
+use HeaderDoc::BlockParse qw(blockParseOutside);
 use File::Basename;
 use Cwd;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.17.2.16.2.71 $';
 
 # Inheritance
 @ISA = qw(HeaderDoc::HeaderElement);
@@ -64,7 +65,7 @@ my $debugging = 0;
 my $theTime = time();
 my ($sec, $min, $hour, $dom, $moy, $year, @rest);
 ($sec, $min, $hour, $dom, $moy, $year, @rest) = localtime($theTime);
-$moy++;
+# $moy++;
 $year += 1900;
 my $dateStamp = HeaderDoc::HeaderElement::strdate($moy, $dom, $year);
 ######################################################################
@@ -191,6 +192,7 @@ sub _initialize {
     $self->{ISMERGED} = 0;
     $self->{CCLASS} = 0;
     $self->{HEADEROBJECT} = 0;
+    # $self->{ENCODING} = undef;
     $self->{CLASS} = "HeaderDoc::APIOwner";
 } 
 
@@ -300,6 +302,7 @@ sub clone {
     $clone->{ISFRAMEWORK} = $self->{ISFRAMEWORK};
     $clone->{ISMERGED} = $self->{ISMERGED};
     $clone->{CCLASS} = $self->{CCLASS};
+    $clone->{ENCODING} = $self->{ENCODING};
     $clone->{HEADEROBJECT} = $self->{HEADEROBJECT} = 0;
 
     return $clone;
@@ -313,6 +316,26 @@ sub CClass
 	$self->{CCLASS} = shift;
     }
     return $self->{CCLASS};
+}
+
+
+sub classType
+{
+    my $self = shift;
+    my $type = $self->{CLASS};
+
+    if ($type =~ /CPPClass/) {
+	if ($self->CClass()) { return "C"; }
+	return $self->sublang();
+    } elsif ($type =~ /ObjCProtocol/) {
+	return "intf";
+    } elsif ($type =~ /ObjCCategory/) {
+	return "occCat";
+    } elsif ($type =~ /ObjCClass/) {
+	return "occ";
+    } else {
+	warn "Couldn't determine my own class type....\n";
+    }
 }
 
 
@@ -406,13 +429,36 @@ sub categories
     return ();
 }
 
-# Add this as part of Java subclass support.
 # /*! @function addToClasses
-#     @abstract add to subclass list
+#     @abstract add to class list
+#     @discussion Both headers and classes can contain classes.  This
+#     function is used to handle both cases.
 #  */
-# sub addToClasses
-# {
-# }
+sub addToClasses {
+    my $self = shift;
+
+    if (@_) {
+        foreach my $item (@_) {
+	    # print "ADDING TO CLASSES: $item\n";
+	    # print "ref(\$item): ".ref($item)."\n";
+            $self->currentClass($item);
+            push (@{ $self->{CLASSES} }, $item);
+        }
+    }
+    return @{ $self->{CLASSES} };
+}
+
+# /*! Returns the last class being processed.
+#  */
+sub currentClass {
+    my $self = shift;
+
+    if (@_) {
+        @{ $self->{CURRENTCLASS} } = @_;
+    }
+    return @{ $self->{CURRENTCLASS} };
+}
+
 
 sub outputDir {
     my $self = shift;
@@ -440,6 +486,7 @@ sub outputDir {
 	    $self->pDefinesDir("$rootOutputDir$pathSeparator"."PDefines");
 	    $self->enumsDir("$rootOutputDir$pathSeparator"."Enums");
 	    $self->exportsDir("$rootOutputDir$pathSeparator"."Exports");
+	    $self->classesDir("$rootOutputDir$pathSeparator"."Classes");
     }
     return $self->{OUTPUTDIR};
 }
@@ -515,6 +562,15 @@ sub pDefinesDir {
         $self->{PDEFINESDIR} = shift;
     }
     return $self->{PDEFINESDIR};
+}
+
+sub classesDir {
+    my $self = shift;
+
+    if (@_) {
+        $self->{CLASSESDIR} = shift;
+    }
+    return $self->{CLASSESDIR};
 }
 
 sub enumsDir {
@@ -599,12 +655,13 @@ sub tocStringSub {
 		    # empty group
 		    next;
 		}
-		my $preface = "";
-		if ($group eq "") {
-			$preface = "&nbsp;&nbsp;";
+		my $preface = "&nbsp;&nbsp;";
+		my $entrypreface = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		# if ($done_one) { $tocString .= "&nbsp;<br>" }
+		if (!length($group)) {
+			# $entrypreface = $preface;
 		} else {
-			# if ($done_one) { $tocString .= "&nbsp;<br>" }
-			$tocString .= "<dl><dt>&nbsp;&nbsp;<font size=\"-1\"><i>$group:</i><br></font></dt><dd>";
+			$tocString .= "$preface<font size=\"-1\"><i>$group:</i></font><br>";
 		}
 
 		my @Cs;
@@ -647,12 +704,12 @@ sub tocStringSub {
 	        	my $name = $obj->name();
 			my $urlname = $obj->apiuid(); # sanitize($name);
 	        	if ($self->outputformat eq "hdxml") {
-	        	    $tocString .= "XMLFIX<nobr>$preface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        	    $tocString .= "XMLFIX<nobr>$entrypreface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 		        } elsif ($self->outputformat eq "html") {
 			    if ($composite) {
-	        		$tocString .= "<nobr>$preface<a href=\"$compositePageName#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        		$tocString .= "<nobr>$entrypreface<a href=\"$compositePageName#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 			    } else {
-	        		$tocString .= "<nobr>$preface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        		$tocString .= "<nobr>$entrypreface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 			    }
 			} else {
 			}
@@ -670,12 +727,12 @@ sub tocStringSub {
 	        	my $name = $obj->name();
 			my $urlname = $obj->apiuid(); # sanitize($name);
 	        	if ($self->outputformat eq "hdxml") {
-	        	    $tocString .= "XMLFIX<nobr>$preface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        	    $tocString .= "XMLFIX<nobr>$entrypreface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 		        } elsif ($self->outputformat eq "html") {
 			    if ($composite) {
-	        		$tocString .= "<nobr>$preface<a href=\"$compositePageName#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        		$tocString .= "<nobr>$entrypreface<a href=\"$compositePageName#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 			    } else {
-	        		$tocString .= "<nobr>$preface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        		$tocString .= "<nobr>$entrypreface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 			    }
 			} else {
 			}
@@ -700,12 +757,12 @@ sub tocStringSub {
 	        	my $name = $obj->name();
 			my $urlname = $obj->apiuid(); # sanitize($name);
 	        	if ($self->outputformat eq "hdxml") {
-	        	    $tocString .= "XMLFIX<nobr>$preface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        	    $tocString .= "XMLFIX<nobr>$entrypreface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 		        } elsif ($self->outputformat eq "html") {
 			    if ($composite) {
-	        		$tocString .= "<nobr>$preface<a href=\"$compositePageName#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        		$tocString .= "<nobr>$entrypreface<a href=\"$compositePageName#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 			    } else {
-	        		$tocString .= "<nobr>$preface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        		$tocString .= "<nobr>$entrypreface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 			    }
 			} else {
 			}
@@ -730,12 +787,12 @@ sub tocStringSub {
 	        	my $name = $obj->name();
 			my $urlname = $obj->apiuid(); # sanitize($name);
 		        if ($self->outputformat eq "hdxml") {
-	        	    $tocString .= "XMLFIX<nobr>$preface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        	    $tocString .= "XMLFIX<nobr>$entrypreface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 		        } elsif ($self->outputformat eq "html") {
 			    if ($composite) {
-	        		$tocString .= "<nobr>$preface<a href=\"$compositePageName#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        		$tocString .= "<nobr>$entrypreface<a href=\"$compositePageName#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 			    } else {
-	        		$tocString .= "<nobr>$preface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        		$tocString .= "<nobr>$entrypreface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 			    }
 			} else {
 			}
@@ -760,20 +817,20 @@ sub tocStringSub {
 	        	my $name = $obj->name();
 			my $urlname = $obj->apiuid(); # sanitize($name);
 	        	if ($self->outputformat eq "hdxml") {
-	        	    $tocString .= "XMLFIX<nobr>$preface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        	    $tocString .= "XMLFIX<nobr>$entrypreface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 		        } elsif ($self->outputformat eq "html") {
 			    if ($composite) {
-	        		$tocString .= "<nobr>$preface<a href=\"$compositePageName#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        		$tocString .= "<nobr>$entrypreface<a href=\"$compositePageName#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 			    } else {
-	        		$tocString .= "<nobr>$preface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        		$tocString .= "<nobr>$entrypreface<a href=\"$baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
 			    }
 			} else {
 			}
 	        }
 	      }
-	      if (!($group eq "")) {
-		$tocString .= "</dd></dl><p>\n";
-	      }
+	      # if (!($group eq "")) {
+		# $tocString .= "</dd></dl><p>\n";
+	      # }
 	 }
 
     return $tocString;
@@ -825,7 +882,7 @@ sub tocString {
     my @typedefs = $self->typedefs();
     my @structs = $self->structs();
     my @enums = $self->enums();
-    my @pDefines = $self->pDefines();
+    my @ALLpDefines = $self->pDefines();
     my @globals = $self->vars();
     my $tocString = "";
 
@@ -837,6 +894,13 @@ sub tocString {
 
     my @groups = ("");
     my $localDebug = 0;
+
+    my @pDefines = ();
+    foreach my $define (@ALLpDefines) {
+	if (!$define->parseOnly()) {
+		push(@pDefines, $define);
+	}
+    }
 
     my @objs = ( @funcs, @methods, @constants, @typedefs, @structs, @enums,
 	@pDefines, @globals );
@@ -1187,11 +1251,12 @@ sub addToFunctions {
 
     if (@_) {
         foreach my $item (@_) {
+	    # print "ADDING FUNCTION $item TO $self\n";
 	    foreach my $compare (@{ $self->{FUNCTIONS} }) {
 		my $name1 = $item->name();
 		my $name2 = $compare->name();
 		if ($item->name() eq $compare->name()) {
-			my $oldconflict = ($item->conflict() && compare->conflict());
+			my $oldconflict = ($item->conflict() && $compare->conflict());
 			$item->conflict(1);
 			$compare->conflict(1);
 			$HeaderDoc::ignore_apiuid_errors = 1;
@@ -1217,6 +1282,7 @@ sub addToFunctions {
     return @{ $self->{FUNCTIONS} };
 }
 
+# /*! methods */
 sub methods {
     my $self = shift;
 
@@ -1453,6 +1519,14 @@ sub createFramesetFile {
     my $class = ref($self);
     my $defaultFrameName = $class->defaultFrameName();
 
+    my $HTMLmeta = "";
+    # if ($class eq "HeaderDoc::Header") {
+	$HTMLmeta = $self->HTMLmeta();
+    # }
+    if ($self->outputformat() eq "html") {
+	$HTMLmeta .= $self->styleSheet(0);
+    }
+
     my $filename = $self->filename();
     my $name = $self->name();
     my $title = $filename;
@@ -1478,7 +1552,31 @@ sub createFramesetFile {
     open(OUTFILE, ">$outputFile") || die "Can't write $outputFile. \n$!\n";
     if ($isMacOS) {MacPerl::SetFileInfo('MSIE', 'TEXT', "$outputFile");};
 	print OUTFILE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\"\n    \"http://www.w3.org/TR/1999/REC-html401-19991224/frameset.dtd\">\n";
-    print OUTFILE "<html><head>\n    <title>Documentation for $title</title>\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</head>\n";
+    print OUTFILE "<html><head>\n    <title>Documentation for $title</title>\n$HTMLmeta\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</head>\n";
+
+    my $jsnav = 1;
+
+    if ($jsnav) {
+	print OUTFILE "<script language=\"JavaScript\" type=\"text/javascript\">\n";
+
+	print OUTFILE "origURL = parent.document.URL;\n";
+	print OUTFILE "contentURL = origURL.substring(origURL.indexOf('?')+1, origURL.length);\n";
+
+	print OUTFILE "if (contentURL.length == origURL.length) {\n";
+	if ($composite) {
+       		print OUTFILE "	contentURL = '$compositePageName';\n";
+	} else {
+       		print OUTFILE "	contentURL = '$rootFileName.html';\n";
+	}
+	print OUTFILE "// document.write('contentURL: ' + contentURL + '<br>\\n');\n";
+	print OUTFILE "// document.write('Length: ' + contentURL.length + '<br>\\n');\n";
+	print OUTFILE "}\n";
+	print OUTFILE "document.write('<frameset cols=\"20%,80%\"><frame src=\"toc.html\" name=\"nav\"><frame src=\\\"' + contentURL + '\\\" name=\"doc\"><\/frameset>');\n";
+
+	print OUTFILE "</script>\n";
+	print OUTFILE "<noscript>\n";
+    }
+
     print OUTFILE "<frameset cols=\"190,100%\">\n";
     print OUTFILE "<frame src=\"toc.html\" name=\"toc\">\n";
     if ($composite) {
@@ -1486,8 +1584,19 @@ sub createFramesetFile {
     } else {
 	print OUTFILE "<frame src=\"$rootFileName.html\" name=\"doc\">\n";
     }
-    print OUTFILE "</frameset></html>\n";
+    print OUTFILE "</frameset>\n";
+    print OUTFILE "<noframes>\n";
+    print OUTFILE "<body bgcolor=\"#e6e6e6\">\n";
+    print OUTFILE "<h2>This document set is best viewed in a browser that supports frames. To access the TOC, <a href=\"toc.html\">Click here</a></h2>\n";
+    print OUTFILE "</body>\n";
+    print OUTFILE "</noframes>\n";
+
+    if ($jsnav) {
+	print OUTFILE "</noscript>\n";
+    }
+
     print OUTFILE "$docNavigatorComment\n";
+    print OUTFILE "</html>\n";
     close OUTFILE;
 }
 
@@ -1518,6 +1627,14 @@ sub createTOCFile {
 	$title = "$name ($filename)";
     }
 
+    my $HTMLmeta = "";
+    # if ($class eq "HeaderDoc::Header") {
+	$HTMLmeta = $self->HTMLmeta();
+    # }
+    if ($self->outputformat() eq "html") {
+	$HTMLmeta .= $self->styleSheet(0);
+    }
+
 	open(OUTFILE, ">$outputFile") || die "Can't write $outputFile.\n$!\n";
     if ($isMacOS) {MacPerl::SetFileInfo('MSIE', 'TEXT', "$outputFile");};
 	print OUTFILE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"\n    \"http://www.w3.org/TR/1998/REC-html40-19980424/loose.dtd\">\n";
@@ -1525,7 +1642,7 @@ sub createTOCFile {
 
 	print OUTFILE $self->styleSheet(1);
 
-	print OUTFILE "<head>\n    <title>Documentation for $title</title>\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</head>\n";
+	print OUTFILE "<head>\n    <title>Documentation for $title</title>\n$HTMLmeta\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</head>\n";
 	print OUTFILE "<body bgcolor=\"#edf2f6\" link=\"#000099\" vlink=\"#660066\"\n";
 	print OUTFILE "leftmargin=\"0\" topmargin=\"0\" marginwidth=\"0\"\n"; 
 	print OUTFILE "marginheight=\"0\">\n";
@@ -1588,9 +1705,9 @@ sub createContentFile {
     }
 
     my $HTMLmeta = "";
-    if ($class eq "HeaderDoc::Header") {
+    # if ($class eq "HeaderDoc::Header") {
 	$HTMLmeta = $self->HTMLmeta();
-    }
+    # }
     if ($self->outputformat() eq "html") {
 	$HTMLmeta .= $self->styleSheet(0);
     }
@@ -1639,19 +1756,6 @@ sub createContentFile {
 	my $namespace = $self->namespace();
 	my $availability = $self->availability();
 	my $updated = $self->updated();
- 	if (length($updated) || length($namespace)) {
-	    $fileString .= "<p></p>\n";
-	}
-
-	if (length($namespace)) {
-	    $fileString .= "<b>Namespace:</b> $namespace<br>\n";
-	}
-	if (length($availability)) {      
-	    $fileString .= "<b>Availability:</b> $availability<br>\n";
-	}
-	if (length($updated)) {      
-	    $fileString .= "<b>Updated:</b> $updated<br>\n";
-	}
 	my $includeList = "";
 	if ($class eq "HeaderDoc::Header") {
 	    my $includeref = $HeaderDoc::perHeaderIncludes{$filename};
@@ -1677,12 +1781,25 @@ sub createContentFile {
 			$first = 0;
 		}
 
-		if (length($includeList)) {
-			$fileString .= "<b>Includes:</b> ";
-			$fileString .= $includeList;
-			$fileString .= "<br>\n";
-		}
 	    }
+	}
+ 	if (length($updated) || length($namespace) || length($availability) || length($includeList)) {
+	    $fileString .= "<p></p>\n";
+	}
+
+	if (length($namespace)) {
+	    $fileString .= "<b>Namespace:</b> $namespace<br>\n";
+	}
+	if (length($availability)) {      
+	    $fileString .= "<b>Availability:</b> $availability<br>\n";
+	}
+	if (length($updated)) {      
+	    $fileString .= "<b>Updated:</b> $updated<br>\n";
+	}
+	if (length($includeList)) {
+		$fileString .= "<b>Includes:</b> ";
+		$fileString .= $includeList;
+		$fileString .= "<br>\n";
 	}
 	my $short_attributes = $self->getAttributes(0);
 	my $long_attributes = $self->getAttributes(1);
@@ -1757,6 +1874,7 @@ sub writeHeaderElements {
     my $varsDir = $self->varsDir();
     my $enumsDir = $self->enumsDir();
     my $pDefinesDir = $self->pDefinesDir();
+    my $classesDir = $self->classesDir();
 
 	if (! -e $rootOutputDir) {
 		unless (mkdir ("$rootOutputDir", 0777)) {die ("Can't create output folder $rootOutputDir. \n$!");};
@@ -1774,6 +1892,7 @@ sub writeHeaderElements {
     my @vars = $self->vars();
     my @enums = $self->enums();
     my @pDefines = $self->pDefines();
+    my @classes = $self->classes();
     if (@functions) { foreach my $obj (@functions) { $junk = $obj->apirefSetup();}}
     if (@methods) { foreach my $obj (@methods) { $junk = $obj->apirefSetup();}}
     if (@constants) { foreach my $obj (@constants) { $junk = $obj->apirefSetup();}}
@@ -1782,6 +1901,7 @@ sub writeHeaderElements {
     if (@vars) { foreach my $obj (@vars) { $junk = $obj->apirefSetup();}}
     if (@enums) { foreach my $obj (@enums) { $junk = $obj->apirefSetup();}}
     if (@pDefines) { foreach my $obj (@pDefines) { $junk = $obj->apirefSetup();}}
+    if (@classes) { foreach my $obj (@classes) { $junk = $obj->apirefSetup();}}
     $HeaderDoc::ignore_apiuid_errors = 0;
     
     if ($self->functions()) {
@@ -1836,6 +1956,12 @@ sub writeHeaderElements {
 	    }
 	    $self->writePDefines();
     }
+    if ($self->classes()) {
+		if (! -e $classesDir) {
+			unless (mkdir ("$classesDir", 0777)) {die ("Can't create output folder $classesDir. \n$!");};
+	    }
+	    $self->writeClasses();
+    }
 }
 
 
@@ -1850,13 +1976,16 @@ sub writeHeaderElementsToManPage {
     my $rootOutputDir = $self->outputDir();
     my $tempOutputDir = $rootOutputDir."/mantemp";
     my $XMLPageString = $self->_getXMLPageString();
+    my $section = $HeaderDoc::man_section;
 
     mkdir($tempOutputDir);
 
     my $cwd = getcwd();
     chdir($tempOutputDir);
 
-    open(OUTFILE, "|/usr/bin/hdxml2manxml");
+    # print "SECTION: \"$section\"\n";
+
+    open(OUTFILE, "|/usr/bin/hdxml2manxml -M $section");
     print OUTFILE $XMLPageString;
     print "WROTE: $XMLPageString\n" if ($localDebug);
     close(OUTFILE);
@@ -1864,7 +1993,7 @@ sub writeHeaderElementsToManPage {
     my @files = <*.mxml>;
 
     foreach my $file (@files) {
-	system("/usr/bin/xml2man $file");
+	system("/usr/bin/xml2man \"$file\"");
 	unlink($file);
     }
 
@@ -2394,6 +2523,15 @@ sub _getEmbeddedTOC
 		# Don't do this for pseudo-classes.
 		$parentclass = "";
 	}
+	my $objclass = ref($obj) || $obj;
+	if ($obj =~ /HeaderDoc::Method/) {
+		if ($obj->isInstanceMethod() eq "YES") {
+			$parentclass = "-";
+		} else {
+			$parentclass = "+";
+		}
+		# print "OCC: IIM: ".$obj->isInstanceMethod()."\n";
+	}
 
 	$eTOCString .= "<dt><tt><a href=\"$url\" target=\"$target\">$parentclass$name</a></tt></dt>\n";
 	$eTOCString .= "<dd>$abstract</dd>\n";
@@ -2497,18 +2635,34 @@ sub _getClassEmbeddedTOC
 
 sub _getFunctionEmbeddedTOC
 {
-   my $self = shift;
-   my $composite = shift;
-   my @functions = $self->functions();
-   return $self->_getEmbeddedTOC(\@functions, "Functions.html", "functions", $composite, 0);
+    my $self = shift;
+    my $composite = shift;
+    my @functions = $self->functions();
+    my @tempobjs = ();
+
+    if ($HeaderDoc::sort_entries) {
+	@tempobjs = sort objName @functions;
+    } else {
+	@tempobjs = @functions;
+    }
+
+    return $self->_getEmbeddedTOC(\@tempobjs, "Functions.html", "functions", $composite, 0);
 }
 
 sub _getMethodEmbeddedTOC
 {
-   my $self = shift;
-   my $composite = shift;
-   my @methods = $self->methods();
-   return $self->_getEmbeddedTOC(\@methods, "Methods.html", "methods", $composite, 0);
+    my $self = shift;
+    my $composite = shift;
+    my @methods = $self->methods();
+    my @tempobjs = ();
+
+    if ($HeaderDoc::sort_entries) {
+	@tempobjs = sort objName @methods;
+    } else {
+	@tempobjs = @methods;
+    }
+
+    return $self->_getEmbeddedTOC(\@tempobjs, "Methods.html", "methods", $composite, 0);
 }
 
 sub _getMethodDetailString {
@@ -2774,8 +2928,15 @@ sub writePDefines {
 sub _getPDefineDetailString {
     my $self = shift;
     my $composite = shift;
-    my @pDefineObjs = $self->pDefines();
+    my @ALLpDefineObjs = $self->pDefines();
     my $contentString;
+
+    my @pDefineObjs = ();
+    foreach my $define (@ALLpDefineObjs) {
+	if (!$define->parseOnly()) {
+		push(@pDefineObjs, $define);
+	}
+    }
 
     my @tempobjs = ();
     if ($HeaderDoc::sort_entries) {
@@ -2806,6 +2967,30 @@ sub _getPDefineXMLDetailString {
         $contentString .= $documentationBlock;
     }
     return $contentString;
+}
+
+
+sub writeClasses {
+    my $self = shift;
+    my @classObjs = $self->classes();
+    my $classRootDir = $self->classesDir();
+
+    my @tempobjs = ();
+    if ($HeaderDoc::sort_entries) {
+	@tempobjs = sort objName @classObjs;
+    } else {
+	@tempobjs = @classObjs;
+    }
+    foreach my $obj (@tempobjs) {
+        my $className = $obj->name();
+        # for now, always shorten long names since some files may be moved to a Mac for browsing
+        if (1 || $isMacOS) {$className = &safeName(filename => $className);};
+        $obj->outputDir("$classRootDir$pathSeparator$className");
+        $obj->createFramesetFile();
+        $obj->createContentFile() if (!$HeaderDoc::ClassAsComposite);
+        $obj->createTOCFile();
+        $obj->writeHeaderElements(); 
+    }
 }
 
 
@@ -3396,9 +3581,9 @@ sub _createXMLOutputFile {
     # }
 
     my $HTMLmeta = "";
-    if ($class eq "HeaderDoc::Header") {
+    # if ($class eq "HeaderDoc::Header") {
 	$HTMLmeta = $self->HTMLmeta();
-    }
+    # }
 
         calcDepth($outputFile);
 	my $fileString = $self->xml_fixup_links($orig_fileString);
@@ -3441,9 +3626,9 @@ sub _createHTMLOutputFile {
     }
 
     my $HTMLmeta = "";
-    if ($class eq "HeaderDoc::Header") {
+    # if ($class eq "HeaderDoc::Header") {
 	$HTMLmeta = $self->HTMLmeta();
-    }
+    # }
 
         calcDepth($outputFile);
 	my $fileString = html_fixup_links($self, $orig_fileString);
@@ -3453,9 +3638,10 @@ sub _createHTMLOutputFile {
 	print OUTFILE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"\n    \"http://www.w3.org/TR/1998/REC-html40-19980424/loose.dtd\">\n";
 	print OUTFILE "<html>";
 
-	print OUTFILE $self->styleSheet(0);
-
 	print OUTFILE "<head>\n    <title>$heading</title>\n	$HTMLmeta <meta name=\"generator\" content=\"HeaderDoc\">\n";
+
+	print OUTFILE $self->styleSheet(0);
+	
 	print OUTFILE "</head><body bgcolor=\"#ffffff\">\n";
 	if ($HeaderDoc::insert_header) {
 		print OUTFILE "<!-- start of header -->\n";
@@ -3481,25 +3667,25 @@ sub _createHTMLOutputFile {
 sub objGroup { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-    return ($obj1->group() cmp $obj2->group());
+    return (lc($obj1->group()) cmp lc($obj2->group()));
 }
 
 sub objName { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-   return ($obj1->name() cmp $obj2->name());
+   return (lc($obj1->name()) cmp lc($obj2->name()));
 }
 
 sub byLinkage { # used for sorting
     my $obj1 = $a;
     my $obj2 = $b;
-    return ($obj1->linkageState() cmp $obj2->linkageState());
+    return (lc($obj1->linkageState()) cmp lc($obj2->linkageState()));
 }
 
 sub byAccessControl { # used for sorting
     my $obj1 = $a;
     my $obj2 = $b;
-    return ($obj1->accessControl() cmp $obj2->accessControl());
+    return (lc($obj1->accessControl()) cmp lc($obj2->accessControl()));
 }
 
 sub linkageAndObjName { # used for sorting
@@ -3508,7 +3694,7 @@ sub linkageAndObjName { # used for sorting
    my $linkAndName1 = $obj1->linkageState() . $obj1->name();
    my $linkAndName2 = $obj2->linkageState() . $obj2->name();
    if ($HeaderDoc::sort_entries) {
-        return ($linkAndName1 cmp $linkAndName2);
+        return (lc($linkAndName1) cmp lc($linkAndName2));
    } else {
         return byLinkage($obj1, $obj2); # (1 cmp 2);
    }
@@ -3518,7 +3704,7 @@ sub byMethodType { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
    if ($HeaderDoc::sort_entries) {
-	return ($obj1->isInstanceMethod() cmp $obj2->isInstanceMethod());
+	return (lc($obj1->isInstanceMethod()) cmp lc($obj2->isInstanceMethod()));
    } else {
 	return (1 cmp 2);
    }
@@ -3659,6 +3845,502 @@ sub xml_fixup_links
 
     return $resolver_output;
 }
+
+sub processComment
+{
+	my $self = shift;
+	my $fieldArrayRef = shift;
+	my $embedded = shift;
+	my $parseTree = shift;
+	my $soc = shift;
+	my $ilc = shift;
+	my $localDebug = 0;
+
+	my $headerObj = $self->apiOwner();
+	my $apiOwner = $self;
+
+	my $outputdirtemp = "";
+	my $outputdirtempbase = "";
+
+	my $hofirst = 1;
+	my $curobj = $headerObj;
+	if ($headerObj !~ /HeaderDoc::Header/) {
+		my $name = $curobj->name();
+		my $safename = &safeName(filename => $name);
+		$outputdirtemp = "Classes".$pathSeparator.$safename.$pathSeparator.$outputdirtemp;
+		if ($hofirst) {
+			$hofirst = 0;
+		} else {
+			$outputdirtempbase = "Classes".$pathSeparator.$safename.$pathSeparator.$outputdirtempbase;
+		}
+		$curobj = $curobj->apiOwner();
+	}
+	# warn "HOFIRST: $hofirst\n";
+	# warn "ODTB: $outputdirtempbase\n";
+	if (!$hofirst) {
+		# warn "CREATING SUBS: ".$outputdirtempbase.$pathSeparator."Classes\n";
+		my $name = $headerObj->name();
+		my $safename = &safeName(filename => $name);
+		mkdir( $HeaderDoc::rootOutputDir.$pathSeparator.$outputdirtempbase.$pathSeparator."Classes", 0777);
+		mkdir( $HeaderDoc::rootOutputDir.$pathSeparator.$outputdirtempbase.$pathSeparator."Classes".$pathSeparator.$safename, 0777);
+	}
+
+	$outputdirtemp = $HeaderDoc::rootOutputDir.$pathSeparator.$outputdirtemp;
+
+	# warn "SETTING OUTPUT DIR TO $outputdirtemp\n";
+	$apiOwner->outputDir($outputdirtemp);
+
+	if ($localDebug) {
+		print "PROCESSCOMMENT\n";
+		print "SELF: $self\nFAR: $fieldArrayRef\nEMBEDDED: $embedded\nPTP: $parseTree\nSOC: $soc\nILC: $ilc\n";
+		print "COMMENT RESEMBLES THE FOLLOWING:\n";
+		foreach my $field (@{$fieldArrayRef}) {
+			print "\@$field\n";
+		}
+		print "EOCOMMENT\n";
+	}
+
+	# my $rootOutputDir = shift;
+	# my $fieldArrayRef = shift;
+	my @fields = @$fieldArrayRef;
+	# my $classType = shift;
+	my $filename = $HeaderDoc::headerObject->filename();
+
+	my $lang = $self->lang();
+	my $sublang = $self->sublang();
+	my $linenum = $self->linenum();
+
+	if ($embedded) {
+		my $embedDebug = 0 || $localDebug;
+		my $localDebug = $embedDebug;
+		# We're processing contents of a class.  These get handled differently.
+		if ($self =~ /HeaderDoc::APIOwner/) {
+			# silently return.
+			return;
+		}
+
+		if ($parseTree) {
+			print "GOT PT: SODEC WAS $parseTree (".$parseTree->token().")\n" if ($localDebug);
+
+
+				print "EMBEDDED DECLARATION:\n" if ($localDebug);
+				$parseTree->printTree() if ($localDebug);
+				print "EODEC\n" if ($localDebug);
+
+				my $s = $parseTree->parserState();
+				if ($s) {
+					print "PARSERSTATE EOTREE: $s->{lastTreeNode}\n" if ($localDebug);
+				}
+		}
+
+		my $keyfield = $fields[0];
+		if (!length($keyfield) || $keyfield =~ /^\s+$/) { $keyfield = $fields[1]; }
+
+		my $inFunction = my $inClass = my $inMethod = my $inTypedef = my $inUnion = my $inStruct = my $inConstant = my $inVar = my $inPDefine = my $inEnum = my $inUnknown = my $inInterface = 0;
+
+		my $localDebug = 0;
+		my $classType = $self->classType();
+		my $lang = $self->lang();
+
+		my $first_field = 1;
+
+		SWITCH: {
+			($keyfield =~ /^\/\*\!\s*/) && do {
+				# if ($first_field) {
+					# my $copy = $keyfield;
+					# $copy =~ s/^\/\*\!\s*//s;
+					# if (length($copy)) {
+						# $self->discussion($copy);
+					# }
+				# }
+				my $short = $keyfield;
+				$short =~ s/^\/\*\!\s*//s;
+				if (length($short)) {
+					$inUnknown = 1;
+					print "nested inUnknown\n" if ($localDebug);
+					last SWITCH;
+				}
+				$keyfield = $fields[1];
+			}; # ignore opening /*!
+			($keyfield =~ /^template\s+/) && do {
+				$inFunction = 1;
+				print "nested template\n" if ($localDebug);
+				last SWITCH;
+			    };
+			($keyfield =~ /^class\s+/) && do {
+				$inClass = 1;
+				print "nested class\n" if ($localDebug);
+				# $classType = "cpp";
+				# if ($lang eq "php") {
+					# $classType = "php";
+				# }
+				# if ($lang eq "java") {
+					# $classType = "java";
+				# }
+				last SWITCH;
+			    };
+			($keyfield =~ /^interface\s+/) && do {
+				$inInterface = 1;
+				print "nested interface\n" if ($localDebug);
+				warn("Interface not supported here.\n"); # @@@
+				return;
+				last SWITCH;
+			    };
+			($keyfield =~ /^protocol\s+/) && do {
+				# $inProtocol = 1;
+				print "nested protocol\n" if ($localDebug);
+				warn("Protocol not supported here.\n"); # @@@
+				return;
+				last SWITCH;
+			    };
+			($keyfield =~ /^category\s+/) && do {
+				print "nested category\n" if ($localDebug);
+				warn("Category not supported here.\n"); # @@@
+				return;
+				last SWITCH;
+			    };
+			($keyfield =~ /^language\s+/) && do {
+				print "nested language\n" if ($localDebug);
+				warn("\@language is deprecated.\n"); # @@@
+				return;
+				last SWITCH;
+			    };
+			($keyfield =~ /^(function|method)group\s+/) && do {
+				print "nested function/methodgroup\n" if ($localDebug);
+				my $group = $keyfield;
+				$group =~ s/^functiongroup\s+//s;
+				$group =~ s/\s*\*\/\s*$//s;
+				# warn("Function Groups not supported in classes yet!\n"); # @@@
+				$self->{FUNCTIONGROUPSTATE} = $group;
+				return;
+			    };
+			($keyfield =~ /^group\s+/) && do {
+				# $inGroup = 1;
+				print "nested group\n" if ($localDebug);
+				# warn("Groups not supported in classes yet!\n"); # @@@
+				my $group = $keyfield;
+				$group =~ s/^group\s+//s;
+				$group =~ s/\s*\*\/\s*$//s;
+				$HeaderDoc::globalGroup = $group;
+				return;
+			    };
+			($keyfield =~ /^(function)\s+/) && do {
+				$inFunction = 1;
+				print "nested function $keyfield\n" if ($localDebug);
+				last SWITCH;
+			    };
+			($keyfield =~ /^method\s+/) && do {
+				$inMethod = 1;
+				print "nested method\n" if ($localDebug);
+				last SWITCH;
+			    };
+			($keyfield =~ /^(typedef|callback)\s+/) && do {
+				$inTypedef = 1;
+				print "nested typedef\n" if ($localDebug);
+				last SWITCH;
+			    };
+			($keyfield =~ /^union\s+/) && do {
+				$inUnion = 1;
+				print "nested union\n" if ($localDebug);
+				last SWITCH;
+			    };
+			($keyfield =~ /^struct\s+/) && do {
+				$inStruct = 1;
+				print "nested struct\n" if ($localDebug);
+				last SWITCH;
+			    };
+			($keyfield =~ /^const(ant)?\s+/) && do {
+				$inConstant = 1;
+				print "nested constant\n" if ($localDebug);
+				last SWITCH;
+			    };
+			($keyfield =~ /^var\s+/) && do {
+				$inVar = 1;
+				print "nested var\n" if ($localDebug);
+				last SWITCH;
+			    };
+			($keyfield =~ /^define(d)?block\s+/) && do {
+				$inPDefine = 2;
+				print "nested defineblock\n" if ($localDebug);
+				last SWITCH;
+			    };
+			($keyfield =~ /^define(d)?\s+/) && do {
+				$inPDefine = 1;
+				print "nested define\n" if ($localDebug);
+				last SWITCH;
+			    };
+			($keyfield =~ /^enum\s+/) && do {
+				$inEnum = 1;
+				print "nested enum\n" if ($localDebug);
+				last SWITCH;
+			    };
+			($keyfield =~ /^serial(Data|Field|)\s+/) && do {
+				warn("serialData not supported here.\n"); # @@@
+				return;
+			    };
+			($keyfield eq "") && do {
+				$inUnknown = 1;
+				print "nested inUnknown[???]\n" if ($localDebug);
+				last SWITCH;
+			};
+			    {
+				warn("UNKNOWN FIELD[EMBEDDED]: \"$keyfield\".\n");
+				return;
+			    };
+		}
+		$first_field = 0;
+
+		my $blockOffset = $self->linenum; # @@@ FIXME DAG
+
+		my $categoryObjectsref = undef;
+		my $classObjectsref = \@{$self->{CLASSES}};
+
+		# @@@ FIXME DAG
+		my $cppAccessControlState = "protected:";
+
+		my $fieldsref = \@fields;
+		my $filename = $self->filename;
+
+		my $functionGroup = $self->{FUNCTIONGROUPSTATE} || "";
+
+		my $headerObject = $self;
+		my $inputCounter = 1;
+
+		my @fakelines = ( "This is a test.", "BOGUSFOOBOGUSFOOBOGUS", "This is only a test.");
+		my $inputlinesref = \@fakelines;
+		my $nlines = 42;
+		my $preAtPart = "";
+
+		# @@@ DAG IS THIS RIGHT?
+                                if ($inUnknown == 1) {
+                                        if ($fields[0] =~ s/^\s*\/\*!\s*(\w.*?)\@/\/\*! \@/sio) {
+                                                $preAtPart = $1;
+                                        } elsif ($fields[0] !~ /^\s*\/\*!\s*.*\@/o) {
+                                                $preAtPart = $fields[0];
+                                                $preAtPart =~ s/^\s*\/\*!\s*//sio;
+                                                $preAtPart =~ s/\s*\*\/\s*$//sio;
+                                                $fields[0] = "/*! */";
+                                        }
+                                        print "preAtPart: \"$preAtPart\"\n" if ($localDebug);
+                                        print "fields[0]: \"$fields[0]\"\n" if ($localDebug);
+                                }
+
+		my $xml_output = 0;
+		if ($self->outputformat() eq "hdxml") { $xml_output = 1; }
+
+		my $localDebug = 0;
+		my $hangDebug = 0;
+		my $parmDebug = 0;
+		my $blockDebug = 0;
+
+		my $subparse = 1;
+		if ($self->can("isCOMInterface") && $self->isCOMInterface()) {
+			# warn "COMINT\n";
+			$subparse = 2;
+		}
+		my $subparseTree = $parseTree;
+
+		my $nodec = 0;
+
+		my $oldcur = $HeaderDoc::currentClass;
+		$HeaderDoc::currentClass = $self;
+		blockParseOutside($apiOwner, $inFunction, $inUnknown,
+			$inTypedef, $inStruct, $inEnum, $inUnion,
+			$inConstant, $inVar, $inMethod, $inPDefine,
+			$inClass, $inInterface, $blockOffset, $categoryObjectsref,
+			$classObjectsref, $classType, $cppAccessControlState,
+			$fieldsref, $filename, $functionGroup,
+			$headerObject, $inputCounter, $inputlinesref,
+			$lang, $nlines, $preAtPart, $xml_output, $localDebug,
+			$hangDebug, $parmDebug, $blockDebug, $subparse,
+			$subparseTree, $nodec);
+
+		$HeaderDoc::currentClass = $oldcur;
+
+		return;
+	}
+
+	# NOT EMBEDDED from here down.
+
+	my $class = ref($self) || $self;
+	my $superclassfieldname = "Superclass";
+	if ($class =~ /HeaderDoc::ObjCCategory/) {
+		$superclassfieldname = "Extends&nbsp;Class";
+	}
+	my $first_field = 1;
+	foreach my $field (@fields) {
+		SWITCH: {
+			($field =~ /^\/\*\!/o && $first_field) && do {
+				my $copy = $field;
+				$copy =~ s/^\/\*\!\s*//s;
+				if (length($copy)) {
+					$self->discussion($copy);
+				}
+				last SWITCH;
+				};
+			(($lang eq "java") && ($field =~ /^\s*\/\*\*/o)) && do {last SWITCH;}; # ignore opening /**
+			($field =~ s/^(class|interface|template)(\s+)/$2/io) && 
+				do {
+					my ($name, $disc);
+					my $filename = $HeaderDoc::headerObject->filename();
+					# print "CLASSNAMEANDDISC:\n";
+					($name, $disc) = &getAPINameAndDisc($field);
+					my $classID = ref($apiOwner);
+					$apiOwner->name($name);
+					$apiOwner->filename($filename);
+					if (length($disc)) {$apiOwner->discussion($disc);};
+                	last SWITCH;
+            	};
+			($field =~ /^see(also|)(\s+)/i) &&
+				do {
+					$apiOwner->see($field);
+					last SWITCH;
+				};
+			($field =~ s/^protocol(\s+)/$1/io) && 
+				do {
+					my ($name, $disc);
+					my $filename = $HeaderDoc::headerObject->filename();
+					($name, $disc) = &getAPINameAndDisc($field); 
+					$apiOwner->name($name);
+					$apiOwner->filename($filename);
+					if (length($disc)) {$apiOwner->discussion($disc);};
+					last SWITCH;
+				};
+			($field =~ s/^category(\s+)/$1/io) && 
+				do {
+					my ($name, $disc);
+					my $filename = $HeaderDoc::headerObject->filename();
+					($name, $disc) = &getAPINameAndDisc($field); 
+					$apiOwner->name($name);
+					$apiOwner->filename($filename);
+					if (length($disc)) {$apiOwner->discussion($disc);};
+					last SWITCH;
+				};
+            			($field =~ s/^templatefield(\s+)/$1/io) && do {     
+                                	$field =~ s/^\s+|\s+$//go;
+                    			$field =~ /(\w*)\s*(.*)/so;
+                    			my $fName = $1;
+                    			my $fDesc = $2;
+                    			my $fObj = HeaderDoc::MinorAPIElement->new();
+					$fObj->linenum($linenum);
+					$fObj->apiOwner($apiOwner);
+                    			$fObj->outputformat($apiOwner->outputformat);
+                    			$fObj->name($fName);
+                    			$fObj->discussion($fDesc);
+                    			$apiOwner->addToFields($fObj);
+# print "inserted field $fName : $fDesc";
+                                	last SWITCH;
+                        	};
+			($field =~ s/^super(class|)(\s+)/$2/io) && do { $apiOwner->attribute($superclassfieldname, $field, 0); $apiOwner->explicitSuper(1); last SWITCH; };
+			($field =~ s/^throws(\s+)/$1/io) && do {$apiOwner->throws($field); last SWITCH;};
+			($field =~ s/^exception(\s+)/$1/io) && do {$apiOwner->throws($field); last SWITCH;};
+			($field =~ s/^abstract(\s+)/$1/io) && do {$apiOwner->abstract($field); last SWITCH;};
+			($field =~ s/^discussion(\s+)/$1/io) && do {$apiOwner->discussion($field); last SWITCH;};
+			($field =~ s/^availability(\s+)/$1/io) && do {$apiOwner->availability($field); last SWITCH;};
+			($field =~ s/^since(\s+)/$1/io) && do {$apiOwner->availability($field); last SWITCH;};
+            		($field =~ s/^author(\s+)/$1/io) && do {$apiOwner->attribute("Author", $field, 0); last SWITCH;};
+			($field =~ s/^version(\s+)/$1/io) && do {$apiOwner->attribute("Version", $field, 0); last SWITCH;};
+            		($field =~ s/^deprecated(\s+)/$1/io) && do {$apiOwner->attribute("Deprecated", $field, 0); last SWITCH;};
+            		($field =~ s/^version(\s+)/$1/io) && do {$apiOwner->attribute("Version", $field, 0); last SWITCH;};
+			($field =~ s/^updated(\s+)/$1/io) && do {$apiOwner->updated($field); last SWITCH;};
+	    ($field =~ s/^attribute(\s+)/$1/io) && do {
+		    my ($attname, $attdisc) = &getAPINameAndDisc($field);
+		    if (length($attname) && length($attdisc)) {
+			$apiOwner->attribute($attname, $attdisc, 0);
+		    } else {
+			warn "$filename:$linenum:Missing name/discussion for attribute\n";
+		    }
+		    last SWITCH;
+		};
+	    ($field =~ s/^attributelist(\s+)/$1/io) && do {
+		    $field =~ s/^\s*//so;
+		    $field =~ s/\s*$//so;
+		    my ($name, $lines) = split(/\n/, $field, 2);
+		    $name =~ s/^\s*//so;
+		    $name =~ s/\s*$//so;
+		    $lines =~ s/^\s*//so;
+		    $lines =~ s/\s*$//so;
+		    if (length($name) && length($lines)) {
+			my @attlines = split(/\n/, $lines);
+			foreach my $line (@attlines) {
+			    $apiOwner->attributelist($name, $line);
+			}
+		    } else {
+			warn "$filename:$linenum:Missing name/discussion for attributelist\n";
+		    }
+		    last SWITCH;
+		};
+	    ($field =~ s/^attributeblock(\s+)/$1/io) && do {
+		    my ($attname, $attdisc) = &getAPINameAndDisc($field);
+		    if (length($attname) && length($attdisc)) {
+			$apiOwner->attribute($attname, $attdisc, 1);
+		    } else {
+			warn "$filename:$linenum:Missing name/discussion for attributeblock\n";
+		    }
+		    last SWITCH;
+		};
+			($field =~ s/^namespace(\s+)/$1/io) && do {$apiOwner->namespace($field); last SWITCH;};
+			($field =~ s/^instancesize(\s+)/$1/io) && do {$apiOwner->attribute("Instance Size", $field, 0); last SWITCH;};
+			($field =~ s/^performance(\s+)/$1/io) && do {$apiOwner->attribute("Performance", $field, 1); last SWITCH;};
+			# ($field =~ s/^subclass(\s+)/$1/io) && do {$apiOwner->attributelist("Subclasses", $field); last SWITCH;};
+			($field =~ s/^nestedclass(\s+)/$1/io) && do {$apiOwner->attributelist("Nested Classes", $field); last SWITCH;};
+			($field =~ s/^coclass(\s+)/$1/io) && do {$apiOwner->attributelist("Co-Classes", $field); last SWITCH;};
+			($field =~ s/^helper(class|)(\s+)/$2/io) && do {$apiOwner->attributelist("Helper Classes", $field); last SWITCH;};
+			($field =~ s/^helps(\s+)/$1/io) && do {$apiOwner->attribute("Helps", $field, 0); last SWITCH;};
+			($field =~ s/^classdesign(\s+)/$1/io) && do {$apiOwner->attribute("Class Design", $field, 1); last SWITCH;};
+			($field =~ s/^dependency(\s+)/$1/io) && do {$apiOwner->attributelist("Dependencies", $field); last SWITCH;};
+			($field =~ s/^ownership(\s+)/$1/io) && do {$apiOwner->attribute("Ownership Model", $field, 1); last SWITCH;};
+			($field =~ s/^security(\s+)/$1/io) && do {$apiOwner->attribute("Security", $field, 1); last SWITCH;};
+			($field =~ s/^whysubclass(\s+)/$1/io) && do {$apiOwner->attribute("Reason to Subclass", $field, 1); last SWITCH;};
+			# ($field =~ s/^charset(\s+)/$1/io) && do {$apiOwner->encoding($field); last SWITCH;};
+			# ($field =~ s/^encoding(\s+)/$1/io) && do {$apiOwner->encoding($field); last SWITCH;};
+			# print "Unknown field in class comment: $field\n";
+			warn "$filename:$linenum:Unknown field (\@$field) in class comment (".$apiOwner->name().")[2]\n";
+		}
+		$first_field = 0;
+	}
+	return $apiOwner;
+}
+
+sub encoding
+{
+    my $self = shift;
+    my $apio = $self->apiOwner();
+
+    if (@_) {
+	my $encoding = shift;
+	$encoding =~ s/^\s*//sg;
+	$encoding =~ s/\s*$//sg;
+	$self->{ENCODING} = $encoding;
+    }
+
+    if ($self->{ENCODING}) {
+	return $self->{ENCODING};
+    } elsif ($apio && ($apio != $self)) {
+	return $apio->encoding();
+    } else {
+	return "UTF-8";
+    }
+}
+
+sub HTMLmeta
+{
+    my $self = shift;
+    my $apio = $self->apiOwner();
+
+    if ($apio && ($apio != $self)) {
+	return $apio->HTMLmeta();
+    }
+    # Header.pm overrides this.  We should never reach this.
+    return "";
+}
+
+# sub discussion
+# {
+    # my $self = shift;
+	# print "WARNING: APIO DISCUSSION CHANGED\n";
+    # $self->SUPER::discussion(@_);
+# }
 
 1;
 

@@ -16,6 +16,10 @@
  */
 @class NSFont;
 
+/*! @var test
+ */
+id k;
+
 /*!
 	@typedef NSTitlePosition
 	Constants that represent title positions.
@@ -50,8 +54,7 @@ typedef enum {
 	It can draw a border around itself, and it can title itself. 
 */
 
-@interface ObjCClassUn : NSObject
-{
+@interface ObjCClassUn : NSObject {
     /*All instance variables are private*/
     id                  _titleCell;
     id                  _contentView;

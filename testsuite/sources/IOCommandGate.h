@@ -75,7 +75,8 @@ be checked again, the time is currently absolute.
      @abstract Test of the handling of inline functions.
      @discussion This function is inlined and defined all on one line.
 */
-    void inlineFunctionOneLine() { return foo; };
+    void inlineFunctionOneLine()
+{ return foo; };
 
 /*!
      @function inlineFunctionMultiLine

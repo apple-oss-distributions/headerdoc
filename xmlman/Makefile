@@ -7,7 +7,7 @@ LOCALCFLAGS=
 # LOCALLDFLAGS= -L/usr/local/lib 
 LOCALLDFLAGS=
 
-CFLAGS= ${LOCALCFLAGS} -I/usr/include/libxml2 -Wall ${RC_CFLAGS} ${DEBUG_CFLAGS}
+CFLAGS= ${LOCALCFLAGS} -I/usr/include/libxml2 -Wall ${RC_CFLAGS} ${DEBUG_CFLAGS} -mdynamic-no-pic
 LDFLAGS= ${LOCALLDFLAGS} -lxml2 -force_flat_namespace
 
 all: xml2man hdxml2manxml resolveLinks

@@ -37,7 +37,7 @@ use HeaderDoc::APIOwner;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.00';
+$VERSION = '$Revision: 1.2.2.11.2.28 $';
 
 # Inheritance
 @ISA = qw( HeaderDoc::HeaderElement );
@@ -142,7 +142,14 @@ sub processComment {
 
 	foreach my $field (@fields) {
 		SWITCH: {
-			($field =~ /^\/\*\!/o)&& do {last SWITCH;}; # ignore opening /*!
+            		($field =~ /^\/\*\!/o)&& do {
+                                my $copy = $field;
+                                $copy =~ s/^\/\*\!\s*//s;
+                                if (length($copy)) {
+                                        $self->discussion($copy);
+                                }
+                        last SWITCH;
+                        };
 			($field =~ s/^method(\s+)/$1/o) && 
 			do {
 				my ($name, $disc);
@@ -263,6 +270,7 @@ sub getMethodType {
 	my $declaration = shift;
 	my $methodType = "";
 		
+if (0) {
 	if ($declaration =~ /^\s*-/o) {
 	    $methodType = "instm";
 	    $self->setIsInstanceMethod("YES");
@@ -282,6 +290,55 @@ sub getMethodType {
 		$methodType = "instm";
 	    $self->setIsInstanceMethod("YES");
 	}
+} else {
+    my $apio = $self->apiOwner();
+    my $apioclass = ref($apio) || $apio;
+    $self->setIsInstanceMethod("YES");
+    $methodType = "instm";
+
+
+    my $ptref = $self->parseTree();
+    if (!$ptref) {
+	if (!$HeaderDoc::ignore_apiuid_errors) {
+	    warn "$filename:$linenum:Unable to find parse tree.  File a bug.\n";
+	}
+    } else {
+	my $pt = ${$ptref};
+	my $ps = undef;
+
+	while ($pt && ($pt->token() =~ /\s/ || !length($pt->token()))) { $pt = $pt->next();}
+
+	if ($pt) {
+		# print "PT TOKEN: ".$pt->token()."\n";
+		$ps = $pt->parserState();
+	} else {
+		# This case is always bad, since it means the declaration is
+		# essentially blank....
+		warn "$filename:$linenum:Unable to find parser state for ".$self->name().".  File a bug.\n";
+	}
+
+	if (!$ps) {
+		# This could be a user error or a bug.
+		if ($apioclass =~ /HeaderDoc::Header/) {
+			warn "$filename:$linenum:Objective-C method found outside a class or interface\n(or in a class or interface that lacks HeaderDoc markup).\n";
+		} else {
+			warn "$filename:$linenum:Unable to find parser state for ".$self->name().".  File a bug.\n";
+		}
+		# print "PT TOKEN WAS: ".$pt->token()."\n";
+	} else {
+		my $token = $ps->{occmethodtype};
+		if (!length($token)) {
+			warn "$filename:$linenum:Unable to find Objective-C method type.  File a bug.\n";
+		} elsif ($token =~ /\+/) {
+			$self->setIsInstanceMethod("NO");
+			$methodType = "clm";
+			if ($apioclass =~ /HeaderDoc::ObjCProtocol/) {
+				$methodType = "intfcm";
+			}
+		}
+	}
+    }
+}
 
 # print "GMT NAME: ".$self->name()." TYPE: $methodType DEC:$declaration\n";
 

@@ -4,7 +4,7 @@
 # Synopsis: Holds typedef info parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/10 22:12:16 $
+# Last Updated: $Date: 2004/10/04 23:11:29 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -38,7 +38,7 @@ use XML::Twig;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.1.2.4 $';
 
 sub stringFromFile
 {

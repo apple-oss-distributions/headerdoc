@@ -19,12 +19,12 @@ class inner
 char *innerfunc(int a);
 
 
-}
+};
 
 /*! @function outerfunc_2
  */
 long outerfunc_2(int c);
 
 
-}
+};
 

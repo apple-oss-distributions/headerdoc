@@ -7,7 +7,7 @@
 # Initial modifications: SKoT McDonald <skot@tomandandy.com> Aug 2001
 #
 # Based on CPPClass by Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/10 22:12:16 $
+# Last Updated: $Date: 2004/10/04 23:11:26 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -46,7 +46,7 @@ use HeaderDoc::ObjCContainer;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.2.2.1.2.9 $';
 
 ################ Portability ###################################
 my $isMacOS;
@@ -78,9 +78,30 @@ sub _initialize {
     $self->{CLASS} = "HeaderDoc::ObjCProtocol";
 }
 
+# sub getMethodType {
+	# return "intfm";
+# }
 sub getMethodType {
-	return "intfm";
+    my $self = shift;
+	my $declaration = shift;
+	my $methodType = "";
+		
+	if ($declaration =~ /^\s*-/o) {
+	    $methodType = "intfm";
+	} elsif ($declaration =~ /^\s*\+/o) {
+	    $methodType = "intfcm";
+	} else {
+		# my $filename = $HeaderDoc::headerObject->filename();
+		my $filename = $self->filename();
+		my $linenum = $self->linenum();
+		if (!$HeaderDoc::ignore_apiuid_errors) {
+			print "$filename:$linenum:Unable to determine whether declaration is for an instance or class method[class].\n";
+			print "$filename:$linenum:     '$declaration'\n";
+		}
+	}
+	return $methodType;
 }
+
 
 # we add the apple_ref markup to the navigator comment to identify
 # to Project Builder and other applications indexing the documentation
@@ -90,7 +111,11 @@ sub docNavigatorComment {
     my $name = $self->name();
     $name =~ s/;//sgo;
     my $uid = $self->apiuid("intf"); # "//apple_ref/occ/intf/$name";
-    my $navComment = "<!-- headerDoc=intf; uid=$uid; name=$name-->";
+
+    my $indexgroup = $self->indexgroup(); my $igstring = "";
+    if (length($indexgroup)) { $igstring = "indexgroup=$indexgroup;"; }
+
+    my $navComment = "<!-- headerDoc=intf; uid=$uid; $igstring name=$name-->";
     my $appleRef = "<a name=\"$uid\"></a>";
     
     return "$navComment\n$appleRef";
@@ -100,7 +125,7 @@ sub docNavigatorComment {
 sub objName { # used for sorting
     my $obj1 = $a;
     my $obj2 = $b;
-    return ($obj1->name() cmp $obj2->name());
+    return (lc($obj1->name()) cmp lc($obj2->name()));
 }
 
 1;

@@ -5,7 +5,7 @@
 #           file from the comments it finds.
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/13 02:09:00 $
+# Last Updated: $Date: 2005/01/15 00:36:34 $
 #
 # ObjC additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -30,15 +30,19 @@
 #
 # @APPLE_LICENSE_HEADER_END@
 #
-# $Revision: 1.28.2.16.2.125 $
+# $Revision: 1.28.2.16.2.146 $
 #####################################################################
 
-my $VERSION = 2.1;
+my $HeaderDoc_Version = "8.5 (development)";
+my $VERSION = '$Revision: 1.28.2.16.2.146 $';
+
+
+
 ################ General Constants ###################################
 my $isMacOS;
 my $pathSeparator;
 my $specifiedOutputDir;
-my $export;
+# my $export;
 my $debugging;
 my $testingExport = 0;
 my $printVersion;
@@ -67,9 +71,12 @@ my @inputFiles;
 # @HeaderDoc::perHeaderIgnorePrefixes = ();
 # %HeaderDoc::perHeaderIncludes = ();
 my $reprocess_input = 0;
+$HeaderDoc::nodec = 0;
+my $specified_config_file = "";
 my $functionGroup = "";
 # $HeaderDoc::outerNamesOnly = 0;
 $HeaderDoc::globalGroup = "";
+$HeaderDoc::hidetokens = 0;
 my @headerObjects;	# holds finished objects, ready for printing
 					# we defer printing until all header objects are ready
 					# so that we can merge ObjC category methods into the 
@@ -81,6 +88,10 @@ my %objCClassNameToObject;	# makes it easy to find the class object to add categ
 %HeaderDoc::availability_defs = ();
 
 my @classObjects;
+$HeaderDoc::fileDebug = 0;
+$HeaderDoc::debugFile = "";
+# $HeaderDoc::debugFile = "AAutoToolbar.h";
+# $HeaderDoc::debugFile = "IOFWCommand.h";
 					
 # Turn on autoflushing of 'print' output.  This is useful
 # when HeaderDoc is operating in support of a GUI front-end
@@ -98,6 +109,9 @@ BEGIN {
 
     %HeaderDoc::ignorePrefixes = ();
     %HeaderDoc::perHeaderIgnorePrefixes = ();
+    # NOTE: The following line is just a declaration.  The default
+    # values are added later.
+    %HeaderDoc::perHeaderIgnoreFuncMacros = ();
     %HeaderDoc::perHeaderIncludes = ();
     $HeaderDoc::outerNamesOnly = 0;
     %HeaderDoc::namerefs = ();
@@ -153,11 +167,11 @@ BEGIN {
 	# use HeaderDoc::Regen;
     }
 
-    &getopts("CHOSXbdlhimo:qrstuvx", \%options);
+    &getopts("CHM:OSXabc:dhilmo:pqrstuv", \%options);
     if ($options{v}) {
-    	print "Getting version information for all modules.  Please wait...\n";
-		$printVersion = 1;
-		return;
+    	# print "Getting version information for all modules.  Please wait...\n";
+	$printVersion = 1;
+	return;
     }
 
     if ($options{r}) {
@@ -191,11 +205,29 @@ BEGIN {
 	$HeaderDoc::ClassAsComposite = 0;
     }
 
+    if ($options{a}) {
+	# Align columns
+	$HeaderDoc::align_columns = 1;
+    } else {
+	$HeaderDoc::align_columns = 0;
+    }
+
     if ($options{b}) {
 	# "basic" mode - turn off some smart processing
 	$HeaderDoc::dumb_as_dirt = 1;
     } else {
 	$HeaderDoc::dumb_as_dirt = 0;
+    }
+
+    if ($options{c}) {
+	# Use alternate config file.
+	$specified_config_file = $options{c};
+    }
+
+    if ($options{p}) {
+	$HeaderDoc::enable_cpp = 1;
+    } else {
+	$HeaderDoc::enable_cpp = 0;
     }
 
     if ($options{l}) {
@@ -205,8 +237,14 @@ BEGIN {
 	$HeaderDoc::add_link_requests = 1;
     }
 
+    if ($options{M}) {
+	$HeaderDoc::man_section = $options{M};
+    } else {
+	$HeaderDoc::man_section = 1;
+    }
+
     if ($options{m}) {
-	# man page output mode - don't add link requests
+	# man page output mode - implies xml
 	$man_output = 1;
 	$xml_output = 1;
     } else {
@@ -277,16 +315,16 @@ BEGIN {
 		}
     }
     $lookupTableDir = "$scriptDir$pathSeparator$lookupTableDirName";
-    if (($options{x}) || ($testingExport)) {
-        if ((-e "$lookupTableDir$pathSeparator$functionFilename") && (-e "$lookupTableDir$pathSeparator$typesFilename")) {
-                print "\nWill write database files to an Export directory within each top-level HTML directory.\n\n";
-                $export = 1;
-        } else {
-                print "\nLookup table files not available. Cannot export data.\n";
-            $export = 0;
-                $testingExport = 0;
-        }
-    }
+    # if (($options{x}) || ($testingExport)) {
+        # if ((-e "$lookupTableDir$pathSeparator$functionFilename") && (-e "$lookupTableDir$pathSeparator$typesFilename")) {
+                # print "\nWill write database files to an Export directory within each top-level HTML directory.\n\n";
+                # $export = 1;
+        # } else {
+                # print "\nLookup table files not available. Cannot export data.\n";
+            # $export = 0;
+                # $testingExport = 0;
+        # }
+    # }
     if (($quietLevel eq "0") && !$headerdoc_strip && !$man_output) {
       if ($options{X}) {
 	print "XML output mode.\n";
@@ -341,17 +379,19 @@ BEGIN {
 }
 
 
+$HeaderDoc::curParserState = undef;
+
 use strict;
 use File::Copy;
 use File::Basename;
 use lib $uninstalledModulesPath;
 
 # Classes and other modules specific to HeaderDoc
-use HeaderDoc::DBLookup;
+# use HeaderDoc::DBLookup;
 use HeaderDoc::Utilities qw(findRelativePath safeName getAPINameAndDisc printArray linesFromFile
                             printHash updateHashFromConfigFiles getHashFromConfigFile quote parseTokens
-                            stringToFields);
-use HeaderDoc::BlockParse qw(blockParse);
+                            stringToFields warnHDComment classTypeFromFieldAndBPinfo get_super);
+use HeaderDoc::BlockParse qw(blockParse blockParseOutside getAndClearCPPHash);
 use HeaderDoc::Header;
 use HeaderDoc::ClassArray;
 use HeaderDoc::CPPClass;
@@ -368,6 +408,8 @@ use HeaderDoc::PDefine;
 use HeaderDoc::Enum;
 use HeaderDoc::MinorAPIElement;
 use HeaderDoc::ParseTree;
+use HeaderDoc::ParserState;
+use HeaderDoc::IncludeHash;
 
 $HeaderDoc::modulesPath = $INC{'HeaderDoc/ParseTree.pm'};
 $HeaderDoc::modulesPath =~ s/ParseTree.pm$//so;
@@ -382,6 +424,7 @@ my $localConfigFileName = "headerDoc2HTML.config";
 my $preferencesConfigFileName = "com.apple.headerDoc2HTML.config";
 my $homeDir;
 my $usersPreferencesPath;
+my $systemPreferencesPath;
 #added WD-rpw 07/30/01 to support running on MacPerl
 #modified WD-rpw 07/01/02 to support the MacPerl 5.8.0
 if ($^O =~ /MacOS/io) {
@@ -396,14 +439,21 @@ if ($^O =~ /MacOS/io) {
 		$homeDir = Mac::Files::FindFolder(kOnSystemDisk(), kDesktopFolderType());
 		$usersPreferencesPath = Mac::Files::FindFolder(kOnSystemDisk(), kPreferencesFolderType());
 	}
+	$systemPreferencesPath = $usersPreferencesPath;
 } else {
 	$homeDir = (getpwuid($<))[7];
 	$usersPreferencesPath = $homeDir.$pathSeparator."Library".$pathSeparator."Preferences";
+	$systemPreferencesPath = "/Library/Preferences";
 }
 
 # The order of files in this array determines the order that the config files will be read
 # If there are multiple config files that declare a value for the same key, the last one read wins
-my @configFiles = ($usersPreferencesPath.$pathSeparator.$preferencesConfigFileName, $Bin.$pathSeparator.$localConfigFileName);
+my $CWD = getcwd();
+my @configFiles = ($systemPreferencesPath.$pathSeparator.$preferencesConfigFileName, $usersPreferencesPath.$pathSeparator.$preferencesConfigFileName, $Bin.$pathSeparator.$localConfigFileName, $CWD.$pathSeparator.$localConfigFileName);
+
+if (length($specified_config_file)) {
+	push(@configFiles, $specified_config_file);
+}
 
 # default configuration, which will be modified by assignments found in config files.
 my %config = (
@@ -449,6 +499,7 @@ if (defined $config{"ignorePrefixes"}) {
 if (defined $config{"styleImports"}) {
     $HeaderDoc::styleImports = $config{"styleImports"};
     $HeaderDoc::styleImports =~ s/[\n\r]/ /sgo;
+    $HeaderDoc::use_styles = 1;
 }
 
 if (defined $config{"copyrightOwner"}) {
@@ -485,6 +536,11 @@ $/ = $oldRecSep;
 
 if (defined $config{"dateFormat"}) {
     $HeaderDoc::datefmt = $config{"dateFormat"};
+    if ($HeaderDoc::datefmt !~ /\S/) {
+	$HeaderDoc::datefmt = "%B %d, %Y";
+    }
+} else {
+    $HeaderDoc::datefmt = "%B %d, %Y";
 }
 HeaderDoc::APIOwner->fix_date();
 
@@ -543,10 +599,10 @@ if ($printVersion) {
     exit;
 } 
 
-################ Exporting ##############################
-if ($export || $testingExport) {
-	HeaderDoc::DBLookup->loadUsingFolderAndFiles($lookupTableDir, $functionFilename, $typesFilename, $enumsFilename);
-}
+# ################ Exporting ##############################
+# if ($export || $testingExport) {
+	# HeaderDoc::DBLookup->loadUsingFolderAndFiles($lookupTableDir, $functionFilename, $typesFilename, $enumsFilename);
+# }
 
 ################### States ###########################################
 my $inHeader        = 0;
@@ -576,6 +632,12 @@ my $inMethod        = 0;
 my $headerObject;  # this is the Header object that will own the HeaderElement objects for this file.
 my $rootFileName;
 
+my %HeaderFileProcessedThisRound = ();
+%HeaderDoc::HeaderFileCPPArgHashHash = ();
+%HeaderDoc::HeaderFileCPPHashHash = ();
+
+my $includeDebug = 0;
+
 if (!$quietLevel) {
     print "======= Parsing Input Files =======\n";
 }
@@ -588,7 +650,30 @@ foreach my $inputFile (@inputFiles) {
     processIncludes(\@rawInputLines, $inputFile);
 }
 
-foreach my $inputFile (@inputFiles) {
+my @fileList = ();
+
+if ($HeaderDoc::enable_cpp) {
+	my $deplistref = fix_dependency_order(\@inputFiles);
+	if ($deplistref) {
+		@fileList = @{$deplistref};
+	} else {
+		@fileList = @inputFiles;
+	}
+} else {
+	@fileList = @inputFiles
+}
+
+my %filelisthash = ();
+my @oldfileList = @fileList;
+@fileList = ();
+foreach my $inputFile (@oldfileList) {
+	if (!$filelisthash{$inputFile}) {
+		$filelisthash{$inputFile} = 1;
+		push(@fileList, $inputFile);
+	}
+}
+
+foreach my $inputFile (@fileList) {
 	my $constantObj;
 	my $enumObj;
 	my $funcObj;
@@ -602,6 +687,15 @@ foreach my $inputFile (@inputFiles) {
 	
     my @path = split (/$pathSeparator/, $inputFile);
     my $filename = pop (@path);
+    if ($HeaderDoc::HeaderFileCPPHashHash{$inputFile}) {
+	print "Already procesed $inputFile.  Skipping.\n" if ($includeDebug);
+	next;
+    }
+
+    if ($filename eq $HeaderDoc::debugFile) {
+	$HeaderDoc::fileDebug = 1;
+    }
+
     my $sublang = "";
     if ($quietLevel eq "0") {
 	if ($headerdoc_strip) {
@@ -612,6 +706,7 @@ foreach my $inputFile (@inputFiles) {
 		print "\nProcessing $inputFile\n";
 	}
     }
+    %HeaderDoc::perHeaderIgnoreFuncMacros = ( "OSDeclareDefaultStructors" => "OSDeclareDefaultStructors", "OSDeclareAbstractStructors" => "OSDeclareAbstractStructors" );
     %HeaderDoc::perHeaderIgnorePrefixes = ();
     $HeaderDoc::globalGroup = "";
     $reprocess_input = 0;
@@ -660,6 +755,7 @@ foreach my $inputFile (@inputFiles) {
     } else {
     	$rootOutputDir = $rootFileName;
     }
+    $HeaderDoc::rootOutputDir = $rootOutputDir;
     
 	my @rawInputLines = &linesFromFile($inputFile);
 
@@ -676,6 +772,9 @@ foreach my $inputFile (@inputFiles) {
 	# push(@cookedInputLines, $line);
     # }
     # @rawInputLines = @cookedInputLines;
+
+    @HeaderDoc::cppHashList = ();
+    @HeaderDoc::cppArgHashList = ();
 	
 REDO:
 print "REDO" if ($debugging);
@@ -730,7 +829,7 @@ print "REDO" if ($debugging);
     # scan input lines for class declarations
     # return an array of array refs, the first array being the header-wide lines
     # the others (if any) being the class-specific lines
-	my @lineArrays = &getLineArrays(\@rawInputLines);
+	my @lineArrays = &getLineArrays(\@rawInputLines, $lang, $sublang);
 
 # print "NLA: " . scalar(@lineArrays) . "\n";
     
@@ -774,6 +873,24 @@ print "REDO" if ($debugging);
 	    while ($inputCounter <= $nlines) {
 			my $line = "";           
 	        
+			if ($inputLines[$inputCounter] =~ /^\s*#include (.*)$/) {
+				my $rest = $1;
+				$rest =~ s/^\s*//s;
+				$rest =~ s/\s*$//s;
+				if ($rest !~ s/^\<(.*)\>$/$1/s) {
+					$rest =~ s/^\"(.*)\"$/$1/s;
+				}
+				my $filename = basename($rest);
+				if ($HeaderDoc::HeaderFileCPPHashHash{$filename}) {
+					my $includehash = HeaderDoc::IncludeHash->new();
+					$includehash->{FILENAME} = $filename;
+					$includehash->{LINENUM} = $inputCounter + $blockOffset;
+					$includehash->{HASHREF} = $HeaderDoc::HeaderFileCPPHashHash{$filename};
+					push(@HeaderDoc::cppHashList, $includehash);
+# print "PUSH HASH\n";
+					push(@HeaderDoc::cppArgHashList, $HeaderDoc::HeaderFileCPPArgHashHash{$filename});
+				}
+			}
 	        	print "Input line number[1]: $inputCounter\n" if ($localDebug);
 			print "last line ".$inputLines[$inputCounter-1]."\n" if ($localDebug);
 			print "next line ".$inputLines[$inputCounter]."\n" if ($localDebug);
@@ -851,7 +968,12 @@ print "REDO" if ($debugging);
 					my $newline = $inputLines[$inputCounter++];
 					# This is not inherently wrong.
 					if (!emptyHDok($line)) {
-				 		warnHDComment(\@inputLines, $inputCounter, $blockOffset, "HeaderDoc comment", "3");
+# print "LINE WAS $line\n";
+						my $dectype = "HeaderDoc comment";
+						if ($line =~ /^\s*\/\*\!\s*\@define(d)?block\s+/) {
+							$dectype = "defineblock";
+						}
+						warnHDComment(\@inputLines, $inputCounter, $blockOffset, $dectype, "3");
 					}
 					if ($lang eq "perl" || $lang eq "shell") {
 					    $newline =~ s/^\s*\#\s*//o;
@@ -917,7 +1039,7 @@ print "REDO" if ($debugging);
 					($line =~ /^\/\*!\s+\@lineref\s+(\d+)/io) && do {$blockOffset = $1 - $inputCounter; $inputCounter--; print "BLOCKOFFSET SET TO $blockOffset\n" if ($linenumdebug); last SWITCH;};
 					($line =~ /^\/\*!\s+\@enum\s*/io) && do {$inEnum = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@serial(Data|Field|)\s+/io) && do {$inUnknown = 2;last SWITCH;};
-					($line =~ /^\/\*!\s*\w/io) && do {$inUnknown = 1;last SWITCH;};
+					($line =~ /^\/\*!\s*[^\@\s]/io) && do {$inUnknown = 1;last SWITCH;};
 					my $linenum = $inputCounter - 1 + $blockOffset; # @@@
 					warn "$filename:$linenum:HeaderDoc comment is not of known type. Comment text is:\n";
 					print "    $line\n";
@@ -926,10 +1048,12 @@ print "REDO" if ($debugging);
 				my $linenum = $inputCounter - 1;
 				my $preAtPart = "";
 				$line =~ s/\n\n/\n<br><br>\n/go; # change newline pairs into HTML breaks, for para formatting
-				if ($inUnknown == 1) {
-					if ($line =~ s/^\s*\/\*!\s*(\w.*?)\@/\/\*! \@/sio) {
-						$preAtPart = $1;
+				if ( 0 && $inUnknown == 1) {
+					if ($line =~ s/^\s*\/\*!\s*(.*?)([^\\])\@/\/\*! \@/sio) {
+# print "CASEA\n";
+						$preAtPart = $1.$2;
 					} elsif ($line !~ /^\s*\/\*!\s*.*\@/o) {
+# print "CASEB\n";
 						$preAtPart = $line;
 						$preAtPart =~ s/^\s*\/\*!\s*//sio;
 						$preAtPart =~ s/\s*\*\/\s*$//sio;
@@ -946,7 +1070,7 @@ print "REDO" if ($debugging);
 				if ($inPerlScript) {print "inPerlScript\n" if ($debugging); &processCPPHeaderComment(); $lang="php";};
 				if ($inPHPScript) {print "inPHPScript\n" if ($debugging); &processCPPHeaderComment(); $lang="php";};
 				if ($inJavaSource) {print "inJavaSource\n" if ($debugging); &processCPPHeaderComment(); $lang="java";};
-				if ($inClass) {
+				if ($inClass && 0) {
 					$functionGroup = "";
 					$HeaderDoc::globalGroup = "";
 					my $classdec = "";
@@ -966,10 +1090,6 @@ print "REDO" if ($debugging);
 						$inInterface = 0;
 						$apiOwner->isCOMInterface(1);
 						$apiOwner->tocTitlePrefix('COM Interface:');
-					}
-					my $superclass = &get_super($classType, $classdec);
-					if (length($superclass) && (!($apiOwner->checkShortLongAttributes("Superclass")))) {
-					    $apiOwner->attribute("Superclass", $superclass, 0);
 					}
 					print "inClass 2\n" if ($debugging); 
 				};
@@ -1093,893 +1213,38 @@ print "REDO" if ($debugging);
 					}
 				}
 
-				if ($inUnknown || $inTypedef || $inStruct || $inEnum || $inUnion || $inConstant || $inVar || $inFunction || ($inMethod && $methods_with_new_parser) || $inPDefine) {
-				    my ($sotemplate, $eotemplate, $operator, $soc, $eoc, $ilc, $sofunction,
-					$soprocedure, $sopreproc, $lbrace, $rbrace, $unionname, $structname,
-					$typedefname, $varname, $constname, $structisbrace, $macronameref)
-					= parseTokens($lang, $HeaderDoc::sublang);
-				    my $varIsConstant = 0;
-				    my $blockmode = 0;
-				    my $curtype = "";
-				    my $warntype = "";
-				    my $blockDebug = 0;
-				    my $parmDebug = 0;
-				    my $localDebug = 0;
+    if ($inUnknown || $inTypedef || $inStruct || $inEnum || $inUnion || $inConstant || $inVar || $inFunction || ($inMethod && $methods_with_new_parser) || $inPDefine || $inClass) {
+	my $localDebug = 0;
+	my $hangDebug  = 0;
+	my $parmDebug  = 0;
+	my $blockDebug = 0;
 
-				    if ($inPDefine == 2) { $blockmode = 1; }
-				    if ($inFunction || $inMethod) {
-					if ($localDebug) {
-						if ($inMethod) {
-							print "inMethod\n";
-						} else {
-							print "inFunction\n";
-						}
-					}
-					# @@@ FIXME DAG (OBJC)
-					my $method = 0;
-					if ($classType eq "occ" ||
-						$classType eq "intf" ||
-						$classType eq "occCat") {
-							$method = 1;
-					}
-					if ($method) {
-						$curObj = HeaderDoc::Method->new;
-						$curtype = "method";
-					} else {
-						$curObj = HeaderDoc::Function->new;
-						$curtype = "function";
-					}
-					$curObj->apiOwner($apiOwner);
-					if ($xml_output) {
-					    $curObj->outputformat("hdxml");
-					} else { 
-					    $curObj->outputformat("html");
-					}
-					if (length($functionGroup)) {
-						$curObj->group($functionGroup);
-					} else {
-						$curObj->group($HeaderDoc::globalGroup);
-					}
-                                        $curObj->filename($filename);
-					$curObj->linenum($inputCounter+$blockOffset);
-					if ($method) {
-						$curObj->processComment(\@fields);
-					} else {
-						$curObj->processComment(\@fields);
-					}
-				    } elsif ($inPDefine) {
-					print "inPDefine\n" if ($localDebug);
-					$curtype = "#define";
-					if ($blockmode) { $warntype = "defineblock"; }
-					$curObj = HeaderDoc::PDefine->new;
-					$curObj->group($HeaderDoc::globalGroup);
-					$curObj->apiOwner($apiOwner);
-					if ($xml_output) {
-					    $curObj->outputformat("hdxml");
-					} else { 
-					    $curObj->outputformat("html");
-					}
-                                        $curObj->filename($filename);
-					$curObj->linenum($inputCounter+$blockOffset);
-					$curObj->processComment(\@fields);
-				    } elsif ($inVar) {
-# print "inVar!!\n";
-					print "inVar\n" if ($localDebug);
-					$curtype = "constant";
-					$varIsConstant = 0;
-					$curObj = HeaderDoc::Var->new;
-					$curObj->group($HeaderDoc::globalGroup);
-					$curObj->apiOwner($apiOwner);
-					if ($xml_output) {
-					    $curObj->outputformat("hdxml");
-					} else { 
-					    $curObj->outputformat("html");
-					}
-                                        $curObj->filename($filename);
-					$curObj->linenum($inputCounter+$blockOffset);
-					$curObj->processComment(\@fields);
-				    } elsif ($inConstant) {
-					print "inConstant\n" if ($localDebug);
-					$curtype = "constant";
-					$varIsConstant = 1;
-					$curObj = HeaderDoc::Constant->new;
-					$curObj->group($HeaderDoc::globalGroup);
-					$curObj->apiOwner($apiOwner);
-					if ($xml_output) {
-					    $curObj->outputformat("hdxml");
-					} else { 
-					    $curObj->outputformat("html");
-					}
-                                        $curObj->filename($filename);
-					$curObj->linenum($inputCounter+$blockOffset);
-					$curObj->processComment(\@fields);
-				    } elsif ($inUnknown) {
-					print "inUnknown\n" if ($localDebug);
-					$curtype = "UNKNOWN";
-					$curObj = HeaderDoc::HeaderElement->new;
-					$curObj->group($HeaderDoc::globalGroup);
-					if ($xml_output) {
-					    $curObj->outputformat("hdxml");
-					} else { 
-					    $curObj->outputformat("html");
-					}
-					warnHDComment(\@inputLines, $inputCounter, $blockOffset, "unknown", "11");
-				    } elsif ($inTypedef) {
-# print "inTypedef\n"; $localDebug = 1;
-					print "inTypedef\n" if ($localDebug);
-					$curtype = $typedefname;
-					# if ($lang eq "pascal") {
-						# $curtype = "type";
-					# } else {
-						# $curtype = "typedef";
-					# }
-					$curObj = HeaderDoc::Typedef->new;
-					$curObj->group($HeaderDoc::globalGroup);
-					$curObj->apiOwner($apiOwner);
-					if ($xml_output) {
-					    $curObj->outputformat("hdxml");
-					} else { 
-					    $curObj->outputformat("html");
-					}
-                                        $curObj->filename($filename);
-					$curObj->linenum($inputCounter+$blockOffset);
-					$curObj->processComment(\@fields);
-					$curObj->masterEnum(0);
-					
-					warnHDComment(\@inputLines, $inputCounter, $blockOffset, "enum", "11a");
-					# if a struct declaration precedes the typedef, suck it up
-				} elsif ($inStruct || $inUnion) {
-					if ($localDebug) {
-						if ($inUnion) {
-							print "inUnion\n";
-						} else {
-							print "inStruct\n";
-						}
-					}
-					if ($inUnion) {
-						$curtype = "union";
-					} else {
-						$curtype = "struct";
-					}
-                                        $curObj = HeaderDoc::Struct->new;
-					$curObj->group($HeaderDoc::globalGroup);
-                                        $curObj->apiOwner($apiOwner);
-                                        if ($inUnion) {     
-                                            $curObj->isUnion(1);
-                                        } else {
-                                            $curObj->isUnion(0);
-                                        }
-                                        if ($xml_output) {
-                                            $curObj->outputformat("hdxml");
-                                        } else {
-                                            $curObj->outputformat("html");
-                                        }
-                                        $curObj->filename($filename);
-					$curObj->linenum($inputCounter+$blockOffset);
-                                        $curObj->processComment(\@fields);
-					warnHDComment(\@inputLines, $inputCounter, $blockOffset, "$curtype", "11b");
-				} elsif ($inEnum) {
-					print "inEnum\n" if ($localDebug);
-					$curtype = "enum";
-                                        $curObj = HeaderDoc::Enum->new;
-					$curObj->masterEnum(1);
-					$curObj->group($HeaderDoc::globalGroup);
-                                        $curObj->apiOwner($apiOwner);
-                                        if ($xml_output) {
-                                            $curObj->outputformat("hdxml");
-                                        } else {
-                                            $curObj->outputformat("html");
-                                        }
-                                        $curObj->filename($filename);
-					$curObj->linenum($inputCounter+$blockOffset);
-                                        $curObj->processComment(\@fields);
-					warnHDComment(\@inputLines, $inputCounter, $blockOffset, "$curtype", "11c");
-				}
-				if (!length($warntype)) { $warntype = $curtype; }
-                                while (($inputLines[$inputCounter] !~ /\w/o)  && ($inputCounter <= $nlines)){
-                                	# print "BLANKLINE IS $inputLines[$inputCounter]\n";
-                                	$inputCounter++;
-# print "warntype is $warntype\n";
-                                	warnHDComment(\@inputLines, $inputCounter, $blockOffset, "$warntype", "12");
-                                	print "Input line number[7]: $inputCounter\n" if ($localDebug);
-                                };
-                                # my  $declaration = $inputLines[$inputCounter];
+# print "WRAPPER: FIELDS:\n";
+# foreach my $field (@fields) {
+	# print "FIELD: $field\n";
+# }
+# print "ENDFIELDS\n";
+# print "preAtPart: $preAtPart\n";
 
-print "NEXT LINE is ".$inputLines[$inputCounter].".\n" if ($localDebug);
+	my $subparse = 0;
+	my $subparseTree = undef;
+	my $classref = undef;
+	my $catref = undef;
+	($inputCounter, $cppAccessControlState, $classType, $classref, $catref, $blockOffset) =
+	    blockParseOutside($apiOwner, $inFunction, $inUnknown,
+		$inTypedef, $inStruct, $inEnum, $inUnion,
+		$inConstant, $inVar, $inMethod, $inPDefine,
+		$inClass, $inInterface, $blockOffset, \@categoryObjects,
+		\@classObjects, $classType, $cppAccessControlState,
+		\@fields, $filename, $functionGroup,
+		$headerObject, $inputCounter, \@inputLines,
+		$lang, $nlines, $preAtPart, $xml_output, $localDebug,
+		$hangDebug, $parmDebug, $blockDebug, $subparse,
+		$subparseTree, $HeaderDoc::nodec);
+	@classObjects = @{$classref};
+	@categoryObjects = @{$catref};
 
-	my $outertype = ""; my $newcount = 0; my $declaration = ""; my $namelist = "";
-
-	my ($case_sensitive, $keywordhashref) = $curObj->keywords();
-	my $typelist = ""; my $innertype = ""; my $posstypes = "";
-	print "PTCT: $posstypes =? $curtype\n" if ($localDebug || $blockDebug);
-	my $blockDec = "";
-	my $hangDebug = 0;
-	while (($blockmode || ($outertype ne $curtype && $innertype ne $curtype && $posstypes !~ /$curtype/)) && ($inputCounter <= $nlines)) { # ($typestring !~ /$typedefname/)
-
-		if ($hangDebug) { print "In Block Loop\n"; }
-
-		# while ($inputLines[$inputCounter] !~ /\S/o && ($inputCounter <= $nlines)) { $inputCounter++; }
-		# if (warnHDComment(\@inputLines, $inputCounter, 0, "blockParse:$outertype", "18b")) {
-			# last;
-		# } else { print "OK\n"; }
-		print "DOING SOMETHING\n" if ($localDebug);
-		$HeaderDoc::ignore_apiuid_errors = 1;
-		my $junk = $curObj->apirefSetup();
-		$HeaderDoc::ignore_apiuid_errors = 0;
-		# the value of a constant
-		my $value = "";
-		my $pplref = undef;
-		my $returntype = undef;
-		my $pridec = "";
-		my $parseTree = undef;
-		my $simpleTDcontents = "";
-		my $bpavail = "";
-		print "Entering blockParse\n" if ($hangDebug);
-		($newcount, $declaration, $typelist, $namelist, $posstypes, $value, $pplref, $returntype, $pridec, $parseTree, $simpleTDcontents, $bpavail) = &blockParse($filename, $blockOffset, \@inputLines, $inputCounter, 0, \%HeaderDoc::ignorePrefixes, \%HeaderDoc::perHeaderIgnorePrefixes, $keywordhashref, $case_sensitive);
-
-		if ($bpavail && length($bpavail)) { $curObj->availability($bpavail); }
-		# print "BPAVAIL ($namelist): $bpavail\n";
-
-		print "Left blockParse\n" if ($hangDebug);
-
-		if ($outertype eq $curtype || $innertype eq $curtype || $posstypes =~ /$curtype/) {
-			# Make sure we have the right UID for methods
-			$curObj->declaration($declaration);
-			$HeaderDoc::ignore_apiuid_errors = 1;
-			my $junk = $curObj->apirefSetup(1);
-			$HeaderDoc::ignore_apiuid_errors = 0;
-		}
-		$curObj->privateDeclaration($pridec);
-		$parseTree->addAPIOwner($curObj);
-		$curObj->parseTree(\$parseTree);
-		# print "PT IS A $parseTree\n";
-		# $parseTree->htmlTree();
-		# $parseTree->processEmbeddedTags();
-
-		my @parsedParamList = @{$pplref};
-		print "VALUE IS $value\n" if ($localDebug);
-		# warn("nc: $newcount.  ts: $typestring.  nl: $namelist\nBEGIN:\n$declaration\nEND.\n");
-
-		my $method = 0;
-		if ($classType eq "occ" ||
-			$classType eq "intf" ||
-			$classType eq "occCat") {
-				$method = 1;
-		}
-
-		$declaration =~ s/^\s*//so;
-		# if (!length($declaration)) { next; }
-
-	print "obtained declaration\n" if ($localDebug);
-
-		$inputCounter = $newcount;
-
-		my @oldnames = split(/[,;]/, $namelist);
-		my @oldtypes = split(/ /, $typelist);
-
-		$outertype = $oldtypes[0];
-		if ($outertype eq "") {
-			$outertype = $curtype;
-			my $linenum = $inputCounter + $blockOffset;
-			warn("$filename:$linenum:Parser bug: empty outer type\n");
-			warn("IC: $inputCounter\n");
-			warn("DC: \"$declaration\"\n");
-			warn("TL: \"$typelist\"\n");
-			warn("DC: \"$namelist\"\n");
-			warn("DC: \"$posstypes\"\n");
-		}
-		$innertype = $oldtypes[scalar(@oldtypes)-1];
-
-		if ($localDebug) {
-			foreach my $ot (@oldtypes) {
-				print "TYPE: \"$ot\"\n";
-			}
-		}
-
-		my $explicit_name = 1;
-		my $curname = $curObj->name();
-		$curname =~ s/^\s*//o;
-		$curname =~ s/\s*$//o;
-		my @names = ( ); #$curname
-		my @types = ( ); #$outertype
-
-		my $nameDebug = 0;
-		print "names:\n" if ($nameDebug);
-		if ($curname !~ /:$/o) {
-		    foreach my $name (@oldnames) {
-			my $NCname = $name;
-			my $NCcurname = $curname;
-			$NCname =~ s/:$//so;
-			$NCcurname =~ s/:$//so;
-			print "NM \"$name\" CN: \"$curname\"\n" if ($nameDebug);
-			if ($NCname eq $NCcurname && $name ne $curname) {
-			    $curname .= ":";
-			    $curObj->name($curname);
-			    $curObj->rawname($curname);
-			}
-		    }
-		}
-		print "endnames\n" if ($nameDebug);
-
-		if (length($curname) && length($curtype)) {
-			push(@names, $curname);
-			push(@types, $outertype);
-		}
-		my $count = 0;
-		my $operator = 0;
-		if ($typelist eq "operator") {
-			$operator = 1;
-		}
-		foreach my $name (@oldnames) {
-			if ($operator) {
-				$name =~ s/^\s*operator\s*//so;
-				$name = "operator $name";
-				$curname =~ s/^operator(\s*)(\S+)/operator $2/so;
-			}
-# print "NAME \"$name\"\nCURNAME \"$curname\"\n";
-			if (($name eq $curname) && ($oldtypes[$count] eq $outertype)) {
-				$explicit_name = 0;
-				$count++;
-			} else {
-				push(@names, $name);
-				push(@types, $oldtypes[$count++]);
-			}
-		}
-		# foreach my $xname (@names) { print "XNAME: $xname\n"; }
-		if ($hangDebug) { print "Point A\n"; }
-		# $explicit_name = 0;
-		my $count = 0;
-		foreach my $name (@names) {
-		    my $localDebug = 0;
-		    my $typestring = $types[$count++];
-
-		    print "NAME IS $name\n" if ($localDebug);
-		    print "CURNAME IS $curname\n" if ($localDebug);
-		    print "TYPESTRING IS $typestring\n" if ($localDebug);
-		    print "CURTYPE IS $curtype\n" if ($localDebug);
-			print "MATCH: $name IS A $typestring.\n" if ($localDebug);
-
-print "DEC ($name / $typestring): $declaration\n" if ($localDebug);
-
-		    $name =~ s/\s*$//go;
-		    $name =~ s/^\s*//go;
-		    my $cmpname = $name;
-		    my $cmpcurname = $curname;
-		    $cmpname =~ s/:$//so;
-		    $cmpcurname =~ s/:$//so;
-		    if (!length($name)) { next; }
-			print "Got $name ($curname)\n" if ($localDebug);
-
-			my $extra = undef;
-
-			if ($typestring eq $curtype && ($cmpname eq $cmpcurname || !length($curname))) {
-				print "$curtype = $typestring\n" if ($localDebug);
-				$extra = $curObj;
-# print "E=C\n$extra\n$curObj\n";
-				if ($blockmode) {
-					$blockDec .= $declaration;
-					print "SPDF[1]\n" if ($hangDebug);
-					$curObj->isBlock(1);
-					# $curObj->setPDefineDeclaration($blockDec);
-					print "END SPDF[1]\n" if ($hangDebug);
-					# $declaration = $curObj->declaration() . $declaration;
-				}
-			} else {
-				print "NAME IS $name\n" if ($localDebug);
-			    if ($curtype eq "function" && $posstypes =~ /function/o) {
-				$curtype = "UNKNOWN";
-print "setting curtype to UNKNOWN\n" if ($localDebug);
-			    }
-			    if ($typestring eq $outertype || !$HeaderDoc::outerNamesOnly) {
-				if ($typestring =~ /^$typedefname/ && length($typedefname)) {
-					print "blockParse returned $typedefname\n" if ($localDebug);
-					$extra = HeaderDoc::Typedef->new;
-					$extra->group($HeaderDoc::globalGroup);
-                                        $extra->filename($filename);
-					$extra->linenum($inputCounter+$blockOffset);
-					$curObj->masterEnum(1);
-					if ($curtype eq "UNKNOWN") {
-						$extra->processComment(\@fields);
-					}
-				} elsif ($typestring =~ /^struct/o || $typestring =~ /^union/o || ($lang eq "pascal" && $typestring =~ /^record/o)) {
-					print "blockParse returned struct or union ($typestring)\n" if ($localDebug);
-					$extra = HeaderDoc::Struct->new;
-					$extra->group($HeaderDoc::globalGroup);
-                                        $extra->filename($filename);
-					$extra->linenum($inputCounter+$blockOffset);
-					if ($typestring =~ /union/o) {
-						$extra->isUnion(1);
-					}
-					if ($curtype eq "UNKNOWN") {
-						$extra->processComment(\@fields);
-					}
-				} elsif ($typestring =~ /^enum/o) {
-					print "blockParse returned enum\n" if ($localDebug);
-					$extra = HeaderDoc::Enum->new;
-					$extra->group($HeaderDoc::globalGroup);
-                                        $extra->filename($filename);
-					$extra->linenum($inputCounter+$blockOffset);
-					if ($curtype eq "UNKNOWN") {
-						$extra->processComment(\@fields);
-					}
-					if ($curtype eq "enum" || $curtype eq "typedef") {
-						$extra->masterEnum(0);
-					} else {
-						$extra->masterEnum(1);
-					}
-				} elsif ($typestring =~ /^MACRO/o) {
-					print "blockParse returned MACRO\n" if ($localDebug);
-					# silently ignore this noise.
-				} elsif ($typestring =~ /^\#define/o) {
-					print "blockParse returned #define\n" if ($localDebug);
-					$extra = HeaderDoc::PDefine->new;
-					$extra->group($HeaderDoc::globalGroup);
-                                        $extra->filename($filename);
-					$extra->linenum($inputCounter+$blockOffset);
-					if ($curtype eq "UNKNOWN") {
-						$extra->processComment(\@fields);
-					}
-				} elsif ($typestring =~ /^constant/o) {
-					if ($declaration =~ /\s+const\s+/o) {
-						$varIsConstant = 1;
-						print "blockParse returned constant\n" if ($localDebug);
-						$extra = HeaderDoc::Constant->new;
-						$extra->group($HeaderDoc::globalGroup);
-                                        	$extra->filename($filename);
-						$extra->linenum($inputCounter+$blockOffset);
-						if ($curtype eq "UNKNOWN") {
-							$extra->processComment(\@fields);
-						}
-					} else {
-						$varIsConstant = 0;
-						print "blockParse returned variable\n" if ($localDebug);
-						$extra = HeaderDoc::Var->new;
-						$extra->group($HeaderDoc::globalGroup);
-                                        	$extra->filename($filename);
-						$extra->linenum($inputCounter+$blockOffset);
-						if ($curtype eq "UNKNOWN") {
-							$extra->processComment(\@fields);
-						}
-					}
-				} elsif ($typestring =~ /^(function|method|operator|ftmplt)/o) {
-					print "blockParse returned function or method\n" if ($localDebug);
-					if ($method) {
-						$extra = HeaderDoc::Method->new;
-						if (length($functionGroup)) {
-							$extra->group($functionGroup);
-						} else {
-							$extra->group($HeaderDoc::globalGroup);
-						}
-                                        	$extra->filename($filename);
-						$extra->linenum($inputCounter+$blockOffset);
-						if ($curtype eq "UNKNOWN") {
-							$extra->processComment(\@fields);
-						}
-					} else {
-						$extra = HeaderDoc::Function->new;
-						if (length($functionGroup)) {
-							$extra->group($functionGroup);
-						} else {
-							$extra->group($HeaderDoc::globalGroup);
-						}
-                                        	$extra->filename($filename);
-						$extra->linenum($inputCounter+$blockOffset);
-						if ($curtype eq "UNKNOWN") {
-							$extra->processComment(\@fields);
-						}
-					}
-					if ($typestring eq "ftmplt") {
-						$extra->isTemplate(1);
-					}
-				} else {
-					my $linenum = $inputCounter + $blockOffset;
-					warn("$filename:$linenum:Unknown keyword $typestring in block-parsed declaration\n");
-				}
-			    } else {
-				print "Dropping alternate name\n" if ($localDebug);
-			    }
-			}
-			if ($hangDebug) { print "Point B\n"; }
-			if ($curtype eq "UNKNOWN" && $extra) {
-				$curObj = $extra;
-				$curObj->parseTree(\$parseTree);
-			}
-			if ($extra) {
-				print "Processing \"extra\".\n" if ($localDebug);
-				if ($bpavail && length($bpavail)) {
-					$extra->availability($bpavail);
-				}
-				my $cleantypename = "$typestring $name";
-				$cleantypename =~ s/\s+/ /sgo;
-				$cleantypename =~ s/^\s*//so;
-				$cleantypename =~ s/\s*$//so;
-				if (length($cleantypename)) {
-					$HeaderDoc::namerefs{$cleantypename} = $extra;
-				}
-				my $extraclass = ref($extra) || $extra;
-				my $abstract = $curObj->abstract();
-				my $discussion = $curObj->discussion();
-				my $pridec = $curObj->privateDeclaration();
-				$extra->privateDeclaration($pridec);
-
-				if ($curObj != $extra) {
-					my $orig_parsetree_ref = $curObj->parseTree();
-					my $orig_parsetree = ${$orig_parsetree_ref};
-					bless($orig_parsetree, "HeaderDoc::ParseTree");
-					$extra->parseTree($orig_parsetree_ref); # ->clone());
-					# my $new_parsetree = $extra->parseTree();
-					# bless($new_parsetree, "HeaderDoc::ParseTree");
-					# $new_parsetree->addAPIOwner($extra);
-					$orig_parsetree->addAPIOwner($extra);
-					# $new_parsetree->processEmbeddedTags();
-				}
-				# print "PROCESSING CO $curObj EX $extra\n";
-				# print "PT: ".$curObj->parseTree()."\n";
-
-				if ($blockmode) {
-					my $altDiscussionRef = $curObj->checkAttributeLists("Included Defines");
-					my $discussionParam = $curObj->taggedParamMatching($name);
-					# print "got $discussionParam\n";
-	# print "DP: $discussionParam ADP: $altDiscussionRef\n";
-					if ($discussionParam) {
-						$discussion = $discussionParam->discussion;
-					} elsif ($altDiscussionRef) {
-						my @altDiscEntries = @{$altDiscussionRef};
-						foreach my $field (@altDiscEntries) {
-						    my ($dname, $ddisc) = &getAPINameAndDisc($field);
-						    if ($name eq $dname) {
-						    	$discussion = $ddisc;
-						    }
-						}
-					}
-					if ($curObj != $extra) {
-						# we use the parsed parms to
-						# hold subdefines.
-						$curObj->addParsedParameter($extra);
-					}
-				}
-
-				print "Point B1\n" if ($hangDebug);
-				if ($extraclass ne "HeaderDoc::Method") {
-					print "Point B2\n" if ($hangDebug);
-					my $paramName = "";
-					my $position = 0;
-					my $type = "";
-					if ($extraclass eq "HeaderDoc::Function") {
-						$extra->returntype($returntype);
-					}
-					my @tempPPL = @parsedParamList;
-					foreach my $parsedParam (@tempPPL) {
-					    if (0) {
-						# temp code
-						print "PARSED PARAM: \"$parsedParam\"\n" if ($parmDebug);
-						if ($parsedParam =~ s/(\w+\)*)$//so) {
-							$paramName = $1;
-						} else {
-							$paramName = "";
-						}
-
-						$parsedParam =~ s/\s*$//so;
-						if (!length($parsedParam)) {
-							$type = $paramName;
-							$paramName = "";
-						} else {
-							$type = $parsedParam;
-						}
-						print "NAME: $paramName\nType: $type\n" if ($parmDebug);
-
-						my $param = HeaderDoc::MinorAPIElement->new();
-						$param->linenum($inputCounter+$blockOffset);
-						$param->outputformat($extra->outputformat);
-						$param->name($paramName);
-						$param->position($position++);
-						$param->type($type);
-						$extra->addParsedParameter($param);
-					    } else {
-						# the real code
-						my $ppDebug = 0 || $parmDebug;
-
-						print "PARSED PARAM: \"$parsedParam\"\n" if ($ppDebug);
-
-						my $ppstring = $parsedParam;
-						$ppstring =~ s/^\s*//sgo;
-						$ppstring =~ s/\s*$//sgo;
-
-						my $foo;
-						my $dec;
-						my $pridec;
-						my $type;
-						my $name;
-						my $pt;
-						my $value;
-						my $pplref;
-						my $returntype;
-						if ($ppstring eq "...") {
-							$name = $ppstring;
-							$type = "";
-							$pt = "";
-						} else {
-							$ppstring .= ";";
-							my @array = ( $ppstring );
-
-							my $parseTree = undef;
-							my $simpleTDcontents = "";
-							my $bpavail = "";
-							($foo, $dec, $type, $name, $pt, $value, $pplref, $returntype, $pridec, $parseTree, $simpleTDcontents, $bpavail) = &blockParse($filename, $extra->linenum(), \@array, 0, 1, \%HeaderDoc::ignorePrefixes, \%HeaderDoc::perHeaderIgnorePrefixes, $keywordhashref, $case_sensitive);
-						}
-						if ($ppDebug) {
-							print "NAME: $name\n";
-							print "TYPE: $type\n";
-							print "PT:   $pt\n";
-							print "RT:   $returntype\n";
-						}
-						
-						my $param = HeaderDoc::MinorAPIElement->new();
-						$param->linenum($inputCounter+$blockOffset);
-						$param->outputformat($extra->outputformat);
-						$returntype =~ s/^\s*//s;
-						$returntype =~ s/\s*$//s;
-						if ($returntype =~ /(struct|union|enum|record|typedef)$/) {
-							$returntype .= " $name";
-							$name = "";
-						} elsif (!length($returntype)) {
-							$returntype .= " $name";
-							if ($name !~ /\.\.\./) {
-								$name = "anonymous$name";
-							}
-						}
-						print "NM: $name RT $returntype\n" if ($ppDebug);
-						$param->name($name);
-						$param->position($position++);
-						$param->type($returntype);
-						$extra->addParsedParameter($param);
-					    }
-					}
-				} else {
-					# we're a method
-					$extra->returntype($returntype);
-					my @newpps = $parseTree->objCparsedParams();
-					foreach my $newpp (@newpps) {
-						$extra->addParsedParameter($newpp);
-					}
-				}
-				my $extradirty = 0;
-				if (length($simpleTDcontents)) {
-					$extra->typedefContents($simpleTDcontents);
-				}
-				print "Point B3\n" if ($hangDebug);
-				if (length($preAtPart)) {
-					print "preAtPart: $preAtPart\n" if ($localDebug);
-					$extra->discussion($preAtPart);
-				} elsif ($extra != $curObj) {
-					# Otherwise this would be bad....
-					$extra->discussion($discussion);
-
-				}
-				print "Point B4\n" if ($hangDebug);
-				$extra->abstract($abstract);
-				if (length($value)) { $extra->value($value); }
-				if ($extra != $curObj || !length($curObj->name())) {
-					$name =~ s/^(\s|\*)*//sgo;
-				}
-				print "NAME IS $name\n" if ($localDebug);
-				$extra->rawname($name);
-				# my $namestring = $curObj->name();
-				# if ($explicit_name && 0) {
-					# $extra->name("$name ($namestring)");
-				# } else {
-					# $extra->name($name);
-				# }
-				print "Point B5\n" if ($hangDebug);
-				$HeaderDoc::ignore_apiuid_errors = 1;
-				$extra->name($name);
-				my $junk = $extra->apirefSetup();
-				$HeaderDoc::ignore_apiuid_errors = 0;
-
-
-				# print "NAMES: \"".$curObj->name()."\" & \"".$extra->name()."\"\n";
-				# print "ADDYS: ".$curObj." & ".$extra."\n";
-
-				if ($extra != $curObj) {
-				    my @params = $curObj->taggedParameters();
-				    foreach my $param (@params) {
-					$extradirty = 1;
-					# print "CONSTANT $param\n";
-					$extra->addTaggedParameter($param->clone());
-				    }
-				    my @constants = $curObj->constants();
-				    foreach my $constant (@constants) {
-					$extradirty = 1;
-					# print "CONSTANT $constant\n";
-					if ($extra->can("addToConstants")) {
-					    $extra->addToConstants($constant->clone());
-					    # print "ATC\n";
-					} elsif ($extra->can("addConstant")) {
-					    $extra->addConstant($constant->clone());
-					    # print "AC\n";
-					}
-				    }
-
-				    print "Point B6\n" if ($hangDebug);
-				    if (length($curObj->name())) {
-	# my $a = $extra->rawname(); my $b = $curObj->rawname(); my $c = $curObj->name();
-	# print "EXTRA RAWNAME: $a\nCUROBJ RAWNAME: $b\nCUROBJ NAME: $c\n";
-					# change whitespace to ctrl-d to
-					# allow multi-word names.
-					my $ern = $extra->rawname();
-					if ($ern =~ /\s/o && $localDebug) {
-						print "changed space to ctrl-d\n";
-						print "ref is ".$extra->apiuid()."\n";
-					}
-					$ern =~ s/\s/\cD/sgo;
-					my $crn = $curObj->rawname();
-					if ($crn =~ /\s/o && $localDebug) {
-						print "changed space to ctrl-d\n";
-						print "ref is ".$curObj->apiuid()."\n";
-					}
-					$crn =~ s/\s/\cD/sgo;
-					$curObj->attributelist("See Also", $ern." ".$extra->apiuid());
-					$extra->attributelist("See Also", $crn." ".$curObj->apiuid());
-				    }
-				}
-				print "Point B7 TS = $typestring\n" if ($hangDebug);
-				if (ref($apiOwner) ne "HeaderDoc::Header") {
-					$extra->accessControl($cppAccessControlState); # @@@ FIXME DAG CHECK FOR OBJC
-				}
-				if ($extra != $curObj && $curtype ne "UNKNOWN" && $curObj->can("fields") && $extra->can("fields")) {
-					my @fields = $curObj->fields();
-					print "B7COPY\n" if ($localDebug);
-
-					foreach my $field (@fields) {
-						bless($field, "HeaderDoc::MinorAPIElement");
-						my $newfield = $field->clone();
-						$extradirty = 1;
-						$extra->addField($newfield);
-						# print "Added field ".$newfield->name()." to $extra ".$extra->name()."\n";
-					}
-				}
-				$extra->apiOwner($apiOwner);
-				if ($xml_output) {
-				    $extra->outputformat("hdxml");
-				} else { 
-				    $extra->outputformat("html");
-				}
-				$extra->filename($filename);
-
-		# warn("Added ".$extra->name()." ".$extra->apiuid().".\n");
-
-				print "B8 blockmode=$blockmode ts=$typestring\n" if ($localDebug || $hangDebug);
-				if ($typestring =~ /$typedefname/ && length($typedefname)) {
-	                		if (length($declaration)) {
-                        			$extra->setTypedefDeclaration($declaration);
-					}
-					if (length($extra->name())) {
-						if (($blockmode != 2) || ($extra != $curObj)) { $apiOwner->addToTypedefs($extra); }
-				    	}
-				} elsif ($typestring =~ /MACRO/o) {
-					# throw these away.
-					# $extra->setPDefineDeclaration($declaration);
-					# $apiOwner->addToPDefines($extra);
-				} elsif ($typestring =~ /#define/o) {
-					print "SPDF[2]\n" if ($hangDebug);
-					$extra->setPDefineDeclaration($declaration);
-# print "DEC:$declaration\n" if ($hangDebug);
-					print "END SPDF[2]\n" if ($hangDebug);
-					if (($blockmode != 2) || ($extra != $curObj)) { $apiOwner->addToPDefines($extra); }
-				} elsif ($typestring =~ /struct/o || $typestring =~ /union/o || ($lang eq "pascal" && $typestring =~ /record/o)) {
-					if ($typestring =~ /union/o) {
-						$extra->isUnion(1);
-					} else {
-						$extra->isUnion(0);
-					}
-					# $extra->declaration($declaration);
-# print "PRE (DEC IS $declaration)\n";
-					$extra->setStructDeclaration($declaration);
-# print "POST\n";
-					if (($blockmode != 2) || ($extra != $curObj)) { $apiOwner->addToStructs($extra); }
-				} elsif ($typestring =~ /enum/o) {
-					$extra->declaration($declaration);
-					$extra->declarationInHTML($extra->getEnumDeclaration($declaration));
-print "B8ENUM\n" if ($localDebug || $hangDebug);
-					if (($blockmode != 2) || ($extra != $curObj)) {
-print "B8ENUMINSERT apio=$apiOwner\n" if ($localDebug || $hangDebug);
- $apiOwner->addToEnums($extra); }
-				} elsif ($typestring =~ /\#define/o) {
-					print "SPDF[3]\n" if ($hangDebug);
-					$extra->setPDefineDeclaration($declaration);
-					print "END SPDF[3]\n" if ($hangDebug);
-					if (($blockmode != 2) || ($extra != $curObj)) { $headerObject->addToPDefines($extra); }
-				} elsif ($typestring =~ /(function|method|operator|ftmplt)/o) {
-					if ($method) {
-						$extra->setMethodDeclaration($declaration);
-						$HeaderDoc::ignore_apiuid_errors = 1;
-						my $junk = $extra->apirefSetup(1);
-						$extradirty = 0;
-						$HeaderDoc::ignore_apiuid_errors = 0;
-						if (($blockmode != 2) || ($extra != $curObj)) { $apiOwner->addToMethods($extra); }
-					} else {
-						print "SFD\n" if ($hangDebug);
-						$extra->setFunctionDeclaration($declaration);
-						print "END SFD\n" if ($hangDebug);
-						$HeaderDoc::ignore_apiuid_errors = 1;
-						my $junk = $extra->apirefSetup(1);
-						$extradirty = 0;
-						$HeaderDoc::ignore_apiuid_errors = 0;
-						if (($blockmode != 2) || ($extra != $curObj)) { $apiOwner->addToFunctions($extra); }
-					}
-					if ($typestring eq "ftmplt") {
-						$extra->isTemplate(1);
-					}
-				} elsif ($typestring =~ /constant/o) {
-					$extra->declaration($declaration);
-					if ($varIsConstant) {
-					    $extra->setConstantDeclaration($declaration);
-                                            if (length($extra->name())) {
-                                                    if (ref($apiOwner) ne "HeaderDoc::Header") {
-                                                        $extra->accessControl($cppAccessControlState);
-                                                        if (($blockmode != 2) || ($extra != $curObj)) { $apiOwner->addToVars($extra); }
-                                                    } else { # headers group by type
-                                                            if (($blockmode != 2) || ($extra != $curObj)) { $apiOwner->addToConstants($extra); }
-                                                }
-                                            }
-					} else {
-						$extra->setVarDeclaration($declaration);
-                                                if (ref($apiOwner) ne "HeaderDoc::Header") {
-                                                    $extra->accessControl($cppAccessControlState);
-						}
-						if (($blockmode != 2) || ($extra != $curObj)) { $apiOwner->addToVars($extra); }
-					}
-				} else {
-					my $linenum = $inputCounter + $blockOffset;
-					warn("$filename:$linenum:Unknown typestring $typestring returned by blockParse\n");
-				}
-				print "B9 blockmode=$blockmode ts=$typestring\n" if ($localDebug || $hangDebug);
-				$extra->checkDeclaration();
-				$HeaderDoc::ignore_apiuid_errors = 1;
-				my $junk = $extra->apirefSetup($extradirty);
-				$HeaderDoc::ignore_apiuid_errors = 0;
-			}
-		}
-		if ($hangDebug) {
-			print "Point C\n";
-			print "inputCounter is $inputCounter, #inputLines is $nlines\n";
-		}
-
-		while ($inputLines[$inputCounter] !~ /\S/o && ($inputCounter <= $nlines)) { $inputCounter++; }
-		if ($hangDebug) { print "Point D\n"; }
-		if ($curtype eq "UNKNOWN") { $curtype = $outertype; }
-		if ((($outertype ne $curtype && $innertype ne $curtype && $posstypes !~ /$curtype/)) && (($inputCounter > $nlines) || warnHDComment(\@inputLines, $inputCounter, $blockOffset, "blockParse:$outertype", "18a"))) {
-			warn "No matching declaration found.  Last name was $curname\n";
-			warn "$outertype ne $curtype && $innertype ne $curtype && $posstypes !~ $curtype\n";
-			last;
-		}
-		if ($hangDebug) { print "Point E\n"; }
-		if ($blockmode) {
-			warn "next line: ".$inputLines[$inputCounter]."\n" if ($hangDebug);
-			$blockmode = 2;
-			$HeaderDoc::ignore_apiuid_errors = 1;
-			if (warnHDComment(\@inputLines, $inputCounter, $blockOffset, "blockParse:$outertype", "18a")) {
-				$blockmode = 0;
-				warn "Block Mode Ending\n" if ($hangDebug);
-			}
-			$HeaderDoc::ignore_apiuid_errors = 0;
-		}
-		print "PTCT: $posstypes =? $curtype\n" if ($localDebug || $blockDebug);
-	}
-	if (length($blockDec)) {
-		$curObj->declaration($blockDec);
-		$curObj->declarationInHTML($blockDec);
-	}
-	if ($hangDebug) { print "Point F\n"; }
-	print "Out of Block\n" if ($localDebug || $blockDebug);
-	# the end of this block assumes that inputCounter points
-	# to the last line grabbed, but right now it points to the
-	# next line available.  Back it up by one.
-	$inputCounter--;
-	# warn("NEWDEC:\n$declaration\nEND NEWDEC\n");
-
-				}  ## end blockParse handler
-				
+    }
 	        }
 			$inCPPHeader = $inOCCHeader = $inPerlScript = $inShellScript = $inPHPScript = $inJavaSource = $inHeader = $inUnknown = $inFunction = $inAvailabilityMacro = $inFunctionGroup = $inGroup = $inTypedef = $inUnion = $inStruct = $inConstant = $inVar = $inPDefine = $inEnum = $inMethod = $inClass = 0;
 	        $inputCounter++;
@@ -2031,13 +1296,44 @@ print "B8ENUMINSERT apio=$apiOwner\n" if ($localDebug || $hangDebug);
 					$headerObject->addToClasses($apiOwner);
 					last SWITCH;
 				};
-foreach my $testclass ( $headerObject->classes() ) { print $testclass->name() . "\n"; }
+			foreach my $testclassref ( $headerObject->classes() ) {
+				my $testclass = %{$testclassref};
+				bless($testclass, "HeaderDoc::APIOwner");
+				bless($testclass, $testclass->class());
+				print $testclass->name() . "\n";
+			}
 			my $linenum = $inputCounter - 1;
                     	print "$filename:$linenum:Unknown class type '$classType' (known: cpp, objC, intf, occCat)\n";		
 			}
 	    }
     } # end processing array of line arrays
     push (@headerObjects, $headerObject);
+    my ($headercpphashref, $headercpparghashref) = getAndClearCPPHash();
+    my %headercpphash = %{$headercpphashref};
+    my %headercpparghash = %{$headercpparghashref};
+
+    my $includeListRef = $HeaderDoc::perHeaderIncludes{$filename};
+    if ($includeListRef) {
+	my @includeList = @{$includeListRef};
+	foreach my $include (@includeList) {
+		my $pathname = $include;
+		$pathname =~ s/^\s*//s;
+		$pathname =~ s/\s*$//s;
+		if ($pathname !~ s/^\<(.*)\>$/$1/s) {
+			$pathname =~ s/^\"(.*)\"$/$1/s;
+		}
+		my $includedfilename = basename($pathname);
+		if ($HeaderDoc::HeaderFileCPPHashHash{$includedfilename}) {
+			# Merge the hashes.
+
+			%headercpphash = (%headercpphash, %{$HeaderDoc::HeaderFileCPPHashHash{$includedfilename}});
+			%headercpparghash = (%headercpparghash, %{$HeaderDoc::HeaderFileCPPArgHashHash{$includedfilename}});
+		}
+	}
+    }
+
+    $HeaderDoc::HeaderFileCPPHashHash{$filename} = \%headercpphash;
+    $HeaderDoc::HeaderFileCPPArgHashHash{$filename} = \%headercpparghash;
 }
 
 if (!$quietLevel) {
@@ -2050,6 +1346,14 @@ if (@classObjects && !$xml_output) {
     }
 }
 
+# print "CLASSES: ".scalar(@classObjects)."\n";
+# print "CATEGORIES: ".scalar(@categoryObjects)."\n";
+# print "HEADERS: ".scalar(@headerObjects)."\n";
+
+# foreach my $obj (@categoryObjects) {
+	# print "CO: $obj\n";
+# }
+
 # we merge ObjC methods declared in categories into the owning class,
 # if we've seen it during processing
 if (@categoryObjects && !$xml_output) {
@@ -2057,11 +1361,16 @@ if (@categoryObjects && !$xml_output) {
         my $nameOfAssociatedClass = $obj->className();
         my $categoryName = $obj->categoryName();
         my $localDebug = 0;
+
+	# print "FOR CATEGORY: \"$categoryName\" CLASS IS \"$nameOfAssociatedClass\"\n";
         
 		if (exists $objCClassNameToObject{$nameOfAssociatedClass}) {
 			my $associatedClass = $objCClassNameToObject{$nameOfAssociatedClass};
+			print "AC: $associatedClass\n" if ($localDebug);
+			print "OBJ: $obj\n" if ($localDebug);
+			my $methods = $obj->methods();
 			$associatedClass->addToMethods($obj->methods());
-			
+
 			my $owner = $obj->headerObject();
 			
 			print "Found category with name $categoryName and associated class $nameOfAssociatedClass\n" if ($localDebug);
@@ -2097,7 +1406,7 @@ foreach my $obj (@headerObjects) {
 	$obj->writeHeaderElements(); 
 	$obj->writeHeaderElementsToCompositePage();
 	$obj->createContentFile();
-	$obj->writeExportsWithName($rootFileName) if (($export) || ($testingExport));
+	# $obj->writeExportsWithName($rootFileName) if (($export) || ($testingExport));
     }
     if ("$write_control_file" eq "1") {
 	print "Writing doc server control file... ";
@@ -2115,106 +1424,15 @@ exit 0;
 
 #############################  Subroutines ###################################
 
-# /*! @function nestignore
-#     This function includes a list of headerdoc tags that are legal
-#     within a headerdoc documentation block (e.g. a C struct)
-#     such as parameters, etc.
+
+# /*! The mergeClass function is used for merging bits of
+#     a superclass into subclasses when the \@superclass
+#     tag is specified.
 #
-#     The block parser support aspects of this function are
-#     deprecated, as the calls to warnHDComment within the block
-#     parser no longer exists.  Most calls to warnHDComment from
-#     headerDoc2HTML.pl should always result in an error (since
-#     they only occur outside the context of a declaration.
-#
-#     The exception is test point 12, which can cause false
-#     positives for @defineblock blocks.
-#  */
-sub nestignore
-{
-    my $tag = shift;
-    my $dectype = shift;
-
-#print "DT: $dectype TG: $tag\n";
-
-    # defineblock can only be passed in for debug point 12, so
-    # this can't break anything.
-
-    if ($dectype =~ /defineblock/o && $tag =~ /^\@define/o) {
-	return 1;
-    }
-
-    return 0;
-
-    # Old blockparser support logic.  Removed, since it broke other things.
-    # if ($dectype =~ /(function|method|typedef)/o && $tag =~ /^\@param/o) {
-	# return 1;
-    # } elsif ($dectype =~ /\#define/o && $tag =~ /^\@define/o) {
-	# return 1;
-    # } elsif ($dectype !~ /(typedef|struct)/o && $tag =~ /^\@callback/o) {
-	# return 1;
-    # } elsif ($dectype !~ /(class|function|method|define)/o && $tag =~ /^\@field/o) {
-	# return 1;
-    # } elsif ($dectype !~ /(class|function|method|define)/o && $tag =~ /^\@constant/o) {
-	# return 1;
-    # }
-
-    # return 0;
-}
-
-# /*! @function warnHDComment
-#     @param teststring string to be checked for headerdoc markup
-#     @param linenum line number
-#     @param dectype declaration type
-#     @param dp debug point string
-#  */
-sub warnHDComment
-{
-    my $linearrayref = shift;
-    my $blocklinenum = shift;
-    my $blockoffset = shift;
-    my $dectype = shift;
-    my $dp = shift;
-    my $filename = $HeaderDoc::headerObject->filename();
-    my $localDebug = 2; # Set to 2 so I wouldn't keep turning this off.
-
-    my $line = ${$linearrayref}[$blocklinenum];
-    my $linenum = $blocklinenum + $blockoffset;
-
-    my $debugString = "";
-    if ($localDebug) { $debugString = " [debug point $dp]"; }
-
-    if ($line =~ /\/\*\!(.*)$/o) {
-	my $rest = $1;
-
-	$rest =~ s/^\s*//so;
-	$rest =~ s/\s*$//so;
-
-	while (!length($rest) && ($blocklinenum < scalar(@{$linearrayref}))) {
-		$blocklinenum++;
-		$rest = ${$linearrayref}[$blocklinenum];
-		$rest =~ s/^\s*//so;
-		$rest =~ s/\s*$//so;
-	}
-
-	if ($rest =~ /^\@/o) {
-		 if (nestignore($rest, $dectype)) {
-#print "IGNORE\n";
-			return 0;
-		}
-	} else {
-		printf("Nested headerdoc markup with no tag.\n") if ($localDebug);
-	}
-
-	if (!$HeaderDoc::ignore_apiuid_errors) {
-		warn("$filename:$linenum: WARNING: Unexpected headerdoc markup found in $dectype declaration$debugString.  Output may be broken.\n");
-	}
-	return 1;
-    }
-#print "OK\n";
-    return 0;
-}
-
-
+#     It is also always used for C psuedoclass classes
+#     because any pseudo-superclass relationship isn't
+#     really a superclass.
+# */
 sub mergeClass
 {
 	my $class = shift;
@@ -2453,12 +1671,19 @@ sub mergeClass
 			    }
 		        }
 		        if (@classes) {
-			    foreach my $class (@classes) {
+			    foreach my $classref (@classes) {
+				my $class = %{$class};
+				bless($class, "HeaderDoc::APIOwner");
+				bless($class, $class->class());
 				if ($class->accessControl() eq "private") {
 					next;
 				}
 				my $include = 1;
-				foreach my $childclass (@childclasses) {
+				foreach my $childclassref (@childclasses) {
+				    my $childclass = %{$childclassref};
+				    bless($class, "HeaderDoc::APIOwner");
+				    bless($class, $class->class());
+				    
 				    if ($class->name() eq $childclass->name()) {
 					$include = 0; last;
 				    }
@@ -2509,12 +1734,126 @@ sub getLineArrays {
     my @arrayOfLineArrays = ();
     my @generalHeaderLines = ();
     my @classStack = ();
-	
+
+    my $lang = shift;
+    my $sublang = shift;
+
     my $inputCounter = 0;
     my $lastArrayIndex = @{$rawLineArrayRef};
     my $line = "";
     my $className = "";
     my $classType = "";
+    my $broken_nosplit_classes = 0;
+    my $split_classes = 0;
+    my $isshell = 0;
+
+    if ($lang eq "shell" || $lang eq "perl") {
+	$isshell = 1;
+    }
+    my ($sotemplate, $eotemplate, $operator, $soc, $eoc, $ilc, $sofunction,
+	$soprocedure, $sopreproc, $lbrace, $rbrace, $unionname, $structname,
+	$typedefname, $varname, $constname, $structisbrace, $macronamesref,
+	$classregexp, $classbraceregexp, $classclosebraceregexp, $accessregexp) = parseTokens($lang, $sublang);
+
+    my $socquot = $HeaderDoc::socquot;
+    my $eocquot = $HeaderDoc::eocquot;
+    my $ilcquot = $HeaderDoc::ilcquot;
+
+    if ($isshell) { $eoc = "*/"; $eocquot = $eoc; $eocquot =~ s/(\W)/\\$1/sg; }
+
+    if ($broken_nosplit_classes) {
+	while ($inputCounter <= $lastArrayIndex) {
+		$line = ${$rawLineArrayRef}[$inputCounter++];
+		push(@generalHeaderLines, $line);
+	}
+	push (@arrayOfLineArrays, \@generalHeaderLines);
+	return @arrayOfLineArrays;
+     } elsif (!$split_classes) {
+    while ($inputCounter <= $lastArrayIndex) {
+        $line = ${$rawLineArrayRef}[$inputCounter];
+
+	# inputCounter should always point to the current line being processed
+
+        # we're entering a headerdoc comment--look ahead for @class tag
+	my $startline = $inputCounter;
+
+	print "MYLINE: $line\n" if ($localDebug);
+	if (($isshell && $line =~ /$ilcquot\s*\/\*\!(.*)$/) || (!$isshell && (($line =~ /^\s*$socquot\!/o) || (($lang eq "java") && ($line =~ /^\s*$socquot\*/o)))))  {  # entering headerDoc comment
+			print "inHDComment\n" if ($localDebug);
+			my $headerDocComment = "";
+			{
+				local $^W = 0;  # turn off warnings since -w is overly sensitive here
+				my $in_textblock = 0; my $in_pre = 0;
+				while (($line !~ /$eocquot/o) && ($inputCounter <= $lastArrayIndex)) {
+				    # if ($lang eq "java") {
+					$line =~ s/\{\s*\@linkdoc\s+(.*?)\}/<i>\@link $1\@\/link<\/i>/sgio;
+					$line =~ s/\{\s*\@linkplain\s+(.*?)\}/\@link $1\@\/link/sgio;
+					$line =~ s/\{\s*\@link\s+(.*?)\}/<code>\@link $1\@\/link<\/code>/sgio;
+					$line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/gio;
+					# if ($line =~ /value/o) { warn "line was: $line\n"; }
+					$line =~ s/\{\@value\}/\@value/sgio;
+					$line =~ s/\{\@inheritDoc\}/\@inheritDoc/sgio;
+					# if ($line =~ /value/o) { warn "line now: $line\n"; }
+				    # }
+				    $line =~ s/([^\\])\@docroot/$1\\\@\\\@docroot/gi;
+				    my $templine = $line;
+				    while ($templine =~ s/\@textblock//io) { $in_textblock++; }
+				    while ($templine =~ s/\@\/textblock//io) { $in_textblock--; }
+				    while ($templine =~ s/<pre>//io) { $in_pre++; }
+				    while ($templine =~ s/<\/pre>//io) { $in_pre--; }
+				    if (!$in_textblock && !$in_pre) {
+					$line =~ s/^[ \t]*//o; # remove leading whitespace
+				    }
+				    $line =~ s/^[*]\s*$/\n/o; # replace sole asterisk with paragraph divider
+				    $line =~ s/^[*]\s+(.*)/$1/o; # remove asterisks that precede text
+				    $headerDocComment .= $line;
+				    # warnHDComment($rawLineArrayRef, $inputCounter, 0, "HeaderDoc comment", "32");
+			            $line = ${$rawLineArrayRef}[++$inputCounter];
+				    warnHDComment($rawLineArrayRef, $inputCounter, 0, "HeaderDoc comment", "33");
+				}
+				$line =~ s/\{\s*\@linkdoc\s+(.*?)\}/<i>\@link $1\@\/link<\/i>/sgio;
+				$line =~ s/\{\s*\@linkplain\s+(.*?)\}/\@link $1\@\/link/sgio;
+				$line =~ s/\{\s*\@link\s+(.*?)\}/<code>\@link $1\@\/link<\/code>/sgio;
+				# $line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/gio;
+				# if ($line =~ /value/o) { warn "line was: $line\n"; }
+				$line =~ s/\{\@value\}/\@value/sgio;
+				$line =~ s/\{\@inheritDoc\}/\@inheritDoc/sgio;
+				$line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/go;
+				$headerDocComment .= $line ;
+				# warnHDComment($rawLineArrayRef, $inputCounter, 0, "HeaderDoc comment", "34");
+				$line = ${$rawLineArrayRef}[++$inputCounter];
+
+				# A HeaderDoc comment block immediately
+				# after another one can be legal after some
+				# tag types (e.g. @language, @header).
+				# We'll postpone this check until the
+				# actual parsing.
+				# 
+				if (!emptyHDok($headerDocComment)) {
+					my $emptyDebug = 0;
+					warn "curline is $line" if ($emptyDebug);
+					print "HEADERDOC COMMENT WAS $headerDocComment\n" if ($localDebug);
+					warnHDComment($rawLineArrayRef, $inputCounter, 0, "HeaderDoc comment", "35", $headerDocComment);
+				}
+			}
+			if ($localDebug) { print "first line after $headerDocComment is $line\n"; }
+			push(@generalHeaderLines, $headerDocComment);
+			$inputCounter--;
+		} else {
+			push (@generalHeaderLines, $line); print "PUSHED $line\n" if ($blockDebug);
+		}
+		$inputCounter++;
+	     }
+
+	# print "DUMPING LINES.\n";
+	# for my $line (@generalHeaderLines) {
+		# print "$line";
+	# }
+	# print "DONE DUMPING LINES.\n";
+
+	push (@arrayOfLineArrays, \@generalHeaderLines);
+	return @arrayOfLineArrays;
+    }
 
     while ($inputCounter <= $lastArrayIndex) {
         $line = ${$rawLineArrayRef}[$inputCounter];
@@ -2533,6 +1872,7 @@ sub getLineArrays {
 				my $in_textblock = 0; my $in_pre = 0;
 				while (($line !~ /\*\//o) && ($inputCounter <= $lastArrayIndex)) {
 				    # if ($lang eq "java") {
+					$line =~ s/\{\s*\@linkdoc\s+(.*?)\}/<i>\@link $1\@\/link<\/i>/sgio;
 					$line =~ s/\{\s*\@linkplain\s+(.*?)\}/\@link $1\@\/link/sgio;
 					$line =~ s/\{\s*\@link\s+(.*?)\}/<code>\@link $1\@\/link<\/code>/sgio;
 					$line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/gio;
@@ -2571,7 +1911,7 @@ sub getLineArrays {
 				if (!emptyHDok($headerDocComment)) {
 					my $emptyDebug = 0;
 					warn "curline is $line" if ($emptyDebug);
-					warnHDComment($rawLineArrayRef, $inputCounter, 0, "HeaderDoc comment", "35");
+					warnHDComment($rawLineArrayRef, $inputCounter, 0, "HeaderDoc comment", "35a");
 				}
 			}
 			# print "first line after $headerDocComment is $line\n";
@@ -2580,11 +1920,12 @@ sub getLineArrays {
 			# here is where we create an array of class-specific lines
 			# first, get the class name
 			my $name = ""; my $type = "";
-			if (($headerDocComment =~ /^\/\*!\s*\@class|\@interface|\@protocol|\@category\s*/io ||
-			    ($headerDocComment =~ /^\/\*\!\s*\w+/o && (($name,$type)=classLookAhead($rawLineArrayRef, $inputCounter, $lang, $HeaderDoc::sublang)))) ||
+			# print "HDC: $headerDocComment\n";
+			if (($headerDocComment =~ /^\s*\/\*!\s*\@class|\@interface|\@protocol|\@category\s*/iso ||
+			    ($headerDocComment =~ /^\s*\/\*\!\s*[^\@\s]/so && (($name,$type)=classLookAhead($rawLineArrayRef, $inputCounter, $lang, $HeaderDoc::sublang)))) ||
 			    ($lang eq "java" &&
-				($headerDocComment =~ /^\/\*!\s*\@class|\@interface|\@protocol|\@category\s*/io ||
-				($headerDocComment =~ /^\/\*\*\s*\w+/o && (($name,$type)=classLookAhead($rawLineArrayRef, $inputCounter, $lang, $HeaderDoc::sublang)))))) {
+				($headerDocComment =~ /^\s*\/\*!\s*\@class|\@interface|\@protocol|\@category\s*/iso ||
+				($headerDocComment =~ /^\s*\/\*\*\s*[^\@\s]/so && (($name,$type)=classLookAhead($rawLineArrayRef, $inputCounter, $lang, $HeaderDoc::sublang)))))) {
 				print "INCLASS\n" if ($localDebug);
 				my $explicitName = "";
 				if (length($type)) {
@@ -2881,54 +2222,6 @@ sub removeSlashSlashComment {
 }
 
 
-sub get_super {
-my $classType = shift;
-my $dec = shift;
-my $super = "";
-my $localDebug = 0;
-
-    print "GS: $dec EGS\n" if ($localDebug);
-
-    $dec =~ s/\n/ /smgo;
-
-    if ($classType =~ /^occ/o) {
-	if ($dec !~ s/^\s*\@interface\s*//so) {
-	    if ($dec !~ s/^\s*\@protocol\s*//so) {
-	    	$dec !~ s/^\s*\@class\s*//so;
-	    }
-	}
-	if ($dec =~ /(\w+)\s*\(\s*(\w+)\s*\)/o) {
-	    $super = $1; # delegate is $2
-        } elsif (!($dec =~ s/.*?://so)) {
-	    $super = "";
-	} else {
-	    $dec =~ s/\(.*//sgo;
-	    $dec =~ s/\{.*//sgo;
-	    $super = $dec;
-	}
-    } elsif ($classType =~ /^cpp$/o) {
-	$dec !~ s/^\s*\class\s*//so;
-        if (!($dec =~ s/.*?://so)) {
-	    $super = "";
-	} else {
-	    $dec =~ s/\(.*//sgo;
-	    $dec =~ s/\{.*//sgo;
-	    $dec =~ s/^\s*//sgo;
-	    $dec =~ s/^public//go;
-	    $dec =~ s/^private//go;
-	    $dec =~ s/^protected//go;
-	    $dec =~ s/^virtual//go;
-	    $super = $dec;
-	}
-    }
-
-    $super =~ s/^\s*//o;
-    $super =~ s/\s.*//o;
-
-    print "$super is super\n" if ($localDebug);
-    return $super;
-}
-
 # /*! @function determineClassType
 #     @discussion determines the class type.
 #   */
@@ -3037,9 +2330,10 @@ sub processClassComment {
 					$HeaderDoc::globalGroup = "";
                 	last SWITCH;
             	};
-			($field =~ s/^see(also|)(\s+)/$2/io) &&
+			($field =~ /^see(also|)(\s+)/i) &&
 				do {
 					$apiOwner->see($field);
+					last SWITCH;
 				};
 			($field =~ s/^protocol(\s+)/$1/io) && 
 				do {
@@ -3092,6 +2386,7 @@ sub processClassComment {
             		($field =~ s/^deprecated(\s+)/$1/io) && do {$apiOwner->attribute("Deprecated", $field, 0); last SWITCH;};
             		($field =~ s/^version(\s+)/$1/io) && do {$apiOwner->attribute("Version", $field, 0); last SWITCH;};
 			($field =~ s/^updated(\s+)/$1/io) && do {$apiOwner->updated($field); last SWITCH;};
+			($field =~ s/^indexgroup(\s+)/$1/io) && do {$apiOwner->indexgroup($field); last SWITCH;};
 	    ($field =~ s/^attribute(\s+)/$1/io) && do {
 		    my ($attname, $attdisc) = &getAPINameAndDisc($field);
 		    if (length($attname) && length($attdisc)) {
@@ -3142,7 +2437,7 @@ sub processClassComment {
 			($field =~ s/^security(\s+)/$1/io) && do {$apiOwner->attribute("Security", $field, 1); last SWITCH;};
 			($field =~ s/^whysubclass(\s+)/$1/io) && do {$apiOwner->attribute("Reason to Subclass", $field, 1); last SWITCH;};
 			# print "Unknown field in class comment: $field\n";
-			warn "$filename:$linenum:Unknown field (\@$field) in class comment (".$apiOwner->name().")\n";
+			warn "$filename:$linenum:Unknown field (\@$field) in class comment (".$apiOwner->name().")[1]\n";
 		}
 	}
 	return $apiOwner;
@@ -3164,9 +2459,10 @@ sub processHeaderComment {
 		SWITCH: {
 			($field =~ /^\/\*\!/o)&& do {last SWITCH;}; # ignore opening /*!
 			(($lang eq "java") && ($field =~ /^\s*\/\*\*/o)) && do {last SWITCH;}; # ignore opening /**
-			($field =~ s/^see(also)\s+//o) &&
+			($field =~ /^see(also)\s+/o) &&
 				do {
 					$apiOwner->see($field);
+					last SWITCH;
 				};
 			(($field =~ /^header\s+/io) ||
 			 ($field =~ /^framework\s+/io)) && 
@@ -3204,6 +2500,7 @@ sub processHeaderComment {
 		    }
 		    last SWITCH;
 		};
+	    ($field =~ s/^indexgroup(\s+)/$1/io) && do {$apiOwner->indexgroup($field); last SWITCH;};
 	    ($field =~ s/^attributelist\s+//io) && do {
 		    $field =~ s/^\s*//so;
 		    $field =~ s/\s*$//so;
@@ -3257,6 +2554,11 @@ sub processHeaderComment {
             ($field =~ s/^(compiler|)flag\s+//io) && do {$apiOwner->attributelist("Compiler Flags", $field); last SWITCH;};
             ($field =~ s/^preprocinfo\s+//io) && do {$apiOwner->attribute("Preprocessor Behavior", $field, 1); last SWITCH;};
 	    ($field =~ s/^whyinclude\s+//io) && do {$apiOwner->attribute("Reason to Include", $field, 1); last SWITCH;};
+            ($field =~ s/^ignorefuncmacro\s+//io) && do { $field =~ s/\n//smgo; $field =~ s/<br>//sgo; $field =~ s/^\s*//sgo; $field =~ s/\s*$//sgo;
+		$HeaderDoc::perHeaderIgnoreFuncMacros{$field} = $field;
+		if (!($reprocess_input)) {$reprocess_input = 1;} print "ignoring $field" if ($localDebug); last SWITCH;};
+	    ($field =~ s/^charset(\s+)/$1/io) && do {$apiOwner->encoding($field); last SWITCH;};
+	    ($field =~ s/^encoding(\s+)/$1/io) && do {$apiOwner->encoding($field); last SWITCH;};
             ($field =~ s/^ignore\s+//io) && do { $field =~ s/\n//smgo; $field =~ s/<br>//sgo; $field =~ s/^\s*//sgo; $field =~ s/\s*$//sgo;
 		# push(@HeaderDoc::perHeaderIgnorePrefixes, $field);
 		$HeaderDoc::perHeaderIgnorePrefixes{$field} = $field;
@@ -3492,6 +2794,7 @@ sub classLookAhead
 						$occIntfName = $typetoken;
 					} else {
 						if ((!length($searchname)) || $token eq $searchname) {
+							print "RETURNING CLASS\n" if ($localDebug);
 							return ($token, $typetoken);
 						} else { $typetoken = ""; }
 					}
@@ -3583,7 +2886,71 @@ sub processIncludes($$)
     $HeaderDoc::perHeaderIncludes{$filename} = \@includeList;
 }
 
+sub fix_dependency_order
+{
+    my $inputlistref = shift;
+    my @inputfiles = @{$inputlistref};
+    my @list = ();
+
+    foreach my $rawfilename (@inputfiles) {
+	# print "CHECK RFN: $rawfilename\n";
+
+	%HeaderFileProcessedThisRound = ();
+
+	my $filename = basename($rawfilename);
+	my $deplistref = dependencies_for_file($rawfilename);
+	if ($deplistref) {
+		# print "DLR\n";
+		my @deplist = @{$deplistref};
+		foreach my $file (@deplist) {
+			push(@list, $file);
+		}
+	}
+	push(@list, $rawfilename);
+    }
+    return \@list;
+}
+
+sub dependencies_for_file
+{
+	my $rawfilename = shift;
+	my @fileList = ();
+	my $filename = basename($rawfilename);
+
+	foreach my $include (@{$HeaderDoc::perHeaderIncludes{$filename}}) {
+		print "COMPARE INCLUDE: $include\n" if ($includeDebug);
+		my $tempname = $include;
+		$tempname =~ s/^\s*//s;
+		$tempname =~ s/\s*$//s;
+		if ($tempname !~ s/^\<(.*)\>$/$1/s) {
+			$tempname =~ s/^\"(.*)\"$/$1/s;
+		}
+		$tempname = basename($tempname);
+		print "TMPNM: $tempname\n" if ($includeDebug);
+		if (!$HeaderFileProcessedThisRound{$tempname}) {
+			$HeaderFileProcessedThisRound{$tempname} = 1;
+			foreach my $cmpfile (@inputFiles) {
+				my $namepart = basename($cmpfile);
+				if ($namepart eq $tempname) {
+					print "FOUND: $cmpfile\n" if ($includeDebug);
+					my $deplist = dependencies_for_file($cmpfile);
+					if ($deplist) {
+						my @deps = @{$deplist};
+						foreach my $dep (@deps) {
+							push(@fileList, $dep);
+						}
+					}
+					push(@fileList, $cmpfile);
+					last;
+				}
+			}
+		}
+	}
+	return \@fileList;
+}
+
 sub printVersionInfo {
+    my $bp = HeaderDoc::BlockParse->VERSION();
     my $av = HeaderDoc::APIOwner->VERSION();
     my $hev = HeaderDoc::HeaderElement->VERSION();
     my $hv = HeaderDoc::Header->VERSION();
@@ -3599,10 +2966,18 @@ sub printVersionInfo {
     my $ev = HeaderDoc::Enum->VERSION();
     my $uv = HeaderDoc::Utilities->VERSION();
     my $me = HeaderDoc::MinorAPIElement->VERSION();
+    my $pt = HeaderDoc::ParseTree->VERSION();
+    my $ps = HeaderDoc::ParserState->VERSION();
+    my $ih = HeaderDoc::IncludeHash->VERSION();
+    my $ca = HeaderDoc::ClassArray->VERSION();
+    my $rg = HeaderDoc::Regen->VERSION();
     
-	print "----------------------------------------------------\n";
-	print "\tHeaderDoc version $VERSION.\n";
+	print "---------------------------------------------------------------------\n";
+	print "\tHeaderDoc Version: ".$HeaderDoc_Version."\n\n";
+
+	print "\theaderDoc2HTML - $VERSION\n";
 	print "\tModules:\n";
+	print "\t\tBlockParse - $bp\n";
 	print "\t\tAPIOwner - $av\n";
 	print "\t\tHeaderElement - $hev\n";
 	print "\t\tHeader - $hv\n";
@@ -3618,7 +2993,11 @@ sub printVersionInfo {
 	print "\t\tVar - $vv\n";
 	print "\t\tMinorAPIElement - $me\n";
 	print "\t\tUtilities - $uv\n";
-	print "----------------------------------------------------\n";
+	print "\t\tParseTree - $pt\n";
+	print "\t\tParserState - $ps\n";
+	print "\t\tIncludeHash - $ih\n";
+	print "\t\tClassArray - $ca\n";
+	print "---------------------------------------------------------------------\n";
 }
 
 ################################################################################

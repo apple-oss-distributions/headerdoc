@@ -5,7 +5,7 @@
 # from a C++ header
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/10 22:12:15 $
+# Last Updated: $Date: 2004/10/04 23:11:12 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -36,12 +36,12 @@ BEGIN {
 }
 package HeaderDoc::CPPClass;
 
-use HeaderDoc::Utilities qw(findRelativePath safeName getAPINameAndDisc printArray printHash registerUID sanitize);
+use HeaderDoc::Utilities qw(findRelativePath safeName getAPINameAndDisc printArray printHash sanitize);
 use HeaderDoc::APIOwner;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.13.2.14.2.28 $';
 
 # Inheritance
 @ISA = qw( HeaderDoc::APIOwner );
@@ -471,8 +471,11 @@ sub docNavigatorComment {
 
     my $uid = $self->apiuid($type);
 
+    my $indexgroup = $self->indexgroup(); my $igstring = "";
+    if (length($indexgroup)) { $igstring = "indexgroup=$indexgroup;"; }
+
     my $appleRef = "<a name=\"$uid\"></a>";
-    my $navComment = "<!-- headerDoc=cl; uid=$uid; name=$name-->";
+    my $navComment = "<!-- headerDoc=cl; uid=$uid; $igstring name=$name-->";
     
     return "$navComment\n$appleRef";
 }
@@ -483,25 +486,25 @@ sub docNavigatorComment {
 sub objName { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-   return ($obj1->name() cmp $obj2->name());
+   return (lc($obj1->name()) cmp lc($obj2->name()));
 }
 
 sub byLinkage { # used for sorting
     my $obj1 = $a;
     my $obj2 = $b;
-    return ($obj1->linkageState() cmp $obj2->linkageState());
+    return (lc($obj1->linkageState()) cmp lc($obj2->linkageState()));
 }
 
 sub byAccessControl { # used for sorting
     my $obj1 = $a;
     my $obj2 = $b;
-    return ($obj1->accessControl() cmp $obj2->accessControl());
+    return (lc($obj1->accessControl()) cmp lc($obj2->accessControl()));
 }
 
 sub objGroup { # used for sorting
     my $obj1 = $a;
     my $obj2 = $b;
-    return ($obj1->group() cmp $obj2->group());
+    return (lc($obj1->group()) cmp lc($obj2->group()));
 }
 
 sub linkageAndObjName { # used for sorting
@@ -510,7 +513,7 @@ sub linkageAndObjName { # used for sorting
    my $linkAndName1 = $obj1->linkageState() . $obj1->name();
    my $linkAndName2 = $obj2->linkageState() . $obj2->name();
    if ($HeaderDoc::sort_entries) {
-        return ($linkAndName1 cmp $linkAndName2);
+        return (lc($linkAndName1) cmp lc($linkAndName2));
    } else {
         return byLinkage($obj1, $obj2);
    }

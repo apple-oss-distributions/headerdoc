@@ -4,7 +4,7 @@
 # Synopsis: Holds typedef info parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/13 04:59:12 $
+# Last Updated: $Date: 2004/10/13 00:09:34 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -39,7 +39,7 @@ use HeaderDoc::APIOwner;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.12.2.8.2.36 $';
 
 
 sub new {
@@ -139,7 +139,14 @@ sub processComment {
         my $field = $fields[$fieldCounter];
 	print "FIELD WAS $field\n" if ($localDebug);
         SWITCH: {
-            ($field =~ /^\/\*\!/o)&& do {last SWITCH;}; # ignore opening /*!
+            ($field =~ /^\/\*\!/o)&& do {
+                                my $copy = $field;
+                                $copy =~ s/^\/\*\!\s*//s;
+                                if (length($copy)) {
+                                        $self->discussion($copy);
+                                }
+                        last SWITCH;
+                        };
             ($field =~ s/^(typedef|function)(\s+)/$2/o) && 
                 do {
                     my ($name, $disc);

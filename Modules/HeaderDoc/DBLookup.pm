@@ -6,7 +6,7 @@
 #           we implement only class methods
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/03/10 19:12:17 $
+# Last Updated: $Date: 2004/10/04 23:11:16 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -43,7 +43,7 @@ package HeaderDoc::DBLookup;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.6.6.3 $';
 
 ################ Portability ###################################
 my $isMacOS;

@@ -5,7 +5,7 @@
 #           are used to comment symbolic constants declared with #define
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/13 04:59:12 $
+# Last Updated: $Date: 2004/12/15 21:50:30 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -36,7 +36,7 @@ use HeaderDoc::HeaderElement;
 @ISA = qw( HeaderDoc::HeaderElement );
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.9.2.8.2.31 $';
 
 sub new {
     my($param) = shift;
@@ -55,6 +55,7 @@ sub _initialize {
     # $self->{ISBLOCK} = 0;
     # $self->{RESULT} = undef;
     $self->{PARSETREELIST} = ();
+    $self->{PARSEONLY} = ();
     $self->{CLASS} = "HeaderDoc::PDefine";
 }
 
@@ -74,6 +75,7 @@ sub clone {
     $clone->{ISBLOCK} = $self->{ISBLOCK};
     $clone->{RESULT} = $self->{RESULT};
     $clone->{PARSETREELIST} = $self->{PARSETREELIST};
+    $clone->{PARSEONLY} = $self->{PARSEONLY};
 
     return $clone;
 }
@@ -90,7 +92,14 @@ sub processComment {
 	foreach my $field (@fields) {
         chomp($field);
 		SWITCH: {
-            ($field =~ /^\/\*\!/o)&& do {last SWITCH;}; # ignore opening /*!
+            ($field =~ /^\/\*\!/o)&& do {
+                                my $copy = $field;
+                                $copy =~ s/^\/\*\!\s*//s;
+                                if (length($copy)) {
+                                        $self->discussion($copy);
+                                }
+                        last SWITCH;
+                        };
             ($field =~ s/^define(d)?(\s+)//o || $field =~ s/^function\s+//o) && do {
 		    if (length($2)) { $field = "$2$field"; }
 		    else { $field = "$1$field"; }
@@ -120,14 +129,22 @@ sub processComment {
 		    last SWITCH;
 		};
             ($field =~ s/^abstract\s+//o) && do {$self->abstract($field); last SWITCH;};
-            ($field =~ s/^discussion\s+//o) && do {$self->discussion($field); last SWITCH;};
+            ($field =~ s/^discussion\s+//o) && do {
+			if ($self->inDefineBlock() && length($self->discussion())) {
+				# Silently drop these....
+				$self->{DISCUSSION} = "";
+			}
+			$self->discussion($field);
+			last SWITCH;
+		};
             ($field =~ s/^availability\s+//o) && do {$self->availability($field); last SWITCH;};
             ($field =~ s/^since\s+//o) && do {$self->availability($field); last SWITCH;};
             ($field =~ s/^author\s+//o) && do {$self->attribute("Author", $field, 0); last SWITCH;};
 	    ($field =~ s/^version\s+//o) && do {$self->attribute("Version", $field, 0); last SWITCH;};
             ($field =~ s/^deprecated\s+//o) && do {$self->attribute("Deprecated", $field, 0); last SWITCH;};
             ($field =~ s/^updated\s+//o) && do {$self->updated($field); last SWITCH;};
-            ($field =~ s/^param\s+//o) && do {
+            ($field =~ s/^parseOnly\s+//io) && do { $self->parseOnly(1); last SWITCH; };
+            ($field =~ s/^(param|field)\s+//o) && do {
                     $field =~ s/^\s+|\s+$//go; # trim leading and trailing whitespace
                     # $field =~ /(\w*)\s*(.*)/so;
                     $field =~ /(\S*)\s*(.*)/so;
@@ -260,6 +277,44 @@ sub addParseTree
     my $tree = shift;
 
     push(@{$self->{PARSETREELIST}}, $tree);
+}
+
+sub parseTree
+{
+    my $self = shift;
+    my $xmlmode = 0;
+    if ($self->outputformat eq "hdxml") {
+	$xmlmode = 1;
+    }
+
+    if (@_) {
+	my $treeref = shift;
+
+	$self->SUPER::parseTree($treeref);
+	my $tree = ${$treeref};
+	my ($success, $value) = $tree->getPTvalue();
+	# print "SV: $success $value\n";
+	if ($success) {
+		my $vstr = "";
+		if ($xmlmode) {
+			$vstr = sprintf("0x%x", $value)
+		} else {
+			$vstr = sprintf("0x%x (%d)", $value, $value)
+		}
+		$self->attribute("Value", $vstr, 0);
+	}
+	return $treeref;
+    }
+    return $self->SUPER::parseTree();
+}
+
+sub parseOnly
+{
+    my $self = shift;
+    if (@_) {
+	$self->{PARSEONLY} = shift;
+    }
+    return $self->{PARSEONLY};
 }
 
 1;

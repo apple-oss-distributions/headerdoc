@@ -136,13 +136,13 @@ int main(int argc, char *argv[])
 char *textmatching(char *name, xmlNode *cur, int missing_ok);
 xmlNode *nodematching(char *name, xmlNode *cur);
 void writeData(FILE *fp, xmlNode *node);
-void writeUsage(FILE *fp);
+void writeUsage(FILE *fp, xmlNode *description);
 
 void xml2man(xmlNode *root, char *output_filename, int append_section_number)
 {
     int section;
     xmlNode *names, *usage, *retvals, *env, *files, *examples, *diags, *errs;
-    xmlNode *seeAlso, *conformingTo, *history, *bugs;
+    xmlNode *seeAlso, *conformingTo, *history, *description, *bugs;
     char *docdate = "January 1, 9999";
     char *doctitle = "UNKNOWN MANPAGE";
     char *os = "";
@@ -160,7 +160,7 @@ void xml2man(xmlNode *root, char *output_filename, int append_section_number)
     temp = textmatching("doctitle", root->children, 0);
     if (temp) doctitle = temp;
 
-    temp = textmatching("os", root->children, 0);
+    temp = textmatching("os", root->children, 1);
     if (temp) os = temp;
 
     names = nodematching("names", root->children);
@@ -174,6 +174,7 @@ void xml2man(xmlNode *root, char *output_filename, int append_section_number)
     seeAlso = nodematching("seealso", root->children);
     conformingTo = nodematching("conformingto", root->children);
     history = nodematching("history", root->children);
+    description = nodematching("description", root->children);
     bugs = nodematching("bugs", root->children);
 
     if (usage) { parseUsage(usage->children, 0); }
@@ -207,7 +208,7 @@ void xml2man(xmlNode *root, char *output_filename, int append_section_number)
 
     /* write rest of contents */
     writeData(fp, names);
-    writeUsage(fp);
+    writeUsage(fp, description);
     writeData(fp, retvals);
     writeData(fp, env);
     writeData(fp, files);
@@ -249,7 +250,11 @@ char *textmatching(char *name, xmlNode *node, int missing_ok)
     } else if (!strcmp(name, "text")) {
 		ret = cur->content;
     } else {
-	fprintf(stderr, "Missing/invalid contents for %s.\n", name);
+	if (!missing_ok) {
+		fprintf(stderr, "Missing/invalid contents for %s.\n", name);
+	} else {
+		return NULL;
+	}
     }
 
     return ret;
@@ -264,13 +269,13 @@ enum states
     kLast    = 256
 };
 
-void writeData_sub(FILE *fp, xmlNode *node, int state, int textcontainer, int next, int seendd);
+void writeData_sub(FILE *fp, xmlNode *node, int state, int textcontainer, int next, int seendt);
 void writeData(FILE *fp, xmlNode *node)
 {
     writeData_sub(fp, node, 0, 0, 0, 0);
 }
 
-void writeData_sub(FILE *fp, xmlNode *node, int state, int textcontainer, int next, int seendd)
+void writeData_sub(FILE *fp, xmlNode *node, int state, int textcontainer, int next, int seendt)
 {
     int oldtextcontainer = textcontainer;
     int oldstate = state;
@@ -281,11 +286,11 @@ void writeData_sub(FILE *fp, xmlNode *node, int state, int textcontainer, int ne
     if (!node) return;
     if (!strcmp(node->name, "docdate")) {
 	/* silently ignore */
-	writeData_sub(fp, node->next, state, 0, 1, seendd);
+	writeData_sub(fp, node->next, state, 0, 1, seendt);
 	return;
     } else if (!strcmp(node->name, "doctitle")) {
 	/* silently ignore */
-	writeData_sub(fp, node->next, state, 0, 1, seendd);
+	writeData_sub(fp, node->next, state, 0, 1, seendt);
 	return;
     } else if (!strcmp(node->name, "section")) {
 	if (state == kMan) {
@@ -293,7 +298,7 @@ void writeData_sub(FILE *fp, xmlNode *node, int state, int textcontainer, int ne
 		tail = " ";
 	} else {
 		/* silently ignore */
-		writeData_sub(fp, node->next, state, 0, 1, seendd);
+		writeData_sub(fp, node->next, state, 0, 1, seendt);
 		return;
 	}
     } else if (!strcmp(node->name, "desc")) {
@@ -358,6 +363,10 @@ void writeData_sub(FILE *fp, xmlNode *node, int state, int textcontainer, int ne
 	state = kRetval;
 	textcontainer = 1;
 	fprintf(fp, ".Sh CONFORMING TO\n");
+    } else if (!strcmp(node->name, "description")) {
+	state = kRetval;
+	textcontainer = 1;
+	fprintf(fp, ".Sh DESCRIPTION\n");
     } else if (!strcmp(node->name, "history")) {
 	state = kRetval;
 	textcontainer = 1;
@@ -389,22 +398,27 @@ void writeData_sub(FILE *fp, xmlNode *node, int state, int textcontainer, int ne
 
 	fprintf(fp, ".Bl -tag -width %s\n", xs(minwidth-1));
 	tail = ".El\n";
-    } else if (!strcmp(node->name, "dd")) {
+    } else if (!strcmp(node->name, "dt")) {
 	char *guts = textmatching("text", node->children, 0);
 
 	textcontainer = 0;
 	drop_children = 1;
-	seendd = 1;
+	seendt = 1;
 
 	fprintf(fp, ".It %s", guts ? guts : "");
+	// printf("DTGUTS: \"%s\"\n", guts ? guts : "");
 	
+	while (guts[strlen(guts-1)] == '\n' || guts[strlen(guts-1)] == '\r') {
+		guts[strlen(guts-1)] = '\0';
+	}
 	tail = "\n";
-    } else if (!strcmp(node->name, "dt")) {
-	if (!seendd) {
+    } else if (!strcmp(node->name, "dd")) {
+	if (!seendt) {
 		fprintf(fp, ".It\n");
 	}
 	textcontainer = 1;
-	tail = "\n";
+	// tail = "\n";
+	tail = "";
     } else if (!strcmp(node->name, "tt")) {
 	fprintf(fp, ".Dl ");
     } else if (!strcmp(node->name, "ul")) {
@@ -442,7 +456,7 @@ void writeData_sub(FILE *fp, xmlNode *node, int state, int textcontainer, int ne
     }
 
     if (!drop_children) {
-    	writeData_sub(fp, node->children, state, textcontainer, 1, seendd);
+    	writeData_sub(fp, node->children, state, textcontainer, 1, seendt);
     }
     textcontainer = oldtextcontainer;
     state = oldstate;
@@ -450,7 +464,7 @@ void writeData_sub(FILE *fp, xmlNode *node, int state, int textcontainer, int ne
 	fprintf(fp, "%s", tail);
     }
     if (next) {
-	writeData_sub(fp, node->next, state, textcontainer, 1, seendd);
+	writeData_sub(fp, node->next, state, textcontainer, 1, seendt);
     }
 }
 
@@ -479,7 +493,7 @@ char *xs(int count)
 }
 
 
-void writeUsage(FILE *fp)
+void writeUsage(FILE *fp, xmlNode *description)
 {
     usage_t cur;
     int first, topfirst;
@@ -536,6 +550,7 @@ void writeUsage(FILE *fp)
 	}
     }
 
+    writeData(fp, description);
     /* Write OPTIONS section */
 
     topfirst = 1;
@@ -564,7 +579,7 @@ void writeUsage(FILE *fp)
 		if (cur->arg) {
 			fprintf(fp, " Ar \"%s\"", cur->arg);
 		}
-		fprintf(fp, "\n%s\n", cur->desc);
+		fprintf(fp, "\n%s\n", cur->desc ? cur->desc : "");
 	}
 	if (!first) { fprintf(fp, ".El\n"); }
     }
@@ -683,7 +698,7 @@ void parseUsage(xmlNode *node, int pos)
     if (!strcmp(node->name, "arg")) {
 	flag_or_arg->flag = NULL;
 	flag_or_arg->arg  = textmatching("text", node->children, 0);
-	flag_or_arg->desc = textmatching("desc", node->children, 0);
+	flag_or_arg->desc = textmatching("desc", node->children, 1);
 	flag_or_arg->optional = propval("optional", node->properties);
 	flag_or_arg->functype = NULL;
 	flag_or_arg->funcname = NULL;
@@ -692,7 +707,7 @@ void parseUsage(xmlNode *node, int pos)
     } else if (!strcmp(node->name, "flag")) {
 	flag_or_arg->flag = textmatching("text", node->children, 0);
 	flag_or_arg->arg = NULL;
-	flag_or_arg->desc = textmatching("desc", node->children, 0);
+	flag_or_arg->desc = textmatching("desc", node->children, 1);
 	flag_or_arg->optional = propval("optional", node->properties);
 	flag_or_arg->functype = NULL;
 	flag_or_arg->funcname = NULL;

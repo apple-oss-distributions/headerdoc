@@ -6,7 +6,7 @@
 # Initial modifications: SKoT McDonald <skot@tomandandy.com> Aug 2001
 #
 # Based on CPPClass by Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/10 22:12:16 $
+# Last Updated: $Date: 2004/10/04 23:11:25 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -45,7 +45,7 @@ use HeaderDoc::ObjCContainer;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.2.2.4.2.11 $';
 
 ################ Portability ###################################
 my $isMacOS;
@@ -90,8 +90,10 @@ sub getMethodType {
 		# my $filename = $HeaderDoc::headerObject->filename();
 		my $filename = $self->filename();
 		my $linenum = $self->linenum();
-		print "$filename:$linenum:Unable to determine whether declaration is for an instance or class method[class].\n";
-		print "$filename:$linenum:     '$declaration'\n";
+		if (!$HeaderDoc::ignore_apiuid_errors) {
+			print "$filename:$linenum:Unable to determine whether declaration is for an instance or class method[class].\n";
+			print "$filename:$linenum:     '$declaration'\n";
+		}
 	}
 	return $methodType;
 }
@@ -104,7 +106,11 @@ sub docNavigatorComment {
     my $name = $self->name();
     $name =~ s/;//sgo;
     my $uid = $self->apiuid("cl"); # "//apple_ref/occ/cl/$name";
-    my $navComment = "<!-- headerDoc=cl; uid=$uid; name=$name-->";
+
+    my $indexgroup = $self->indexgroup(); my $igstring = "";
+    if (length($indexgroup)) { $igstring = "indexgroup=$indexgroup;"; }
+
+    my $navComment = "<!-- headerDoc=cl; uid=$uid; $igstring name=$name-->";
     my $appleRef = "<a name=\"$uid\"></a>";
     
     return "$navComment\n$appleRef";
@@ -114,7 +120,7 @@ sub docNavigatorComment {
 sub objName { # used for sorting
     my $obj1 = $a;
     my $obj2 = $b;
-    return ($obj1->name() cmp $obj2->name());
+    return (lc($obj1->name()) cmp lc($obj2->name()));
 }
 
 

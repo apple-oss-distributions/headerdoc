@@ -233,18 +233,22 @@ function selected_div(page_location) {
     }
 }
 
-function page_loaded(page_location) {
+function page_loaded(page_location, tocInSubdirectories) {
     // Called by a page on loading, so we can track what page is displayed.
     // If there is a link that points to the loaded page, make sure that TOC
     // section is disclosed and turn that link black and bold.
+    // tocInSubdirectories is passed through to help with locating TOC files
+
     if (isJavaScriptTOC) {
-        var page_suffix = path_suffix(page_location.pathname);
+        // alert(' it thinks it isJavaScriptTOC');
+
+        var page_suffix = path_suffix(page_location.pathname, tocInSubdirectories);
         var all_links = document.links;
         
         for(var i = 0; i < all_links.length; i++) {
             var anchor = all_links[i];
             var anchor_suffix = path_suffix(anchor.getAttribute("HREF"));
-            
+
         if (page_suffix == anchor_suffix) {
                 if (lastSelectedItem) { lastSelectedItem.style.color = lastSelectedColor; lastSelectedItem.style.fontWeight = lastSelectedWeight }
                 
@@ -258,6 +262,7 @@ function page_loaded(page_location) {
                 // If this page load didn't come from the TOC,
                 // get the parent section and expand it.
                 var parent = div_parent(anchor);
+
                 highlight_chapter_link(parent);
 
                 if (ignore_page_load) {
@@ -271,8 +276,9 @@ function page_loaded(page_location) {
     }
 }
 
-function path_suffix(path) {
+function path_suffix(path, tocInSubdirectories) {
     // Returns last two path segments as a string: "leaf_dir/filename.html".
+    // tocInSubdirectories indicates that the various TOC files are one level down, so we adjust the return path
     var leaf = "";
     var parent = "";
         
@@ -287,7 +293,11 @@ function path_suffix(path) {
     
     if (length) { leaf = path_array[length - 1]; }
     if (length > 1) { parent = path_array[length - 2]; }
-    return parent + '/' + leaf;
+    if (tocInSubdirectories) {
+        return '/' + leaf;
+    }
+    else {return parent + '/' + leaf;}
+
 }
 
 function isMacIE() {

@@ -4,7 +4,7 @@
 # Synopsis: Holds class and instance data members parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2004/06/13 04:59:12 $
+# Last Updated: $Date: 2004/10/13 00:09:34 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -38,7 +38,7 @@ use HeaderDoc::Struct;
 @ISA = qw( HeaderDoc::Struct );
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '$Revision: 1.8.2.8.2.21 $';
 
 sub new {
     my($param) = shift;
@@ -81,7 +81,14 @@ sub processComment {
 
 	foreach my $field (@fields) {
 		SWITCH: {
-            ($field =~ /^\/\*\!/o)&& do {last SWITCH;}; # ignore opening /*!
+            ($field =~ /^\/\*\!/o)&& do {
+                                my $copy = $field;
+                                $copy =~ s/^\/\*\!\s*//s;
+                                if (length($copy)) {
+                                        $self->discussion($copy);
+                                }
+                        last SWITCH;
+                        };
             ($field =~ s/^var(\s+)/$1/o) && 
             do {
                 my ($name, $disc);
