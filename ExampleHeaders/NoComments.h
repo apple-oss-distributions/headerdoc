@@ -2,10 +2,8 @@
 	Copyright 1998-1999, Apple Computer, Inc. All rights reserved.
 */
 
-/* NOTE:  This file is expressly for use with HeaderDoc, for testing purposes.  It is not the current CFArray.h file! */
- 
-/*!
-	@header CFArray
+/*
+	@header CFArrayConst
 	CFArray implements an ordered, compact container of pointer-sized
 	values. Values are accessed via integer keys (indices), from the
 	range 0 to N-1, where N is the number of values in the array when
@@ -57,7 +55,7 @@
 extern "C" {
 #endif
 
-/*!
+/*
 	@typedef CFArrayCallBacks
 	Structure containing the callbacks of a CFArray.
 	@field version The version number of the structure type being passed
@@ -91,15 +89,15 @@ typedef struct {
     CFArrayEqualCallBack		equal;
 } CFArrayCallBacks;
 
-/*!
+/*
 	@const kCFTypeArrayCallBacks
-	@discussion Predefined CFArrayCallBacks structure containing a set of callbacks
+	Predefined CFArrayCallBacks structure containing a set of callbacks
 	appropriate for use when the values in a CFArray are all CFTypes.
 */
 CF_EXPORT
 const CFArrayCallBacks kCFTypeArrayCallBacks;
 
-/*!
+/*
 	@typedef CFArrayApplierFunction
 	Type of the callback function used by the apply functions of
 		CFArrays.
@@ -109,26 +107,26 @@ const CFArrayCallBacks kCFTypeArrayCallBacks;
 */
 typedef void (*CFArrayApplierFunction)(const void *value, void *context);
 
-/*!
+/*
 	@typedef CFArrayRef
 	This is the type of a reference to immutable CFArrays.
 */
 typedef const struct __CFArray * CFArrayRef;
 
-/*!
+/*
 	@typedef CFMutableArrayRef
 	This is the type of a reference to mutable CFArrays.
 */
 typedef struct __CFArray * CFMutableArrayRef;
 
-/*!
+/*
 	@function CFArrayGetTypeID
 	Returns the type identifier of all CFArray instances.
 */
 CF_EXPORT
 CFTypeID CFArrayGetTypeID(void);
 
-/*!
+/*
 	@function CFArrayCreate
 	Creates a new immutable array with the given values.
 	@param allocator The CFAllocator which should be used to allocate
@@ -181,7 +179,7 @@ CFTypeID CFArrayGetTypeID(void);
 CF_EXPORT
 CFArrayRef CFArrayCreate(CFAllocatorRef allocator, const void **values, CFIndex numValues, const CFArrayCallBacks *callBacks);
 
-/*!
+/*
 	@function CFArrayCreateCopy
 	Creates a new immutable array with the values from the given array.
 	@param allocator The CFAllocator which should be used to allocate
@@ -202,7 +200,7 @@ CFArrayRef CFArrayCreate(CFAllocatorRef allocator, const void **values, CFIndex 
 CF_EXPORT
 CFArrayRef CFArrayCreateCopy(CFAllocatorRef allocator, CFArrayRef theArray);
 
-/*!
+/*
 	@function CFArrayCreateMutable
 	Creates a new empty mutable array.
 	@param allocator The CFAllocator which should be used to allocate
@@ -247,7 +245,7 @@ CFArrayRef CFArrayCreateCopy(CFAllocatorRef allocator, CFArrayRef theArray);
 CF_EXPORT
 CFMutableArrayRef CFArrayCreateMutable(CFAllocatorRef allocator, CFIndex capacity, const CFArrayCallBacks *callBacks);
 
-/*!
+/*
 	@function CFArrayCreateMutableCopy
 	Creates a new mutable array with the values from the given array.
 	@param allocator The CFAllocator which should be used to allocate
@@ -277,7 +275,7 @@ CFMutableArrayRef CFArrayCreateMutable(CFAllocatorRef allocator, CFIndex capacit
 CF_EXPORT 
 CFMutableArrayRef CFArrayCreateMutableCopy(CFAllocatorRef allocator, CFIndex capacity, CFArrayRef theArray);
 
-/*!
+/*
 	@function CFArrayGetCount
 	Returns the number of values currently in the array.
 	@param theArray The array to be queried. If this parameter is not a valid
@@ -287,7 +285,7 @@ CFMutableArrayRef CFArrayCreateMutableCopy(CFAllocatorRef allocator, CFIndex cap
 CF_EXPORT
 CFIndex CFArrayGetCount(CFArrayRef theArray);
 
-/*!
+/*
 	@function CFArrayGetCountOfValue
 	Counts the number of times the given value occurs in the array.
 	@param theArray The array to be searched. If this parameter is not a
@@ -310,7 +308,7 @@ CFIndex CFArrayGetCount(CFArrayRef theArray);
 CF_EXPORT
 CFIndex CFArrayGetCountOfValue(CFArrayRef theArray, CFRange range, const void *value);
 
-/*!
+/*
 	@function CFArrayContainsValue
 	Reports whether or not the value is in the array.
 	@param theArray The array to be searched. If this parameter is not a
@@ -333,7 +331,7 @@ CFIndex CFArrayGetCountOfValue(CFArrayRef theArray, CFRange range, const void *v
 CF_EXPORT
 Boolean CFArrayContainsValue(CFArrayRef theArray, CFRange range, const void *value);
 
-/*!
+/*
 	@function CFArrayGetValueAtIndex
 	Retrieves the value at the given index.
 	@param theArray The array to be queried. If this parameter is not a
@@ -347,7 +345,7 @@ Boolean CFArrayContainsValue(CFArrayRef theArray, CFRange range, const void *val
 CF_EXPORT
 const void *CFArrayGetValueAtIndex(CFArrayRef theArray, CFIndex idx);
 
-/*!
+/*
 	@function CFArrayGetValues
 	Fills the buffer with values from the array.
 	@param theArray The array to be queried. If this parameter is not a
@@ -368,7 +366,7 @@ const void *CFArrayGetValueAtIndex(CFArrayRef theArray, CFIndex idx);
 CF_EXPORT
 void CFArrayGetValues(CFArrayRef theArray, CFRange range, const void **values);
 
-/*!
+/*
 	@function CFArrayApplyFunction
 	Calls a function once for each value in the array.
 	@param theArray The array to be operated upon. If this parameter is not
@@ -395,7 +393,7 @@ void CFArrayGetValues(CFArrayRef theArray, CFRange range, const void **values);
 CF_EXPORT
 void CFArrayApplyFunction(CFArrayRef theArray, CFRange range, CFArrayApplierFunction applier, void *context);
 
-/*!
+/*
 	@function CFArrayGetFirstIndexOfValue
 	Searches the array for the value.
 	@param theArray The array to be searched. If this parameter is not a
@@ -420,7 +418,7 @@ void CFArrayApplyFunction(CFArrayRef theArray, CFRange range, CFArrayApplierFunc
 CF_EXPORT
 CFIndex CFArrayGetFirstIndexOfValue(CFArrayRef theArray, CFRange range, const void *value);
 
-/*!
+/*
 	@function CFArrayGetLastIndexOfValue
 	Searches the array for the value.
 	@param theArray The array to be searched. If this parameter is not a
@@ -445,7 +443,7 @@ CFIndex CFArrayGetFirstIndexOfValue(CFArrayRef theArray, CFRange range, const vo
 CF_EXPORT
 CFIndex CFArrayGetLastIndexOfValue(CFArrayRef theArray, CFRange range, const void *value);
 
-/*!
+/*
 	@function CFArrayBSearchValues
 	Searches the array for the value using a binary search algorithm.
 	@param theArray The array to be searched. If this parameter is not a
@@ -484,7 +482,7 @@ CFIndex CFArrayGetLastIndexOfValue(CFArrayRef theArray, CFRange range, const voi
 CF_EXPORT
 CFIndex CFArrayBSearchValues(CFArrayRef theArray, CFRange range, const void *value, CFComparatorFunction comparator, void *context);
 
-/*!
+/*
 	@function CFArrayAppendValue
 	Adds the value to the array giving it the new largest index.
 	@param theArray The array to which the value is to be added. If this
@@ -501,7 +499,7 @@ CFIndex CFArrayBSearchValues(CFArrayRef theArray, CFRange range, const void *val
 CF_EXPORT
 void CFArrayAppendValue(CFMutableArrayRef theArray, const void *value);
 
-/*!
+/*
 	@function CFArrayInsertValueAtIndex
 	Adds the value to the array giving it the given index.
 	@param theArray The array to which the value is to be added. If this
@@ -523,7 +521,7 @@ void CFArrayAppendValue(CFMutableArrayRef theArray, const void *value);
 CF_EXPORT
 void CFArrayInsertValueAtIndex(CFMutableArrayRef theArray, CFIndex idx, const void *value);
 
-/*!
+/*
 	@function CFArraySetValueAtIndex
 	Changes the value with the given index in the array.
 	@param theArray The array in which the value is to be changed. If this
@@ -546,7 +544,7 @@ void CFArrayInsertValueAtIndex(CFMutableArrayRef theArray, CFIndex idx, const vo
 CF_EXPORT
 void CFArraySetValueAtIndex(CFMutableArrayRef theArray, CFIndex idx, const void *value);
 
-/*!
+/*
 	@function CFArrayRemoveValueAtIndex
 	Removes the value with the given index from the array.
 	@param theArray The array from which the value is to be removed. If
@@ -560,7 +558,7 @@ void CFArraySetValueAtIndex(CFMutableArrayRef theArray, CFIndex idx, const void 
 CF_EXPORT
 void CFArrayRemoveValueAtIndex(CFMutableArrayRef theArray, CFIndex idx);
 
-/*!
+/*
 	@function CFArrayRemoveAllValues
 	Removes all the values from the array, making it empty.
 	@param theArray The array from which all of the values are to be
@@ -570,7 +568,7 @@ void CFArrayRemoveValueAtIndex(CFMutableArrayRef theArray, CFIndex idx);
 CF_EXPORT
 void CFArrayRemoveAllValues(CFMutableArrayRef theArray);
 
-/*!
+/*
 	@function CFArrayReplaceValues
 	Replaces a range of values in the array.
 	@param theArray The array from which all of the values are to be
@@ -604,7 +602,7 @@ void CFArrayRemoveAllValues(CFMutableArrayRef theArray);
 CF_EXPORT
 void CFArrayReplaceValues(CFMutableArrayRef theArray, CFRange range, const void **newValues, CFIndex newCount);
 
-/*!
+/*
 	@function CFArrayExchangeValuesAtIndices
 	Exchanges the values at two indices of the array.
 	@param theArray The array of which the values are to be swapped. If
@@ -622,7 +620,7 @@ void CFArrayReplaceValues(CFMutableArrayRef theArray, CFRange range, const void 
 CF_EXPORT
 void CFArrayExchangeValuesAtIndices(CFMutableArrayRef theArray, CFIndex idx1, CFIndex idx2);
 
-/*!
+/*
 	@function CFArraySortValues
 	Sorts the values in the array using the given comparison function.
 	@param theArray The array whose values are to be sorted. If this
@@ -652,7 +650,7 @@ void CFArrayExchangeValuesAtIndices(CFMutableArrayRef theArray, CFIndex idx1, CF
 CF_EXPORT
 void CFArraySortValues(CFMutableArrayRef theArray, CFRange range, CFComparatorFunction comparator, void *context);
 
-/*!
+/*
 	@function CFArrayAppendArray
 	Adds the values from an array to another array.
 	@param theArray The array to which values from the otherArray are to

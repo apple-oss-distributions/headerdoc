@@ -1,12 +1,11 @@
 #! /usr/bin/perl -w
 #
-# Class name: MinorAPIElement
-# Synopsis: Class for parameters and members of structs, etc. Primary use
-#           is to hold info for data export to Inside Mac Database
-#
+# Class name: 	DocReference
+# Synopsis: 	Used by gatherHeaderDoc.pl to hold references to doc 
+#		for individual headers and classes
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2001/03/01 07:25:08 $
-#
+# Last Updated: $Date: 2001/01/25 22:59:39 $
+# 
 # Copyright (c) 1999 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
 # subject to the Apple Public Source License Version 1.1 (the "License").
@@ -22,18 +21,14 @@
 # the specific language governing rights and limitations under the
 # License.
 #
-#
 ######################################################################
-
-package HeaderDoc::MinorAPIElement;
-
-use HeaderDoc::Utilities qw(findRelativePath safeName getAPINameAndDisc convertCharsForFileMaker printArray printHash);
-use HeaderDoc::HeaderElement;
-@ISA = qw( HeaderDoc::HeaderElement );
+package HeaderDoc::DocReference;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '1.20';
+$VERSION = '1.00';
+################ General Constants ###################################
+my $debugging = 0;
 
 sub new {
     my($param) = shift;
@@ -41,6 +36,7 @@ sub new {
     my $self = {};
     
     bless($self, $class);
+    #$self->SUPER::_initialize(); # for subclasses
     $self->_initialize();
     # Now grab any key => value pairs passed in
     my (%attributeHash) = @_;
@@ -53,19 +49,41 @@ sub new {
 
 sub _initialize {
     my($self) = shift;
-    $self->{POSITION} = undef;
-    $self->{TYPE} = undef;
-    $self->{USERDICTARRAY} = [];
+    $self->{NAME} = undef;
+    $self->{TYPE} = undef; # Header, CPPClass, etc
+    $self->{PATH} = undef;
+    $self->{LANGUAGE} = "";
 }
 
-sub position {
+sub path {
     my $self = shift;
 
     if (@_) {
-        $self->{POSITION} = shift;
+        $self->{PATH} = shift;
     }
-    return $self->{POSITION};
+    return $self->{PATH};
 }
+
+
+sub language {
+    my $self = shift;
+
+    if (@_) {
+        $self->{LANGUAGE} = shift;
+    }
+    return $self->{LANGUAGE};
+}
+
+
+sub name {
+    my $self = shift;
+
+    if (@_) {
+        $self->{NAME} = shift;
+    }
+    return $self->{NAME};
+}
+
 
 sub type {
     my $self = shift;
@@ -76,46 +94,16 @@ sub type {
     return $self->{TYPE};
 }
 
-# for miscellaneous data, such as the parameters within a typedef'd struct of callbacks
-# stored as an array to preserve order.
-sub userDictArray {
-    my $self = shift;
-
-    if (@_) {
-        @{ $self->{USERDICTARRAY} } = @_;
-    }
-    return @{ $self->{USERDICTARRAY} };
-}
-
-sub addToUserDictArray {
-    my $self = shift;
-
-    if (@_) {
-        foreach my $item (@_) {
-            push (@{ $self->{USERDICTARRAY} }, $item);
-        }
-    }
-    return @{ $self->{USERDICTARRAY} };
-}
-
-
-sub addKeyAndValueInUserDict {
-    my $self = shift;
-    
-    if (@_) {
-        my $key = shift;
-        my $value = shift;
-        $self->{USERDICT}{$key} = $value;
-    }
-    return %{ $self->{USERDICT} };
-}
 
 sub printObject {
     my $self = shift;
-    my $dec = $self->declaration();
  
-    print "position: $self->{POSITION}\n";
+    print "----- DocReference Object ------\n";
+    print "name: $self->{NAME}\n";
     print "type: $self->{TYPE}\n";
+    print "path: $self->{PATH}\n";
+    print "language: $self->{LANGUAGE}\n";
+    print "\n";
 }
 
 1;
