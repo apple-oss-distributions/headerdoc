@@ -5,22 +5,28 @@
 #
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2001/11/30 22:43:17 $
+# Last Updated: $Date: 2004/06/10 22:12:16 $
 # 
-# Copyright (c) 1999-2001 Apple Computer, Inc.  All Rights Reserved.
-# The contents of this file constitute Original Code as defined in and are
-# subject to the Apple Public Source License Version 1.1 (the "License").
-# You may not use this file except in compliance with the License.  Please
-# obtain a copy of the License at http://www.apple.com/publicsource and
-# read it before using this file.
+# Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
-# This Original Code and all software distributed under the License are
-# distributed on an TAS ISU basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+# @APPLE_LICENSE_HEADER_START@
+#
+# This file contains Original Code and/or Modifications of Original Code
+# as defined in and that are subject to the Apple Public Source License
+# Version 2.0 (the 'License'). You may not use this file except in
+# compliance with the License. Please obtain a copy of the License at
+# http://www.opensource.apple.com/apsl/ and read it before using this
+# file.
+# 
+# The Original Code and all software distributed under the License are
+# distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
 # EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
-# INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY, FITNESS
-# FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT.  Please see the License for
-# the specific language governing rights and limitations under the
-# License.
+# INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
+# Please see the License for the specific language governing rights and
+# limitations under the License.
+#
+# @APPLE_LICENSE_HEADER_END@
 #
 ######################################################################
 BEGIN {
@@ -43,7 +49,7 @@ $VERSION = '1.20';
 ################ Portability ###################################
 my $isMacOS;
 my $pathSeparator;
-if ($^O =~ /MacOS/i) {
+if ($^O =~ /MacOS/io) {
 	$pathSeparator = ":";
 	$isMacOS = 1;
 } else {
@@ -55,18 +61,19 @@ my $debugging = 0;
 my $tracing = 0;
 my $outputExtension = ".html";
 my $tocFrameName = "toc.html";
-my $theTime = time();
-my ($sec, $min, $hour, $dom, $moy, $year, @rest);
-($sec, $min, $hour, $dom, $moy, $year, @rest) = localtime($theTime);
-$moy++;
-$year += 1900;
-my $dateStamp = "$moy/$dom/$year";
+# my $theTime = time();
+# my ($sec, $min, $hour, $dom, $moy, $year, @rest);
+# ($sec, $min, $hour, $dom, $moy, $year, @rest) = localtime($theTime);
+# $moy++;
+# $year += 1900;
+# my $dateStamp = "$moy/$dom/$year";
 ######################################################################
 
 sub _initialize {
     my($self) = shift;
     $self->SUPER::_initialize();
     $self->tocTitlePrefix('Class:');
+    $self->{CLASS} = "HeaderDoc::ObjCContainer";
 }
 
 sub _getCompositePageString { 
@@ -74,7 +81,9 @@ sub _getCompositePageString {
     my $name = $self->name();
     my $compositePageString;
     my $contentString;
-    
+
+    $compositePageString .= $self->compositePageAPIRef();
+
     my $abstract = $self->abstract();
     if (length($abstract)) {
 	    $compositePageString .= "<h2>Abstract</h2>\n";
@@ -87,77 +96,41 @@ sub _getCompositePageString {
 	    $compositePageString .= $discussion;
     }
     
-    if ((length($abstract)) || (length($discussion))) {
+    # if ((length($abstract)) || (length($discussion))) {
+    # ALWAYS....
 	    $compositePageString .= "<hr><br>";
+    # }
+
+    my $etoc = $self->_getClassEmbeddedTOC(1);
+    if (length($etoc)) {
+	$compositePageString .= $etoc;
+	$compositePageString .= "<hr><br>";
     }
 
-    $contentString= $self->_getMethodDetailString();
+    $contentString= $self->_getMethodDetailString(1);
     if (length($contentString)) {
 	    $compositePageString .= "<h2>Methods</h2>\n";
+		# $contentString = $self->stripAppleRefs($contentString);
+	    $compositePageString .= $contentString;
+    }
+
+    $contentString= $self->_getVarDetailString();
+    if (length($contentString)) {
+	    $compositePageString .= "<h2>Variables</h2>\n";
+		# $contentString = $self->stripAppleRefs($contentString);
 	    $compositePageString .= $contentString;
     }
 
     $contentString= $self->_getConstantDetailString();
     if (length($contentString)) {
 	    $compositePageString .= "<h2>Constants</h2>\n";
+		# $contentString = $self->stripAppleRefs($contentString);
 	    $compositePageString .= $contentString;
     }
     
     return $compositePageString;
 }
 
-sub tocString {
-    my $self = shift;
-    my $contentFrameName = $self->name();
-    $contentFrameName =~ s/(.*)\.h/$1/; 
-    # for now, always shorten long names since some files may be moved to a Mac for browsing
-    if (1 || $isMacOS) {$contentFrameName = &safeName(filename => $contentFrameName);};
-    $contentFrameName = $contentFrameName . ".html";
-    my $header = $self->headerObject();
-    my @meths = $self->methods();
-	my $compositePageName = HeaderDoc::APIOwner->compositePageName();
-	my $defaultFrameName = HeaderDoc::APIOwner->defaultFrameName();
-    
-    my $tocString = "<h3><a href=\"$contentFrameName\" target =\"doc\">Introduction</a></h3>\n";
-
-    # output list of functions as TOC
-    if (@meths) {
-        my @classMethods;
-        my @instanceMethods;
-	    $tocString .= "<br><h4>Methods</h4><hr>\n";
-	    foreach my $obj (sort byMethodType @meths) {
-	        my $type = $obj->isInstanceMethod();
-	        
-	        if ($type =~ /NO/){
-	            push (@classMethods, $obj);
-	        } elsif ($type =~ /YES/){
-	            push (@instanceMethods, $obj);
-	        } else {
-	            push (@instanceMethods, $obj);
-	        }
-	    }
-	    if (@classMethods) {
-	        $tocString .= "<h5>Class Methods</h5>\n";
-		    foreach my $obj (sort objName @classMethods) {
-	        	my $name = $obj->name();
-	        	my $prefix = $self->getMethodPrefix($obj);
-	        	$tocString .= "<nobr>&nbsp;<a href = \"Methods/Methods.html#$name\" target =\"doc\">$prefix$name</a></nobr><br>\n";
-	        }
-	    }
-	    if (@instanceMethods) {
-	        $tocString .= "<h5>Instance Methods</h5>\n";
-		    foreach my $obj (sort objName @instanceMethods) {
-	        	my $name = $obj->name();
-	        	my $prefix = $self->getMethodPrefix($obj);
-	        	$tocString .= "<nobr>&nbsp;<a href = \"Methods/Methods.html#$name\" target =\"doc\">$prefix$name</a></nobr><br>\n";
-	        }
-	    }
-    }
-	$tocString .= "<br><h4>Other Reference</h4><hr>\n";
-	$tocString .= "<nobr>&nbsp;<a href = \"../../$defaultFrameName\" target =\"_top\">Header</a></nobr><br>\n";
-    $tocString .= "<br><hr><a href=\"$compositePageName\" target =\"_blank\">[Printable HTML Page]</a>\n";
-    return $tocString;
-}
 
 sub getMethodPrefix {
     my $self = shift;
@@ -167,9 +140,9 @@ sub getMethodPrefix {
 	
 	$type = $obj->isInstanceMethod();
 	
-	if ($type =~ /YES/) {
+	if ($type =~ /YES/o) {
 	    $prefix = "- ";
-	} elsif ($type =~ /NO/) {
+	} elsif ($type =~ /NO/o) {
 	    $prefix = "+ ";
 	} else {
 	    $prefix = "";
@@ -181,21 +154,43 @@ sub getMethodPrefix {
 sub docNavigatorComment {
     my $self = shift;
     my $name = $self->name();
+    $name =~ s/;//sgo;
     
-    return "<-- headerDoc=cl; name=$name-->";
+    return "<!-- headerDoc=cl; name=$name-->";
 }
 
 ################## Misc Functions ###################################
 sub objName { # used for sorting
-   my $obj1 = $a;
-   my $obj2 = $b;
-   return ($obj1->name() cmp $obj2->name());
+    my $obj1 = $a;
+    my $obj2 = $b;
+
+    return ($obj1->name() cmp $obj2->name());
 }
 
 sub byMethodType { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-   return ($obj1->isInstanceMethod() cmp $obj2->isInstanceMethod());
+   if ($HeaderDoc::sort_entries) {
+        return ($obj1->isInstanceMethod() cmp $obj2->isInstanceMethod());
+   } else {
+        return (1 cmp 2);
+   }
+}
+
+sub byAccessControl { # used for sorting
+    my $obj1 = $a;
+    my $obj2 = $b;
+    return ($obj1->accessControl() cmp $obj2->accessControl());
+}
+
+sub objGroup { # used for sorting
+   my $obj1 = $a;
+   my $obj2 = $b;
+   # if ($HeaderDoc::sort_entries) {
+        return ($obj1->group() cmp $obj2->group());
+   # } else {
+        # return (1 cmp 2);
+   # }
 }
 
 ##################### Debugging ####################################

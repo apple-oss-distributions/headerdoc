@@ -5,22 +5,28 @@
 # from a C++ header
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2001/11/30 22:43:17 $
+# Last Updated: $Date: 2004/06/10 22:12:15 $
 # 
-# Copyright (c) 1999-2001 Apple Computer, Inc.  All Rights Reserved.
-# The contents of this file constitute Original Code as defined in and are
-# subject to the Apple Public Source License Version 1.1 (the "License").
-# You may not use this file except in compliance with the License.  Please
-# obtain a copy of the License at http://www.apple.com/publicsource and
-# read it before using this file.
+# Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
-# This Original Code and all software distributed under the License are
-# distributed on an TAS ISU basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+# @APPLE_LICENSE_HEADER_START@
+#
+# This file contains Original Code and/or Modifications of Original Code
+# as defined in and that are subject to the Apple Public Source License
+# Version 2.0 (the 'License'). You may not use this file except in
+# compliance with the License. Please obtain a copy of the License at
+# http://www.opensource.apple.com/apsl/ and read it before using this
+# file.
+# 
+# The Original Code and all software distributed under the License are
+# distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
 # EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
-# INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY, FITNESS
-# FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT.  Please see the License for
-# the specific language governing rights and limitations under the
-# License.
+# INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
+# Please see the License for the specific language governing rights and
+# limitations under the License.
+#
+# @APPLE_LICENSE_HEADER_END@
 #
 ######################################################################
 BEGIN {
@@ -30,7 +36,7 @@ BEGIN {
 }
 package HeaderDoc::CPPClass;
 
-use HeaderDoc::Utilities qw(findRelativePath safeName getAPINameAndDisc printArray printHash);
+use HeaderDoc::Utilities qw(findRelativePath safeName getAPINameAndDisc printArray printHash registerUID sanitize);
 use HeaderDoc::APIOwner;
 
 use strict;
@@ -42,7 +48,7 @@ $VERSION = '1.20';
 ################ Portability ###################################
 my $isMacOS;
 my $pathSeparator;
-if ($^O =~ /MacOS/i) {
+if ($^O =~ /MacOS/io) {
 	$pathSeparator = ":";
 	$isMacOS = 1;
 } else {
@@ -54,157 +60,46 @@ my $debugging = 0;
 my $tracing = 0;
 my $outputExtension = ".html";
 my $tocFrameName = "toc.html";
-my $theTime = time();
-my ($sec, $min, $hour, $dom, $moy, $year, @rest);
-($sec, $min, $hour, $dom, $moy, $year, @rest) = localtime($theTime);
-$moy++;
-$year += 1900;
-my $dateStamp = "$moy/$dom/$year";
+# my $theTime = time();
+# my ($sec, $min, $hour, $dom, $moy, $year, @rest);
+# ($sec, $min, $hour, $dom, $moy, $year, @rest) = localtime($theTime);
+# $moy++;
+# $year += 1900;
+# my $dateStamp = "$moy/$dom/$year";
 ######################################################################
 
 sub _initialize {
     my($self) = shift;
     $self->SUPER::_initialize();
     $self->tocTitlePrefix('Class:');
+    $self->{ISCOMINTERFACE} = 0;
+    $self->{CLASS} = "HeaderDoc::CPPClass";
 }
 
-sub tocString {
+sub clone {
     my $self = shift;
-    my $localDebug = 0;
-    my $contentFrameName = $self->name();
-    $contentFrameName =~ s/(.*)\.h/$1/; 
-    # for now, always shorten long names since some files may be moved to a Mac for browsing
-    if (1 || $isMacOS) {$contentFrameName = &safeName(filename => $contentFrameName);};
-    $contentFrameName = $contentFrameName . ".html";
-    my $header = $self->headerObject();
-    my @funcs = $self->functions();    
-    my @constants = $self->constants();
-    my @typedefs = $self->typedefs();
-    my @structs = $self->structs();
-    my @enums = $self->enums();
-    my @vars = $self->vars();
-	my $compositePageName = HeaderDoc::APIOwner->compositePageName();
-	my $defaultFrameName = HeaderDoc::APIOwner->defaultFrameName();
-    
-    my $tocString = "<h3><a href=\"$contentFrameName\" target =\"doc\">Introduction</a></h3>\n";
-
-    
-    # output list of functions as TOC
-    if (@funcs) {
-        my @publics;
-        my @protecteds;
-        my @privates;
-	    $tocString .= "<br><h4>Member Functions</h4><hr>\n";
-	    foreach my $obj (sort byAccessControl @funcs) {
-	        my $access = $obj->accessControl();
-	        
-	        if ($access =~ /public/){
-	            push (@publics, $obj);
-	        } elsif ($access =~ /protected/){
-	            push (@protecteds, $obj);
-	        } elsif ($access =~ /private/){
-	            push (@privates, $obj);
-	        }
-	    }
-	    if (@publics) {
-	        $tocString .= "<h5>Public</h5>\n";
-		    foreach my $obj (sort objName @publics) {
-	        	my $name = $obj->name();
-	        	$tocString .= "<nobr>&nbsp;<a href = \"Functions/Functions.html#$name\" target =\"doc\">$name</a></nobr><br>\n";
-	        }
-	    }
-	    if (@protecteds) {
-	        $tocString .= "<h5>Protected</h5>\n";
-		    foreach my $obj (sort objName @protecteds) {
-	        	my $name = $obj->name();
-	        	$tocString .= "<nobr>&nbsp;<a href = \"Functions/Functions.html#$name\" target =\"doc\">$name</a></nobr><br>\n";
-	        }
-	    }
-	    if (@privates) {
-	        $tocString .= "<h5>Private</h5>\n";
-		    foreach my $obj (sort objName @privates) {
-	        	my $name = $obj->name();
-	        	$tocString .= "<nobr>&nbsp;<a href = \"Functions/Functions.html#$name\" target =\"doc\">$name</a></nobr><br>\n";
-	        }
-	    }
+    my $clone = undef;
+    if (@_) {
+	$clone = shift;
+    } else {
+	$clone = HeaderDoc::CPPClass->new();
     }
-    if (@typedefs) {
-	    $tocString .= "<h4>Defined Types</h4>\n";
-	    foreach my $obj (sort objName @typedefs) {
-	        my $name = $obj->name();
-	        $tocString .= "<nobr>&nbsp;<a href = \"DataTypes/DataTypes.html#$name\" target =\"doc\">$name</a></nobr><br>\n";
-	    }
-    }
-    if (@structs) {
-	    $tocString .= "<h4>Structs</h4>\n";
-	    foreach my $obj (sort objName @structs) {
-	        my $name = $obj->name();
-	        $tocString .= "<nobr>&nbsp;<a href = \"Structs/Structs.html#$name\" target =\"doc\">$name</a></nobr><br>\n";
-	    }
-    }
-    if (@constants) {
-	    $tocString .= "<h4>Constants</h4>\n";
-	    foreach my $obj (sort objName @constants) {
-	        my $name = $obj->name();
-	        $tocString .= "<nobr>&nbsp;<a href = \"Constants/Constants.html#$name\" target =\"doc\">$name</a></nobr><br>\n";
-	    }
-	}
-    if (@enums) {
-	    $tocString .= "<h4>Enumerations</h4>\n";
-	    foreach my $obj (sort objName @enums) {
-	        my $name = $obj->name();
-	        $tocString .= "<nobr>&nbsp;<a href = \"Enums/Enums.html#$name\" target =\"doc\">$name</a></nobr><br>\n";
-	    }
-	}
-    if (@vars) {
-        my @publics;
-        my @protecteds;
-        my @privates;
 
-	    $tocString .= "<br><h4>Member Data</h4><hr>\n";
-	    foreach my $obj (sort byAccessControl @vars) {
-	        my $access = $obj->accessControl();
+    $self->SUPER::clone($clone);
 
-	        if ($access =~ /public/){
-	            push (@publics, $obj);
-	        } elsif ($access =~ /protected/){
-	            push (@protecteds, $obj);
-	        } elsif ($access =~ /private/){
-	            push (@privates, $obj);
-	        }
-	    }
-	    if (@publics) {
-	        $tocString .= "<h5>Public</h5>\n";
-		    foreach my $obj (sort objName @publics) {
-	        	my $name = $obj->name();
-	        	$tocString .= "<nobr>&nbsp;<a href = \"Vars/Vars.html#$name\" target =\"doc\">$name</a></nobr><br>\n";
-	        }
-	    }
-	    if (@protecteds) {
-	        $tocString .= "<h5>Protected</h5>\n";
-		    foreach my $obj (sort objName @protecteds) {
-	        	my $name = $obj->name();
-	        	$tocString .= "<nobr>&nbsp;<a href = \"Vars/Vars.html#$name\" target =\"doc\">$name</a></nobr><br>\n";
-	        }
-	    }
-	    if (@privates) {
-	        $tocString .= "<h5>Private</h5>\n";
-		    foreach my $obj (sort objName @privates) {
-	        	my $name = $obj->name();
-	        	$tocString .= "<nobr>&nbsp;<a href = \"Vars/Vars.html#$name\" target =\"doc\">$name</a></nobr><br>\n";
-	        }
-	    }
-	}
-	$tocString .= "<br><h4>Other Reference</h4><hr>\n";
-	$tocString .= "<nobr>&nbsp;<a href = \"../../$defaultFrameName\" target =\"_top\">Header</a></nobr><br>\n";
-    $tocString .= "<br><hr><a href=\"$compositePageName\" target =\"_blank\">[Printable HTML Page]</a>\n";
-    
-	print "*** finished toc\n" if ($localDebug);
-	
-    return $tocString;
+    $clone->{ISCOMINTERFACE} = $self->{ISCOMINTERFACE};
+    return $clone;
 }
 
+sub isCOMInterface {
+    my $self = shift;
 
+    if (@_) {
+	$self->{ISCOMINTERFACE} = shift;
+    }
+
+    return $self->{ISCOMINTERFACE};
+}
 
 
 sub _getCompositePageString { 
@@ -212,6 +107,9 @@ sub _getCompositePageString {
     my $name = $self->name();
     my $compositePageString;
     my $contentString;
+    my $list_attributes = $self->getAttributeLists(1);
+
+    $compositePageString .= $self->compositePageAPIRef();
     
     my $abstract = $self->abstract();
     if (length($abstract)) {
@@ -219,55 +117,103 @@ sub _getCompositePageString {
 	    $compositePageString .= $abstract;
     }
 
+    my $namespace = $self->namespace();
+    my $availability = $self->availability();
+    my $updated = $self->updated();
+
+    if (length($namespace) || length($updated) || length($availability)) {
+	    $compositePageString .= "<p></p>\n";
+    }
+
+    if (length($namespace)) {
+	    $compositePageString .= "<b>Namespace:</b> $namespace<br>\n";
+    }
+    if (length($availability)) {
+	    $compositePageString .= "<b>Availability:</b> $availability<br>\n";
+    }
+    if (length($updated)) {
+	    $compositePageString .= "<b>Updated:</b> $updated<br>\n";
+    }
+
+    my $short_attributes = $self->getAttributes(0);
+    my $long_attributes = $self->getAttributes(1);
+    my $list_attributes = $self->getAttributeLists(1);
+    if (length($short_attributes)) {
+            $compositePageString .= "$short_attributes";
+    }
+    if (length($long_attributes)) {
+            $compositePageString .= "$long_attributes";
+    }
+    if (length($list_attributes)) {
+	$contentString .= $list_attributes;
+    }
+
     my $discussion = $self->discussion();
     if (length($discussion)) {
 	    $compositePageString .= "<h2>Discussion</h2>\n";
 	    $compositePageString .= $discussion;
     }
+    if (length($long_attributes)) {
+            $compositePageString .= "$long_attributes";
+    }
     
-    if ((length($abstract)) || (length($discussion))) {
+    # if ((length($long_attributes)) || (length($discussion))) {
+    # ALWAYS....
 	    $compositePageString .= "<hr><br>";
+    # }
+
+    my $etoc = $self->_getClassEmbeddedTOC(1);
+    if (length($etoc)) {
+	$compositePageString .= $etoc;
+	$compositePageString .= "<hr><br>";
     }
 
-    $contentString= $self->_getFunctionDetailString();
+    $contentString= $self->_getFunctionDetailString(1);
     if (length($contentString)) {
 	    $compositePageString .= "<h2>Member Functions</h2>\n";
+		# $contentString = $self->stripAppleRefs($contentString);
 	    $compositePageString .= $contentString;
     }
     
-    $contentString= $self->_getVarDetailString();
+    $contentString= $self->_getVarDetailString(1);
     if (length($contentString)) {
 	    $compositePageString .= "<h2>Member Data</h2>\n";
+		# $contentString = $self->stripAppleRefs($contentString);
 	    $compositePageString .= $contentString;
     }
     
-    $contentString= $self->_getConstantDetailString();
+    $contentString= $self->_getConstantDetailString(1);
     if (length($contentString)) {
 	    $compositePageString .= "<h2>Constants</h2>\n";
+		# $contentString = $self->stripAppleRefs($contentString);
 	    $compositePageString .= $contentString;
     }
     
-    $contentString= $self->_getTypedefDetailString();
+    $contentString= $self->_getTypedefDetailString(1);
     if (length($contentString)) {
 	    $compositePageString .= "<h2>Typedefs</h2>\n";
+		# $contentString = $self->stripAppleRefs($contentString);
 	    $compositePageString .= $contentString;
     }
     
-    $contentString= $self->_getStructDetailString();
+    $contentString= $self->_getStructDetailString(1);
     if (length($contentString)) {
-	    $compositePageString .= "<h2>Structs</h2>\n";
+	    $compositePageString .= "<h2>Structs and Unions</h2>\n";
+		# $contentString = $self->stripAppleRefs($contentString);
 	    $compositePageString .= $contentString;
     }
     
-    $contentString= $self->_getEnumDetailString();
+    $contentString= $self->_getEnumDetailString(1);
     if (length($contentString)) {
 	    $compositePageString .= "<h2>Enumerations</h2>\n";
+		# $contentString = $self->stripAppleRefs($contentString);
 	    $compositePageString .= $contentString;
     }
 
-    $contentString= $self->_getPDefineDetailString();
+    $contentString= $self->_getPDefineDetailString(1);
     if (length($contentString)) {
 	    $compositePageString .= "<h2>#defines</h2>\n";
+		# $contentString = $self->stripAppleRefs($contentString);
 	    $compositePageString .= $contentString;
     }  
     return $compositePageString;
@@ -278,31 +224,77 @@ sub _getCompositePageString {
 # overriding inherited method to add access type on line above declaration
 sub _getFunctionDetailString {
     my $self = shift;
+    my $composite = shift;
     my @funcObjs = $self->functions();
     my $className = $self->name();
     my $contentString;
-    my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
+    # my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
 
-    foreach my $obj (sort objName @funcObjs) {
+    $contentString = $self->_getFunctionEmbeddedTOC($composite);
+
+    my @tempobjs = ();
+    if ($HeaderDoc::sort_entries) {
+	@tempobjs = sort objName @funcObjs;
+    } else {
+	@tempobjs = @funcObjs;
+    }
+
+    foreach my $obj (@tempobjs) {
         my $name = $obj->name();
         my $desc = $obj->discussion();
+	my $throws = $obj->throws();
         my $abstract = $obj->abstract();
+        my $availability = $obj->availability();
+        my $updated = $obj->updated();
         my $declaration = $obj->declarationInHTML();
         my $declarationRaw = $obj->declaration();
         my $accessControl = $obj->accessControl();
         my @params = $obj->taggedParameters();
         my $result = $obj->result();
-		if ($declaration !~ /#define/) { # not sure how to handle apple_refs with macros yet
-	        my $paramSignature = $self->getParamSignature($declarationRaw);
+	my $list_attributes = $obj->getAttributeLists($composite);
+
+	$contentString .= "<hr>";
+	# if ($declaration !~ /#define/o) { # not sure how to handle apple_refs with macros yet
 	        my $methodType = $self->getMethodType($declarationRaw);
-        	$contentString .= "<a name=\"//$apiUIDPrefix/cpp/$methodType/$className/$name/$paramSignature\"></a>\n";
+		# registerUID($uid);
+        	# $contentString .= "<a name=\"$uid\"></a>\n";
+		my $apiref = "";
+		$apiref = $obj->apiref($composite);
+		$contentString .= $apiref;
+        # }
+	my $parentclass = $obj->origClass();
+	if (length($parentclass)) { $parentclass .= "::"; }
+	if ($self->CClass()) {
+		# Don't do this for pseudo-classes.
+		$parentclass = "";
+	}
+	$contentString .= "<table border=\"0\"  cellpadding=\"2\" cellspacing=\"2\" width=\"300\">";
+	$contentString .= "<tr>";
+	$contentString .= "<td valign=\"top\" height=\"12\" colspan=\"5\">";
+	my $urlname = sanitize($name);
+	$contentString .= "<h2><a name=\"$urlname\">$parentclass$name</a></h2>\n";
+	$contentString .= "</td>";
+	$contentString .= "</tr></table>";
+	# $contentString .= "<hr>";
+
+	if (length($throws)) {  
+		$contentString .= "<b>Throws:</b>\n$throws<BR>\n";
+	}
+	if (length($abstract)) {
+            # $contentString .= "<b>Abstract:</b> $abstract<BR>\n";
+            $contentString .= "$abstract<BR>\n";
         }
-        $contentString .= "<h3><a name=\"$name\">$name</a></h3>\n";
-	    if (length($abstract)) {
-            $contentString .= "<b>Abstract:</b> $abstract\n";
-        }
+	if (length($availability)) {
+	    $contentString .= "<b>Availability:</b> $availability<BR>\n";
+	}
+	if (length($updated)) {
+	    $contentString .= "<b>Updated:</b> $updated<BR>\n";
+	}
+	if (length($list_attributes)) {
+	    $contentString .= $list_attributes;
+	}
         $contentString .= "<blockquote><pre><tt>$accessControl</tt>\n<br>$declaration</pre></blockquote>\n";
-        $contentString .= "<p>$desc</p>\n";
+        if (length($desc)) {$contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Discussion</font></h5><p>$desc</p>\n"; }
 	    my $arrayLength = @params;
 	    if ($arrayLength > 0) {
 	        my $paramContentString;
@@ -310,105 +302,179 @@ sub _getFunctionDetailString {
 	            my $pName = $element->name();
 	            my $pDesc = $element->discussion();
 	            if (length ($pName)) {
-	                $paramContentString .= "<tr><td align = \"center\"><tt>$pName</tt></td><td>$pDesc</td><tr>\n";
+	                # $paramContentString .= "<tr><td align=\"center\"><tt>$pName</tt></td><td>$pDesc</td></tr>\n";
+	                $paramContentString .= "<dt><tt><em>$pName</em></tt></dt><dd>$pDesc</dd>\n";
 	            }
 	        }
 	        if (length ($paramContentString)){
-		        $contentString .= "<h4>Parameters</h4>\n";
+		        $contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Parameter Descriptions</font></h5>\n";
 		        $contentString .= "<blockquote>\n";
-		        $contentString .= "<table border = \"1\"  width = \"90%\">\n";
-		        $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+		        # $contentString .= "<table border=\"1\"  width=\"90%\">\n";
+		        # $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+			$contentString .= "<dl>\n";
 	            $contentString .= $paramContentString;
-		        $contentString .= "</table>\n</blockquote>\n";
+		        # $contentString .= "</table>\n</blockquote>\n";
+		        $contentString .= "</dl>\n</blockquote>\n";
 		    }
 	    }
-	    if (length($result)) {
-            $contentString .= "<b>Result:</b> $result\n";
+	if (length($result)) {
+            $contentString .= "<dl><dt><i>function result</i></dt><dd>$result</dd></dl>\n";
         }
-	    $contentString .= "<hr>\n";
+	    # $contentString .= "<hr>\n";
     }
+    $contentString .= "<hr>\n";
     return $contentString;
 }
 
 sub _getVarDetailString {
     my $self = shift;
+    my $composite = shift;
     my @varObjs = $self->vars();
     my $contentString;
 
-    foreach my $obj (sort objName @varObjs) {
+    my @tempobjs = ();
+    if ($HeaderDoc::sort_entries) {
+	@tempobjs = sort objName @varObjs;
+    } else {
+	@tempobjs = @varObjs;
+    }
+    foreach my $obj (@tempobjs) {
         my $name = $obj->name();
+	my $abstract = $obj->abstract();
+	my $availability = $obj->availability();
+	my $updated = $obj->updated();
         my $desc = $obj->discussion();
         my $declaration = $obj->declarationInHTML();
         my $accessControl = $obj->accessControl();
         my @fields = ();
         my $fieldHeading;
-        if ($obj->can('fields')) { # for Structs and Typedefs
+        if ($obj->can('fields')) { # for Structs, Unions, and Typedefs
             @fields = $obj->fields();
-            $fieldHeading = "Fields";
+            $fieldHeading = "Field Descriptions";
         } elsif ($obj->can('constants')) { # for enums
             @fields = $obj->constants();
             $fieldHeading = "Constants";
         }
         if ($obj->can('isFunctionPointer')) {
         	if ($obj->isFunctionPointer()) {
-            	$fieldHeading = "Parameters";
+            	$fieldHeading = "Parameter Descriptions";
         	}
         }
+
+	my $methodType = "data"; # $self->getMethodType($declarationRaw);
+	# my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
+	my $apiowner = $self->apiOwner();
+	my $headerObject = $apiowner->headerObject();
+	# my $className = (HeaderDoc::APIOwner->headerObject())->name();
+	my $className = $self->name();
+	$contentString .= "<hr>";
+	# my $uid = "//$apiUIDPrefix/cpp/$methodType/$className/$name";
+	# registerUID($uid);
+	# $contentString .= "<a name=\"$uid\"></a>\n";
+	# Don't potentially change the uid....
+	my $apiref = $obj->apiref($composite); # , $methodType);
+	$contentString .= $apiref;
         
-        $contentString .= "<h3><a name=\"$name\">$name</a></h3>\n";
-        $contentString .= "<blockquote><tt>$accessControl</tt>$declaration</blockquote>\n";
-        $contentString .= "<p>$desc</p>\n";
+	$contentString .= "<table border=\"0\"  cellpadding=\"2\" cellspacing=\"2\" width=\"300\">";
+	$contentString .= "<tr>";
+	$contentString .= "<td valign=\"top\" height=\"12\" colspan=\"5\">";
+	my $urlname = sanitize($name);
+	$contentString .= "<h2><a name=\"$urlname\">$name</a></h2>\n";
+	$contentString .= "</td>";
+	$contentString .= "</tr></table>";
+	# $contentString .= "<hr>";
+	if (length($abstract)) {
+		# $contentString .= "<b>Abstract:</b> $abstract<BR>\n";
+		$contentString .= "$abstract<BR>\n";
+	}
+	if (length($availability)) {
+		$contentString .= "<b>Availability:</b> $availability<BR>\n";
+	}
+	if (length($updated)) {
+		$contentString .= "<b>Updated:</b> $updated<BR>\n";
+	}
+        $contentString .= "<blockquote><tt>$accessControl</tt> $declaration</blockquote>\n";
+        if (length($desc)) {$contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Discussion</font></h5><p>$desc</p>\n"; }
+        # $contentString .= "<p>$desc</p>\n";
 	    my $arrayLength = @fields;
 	    if ($arrayLength > 0) {
-	        $contentString .= "<h4>$fieldHeading</h4>\n";
+	        $contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">$fieldHeading</font></h5>\n";
 	        $contentString .= "<blockquote>\n";
-	        $contentString .= "<table border = \"1\"  width = \"90%\">\n";
-	        $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+	        # $contentString .= "<table border=\"1\"  width=\"90%\">\n";
+	        # $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+		$contentString .= "<dl>\n";
 	        foreach my $element (@fields) {
 	            my $fName = $element->name();
 	            my $fDesc = $element->discussion();
-	            $contentString .= "<tr><td align = \"center\"><tt>$fName</tt></td><td>$fDesc</td><tr>\n";
+	            # $contentString .= "<tr><td align=\"center\"><tt>$fName</tt></td><td>$fDesc</td></tr>\n";
+	            $contentString .= "<dt><tt>$fName</tt></dt><dd>$fDesc</dd>\n";
 	        }
-	        $contentString .= "</table>\n</blockquote>\n";
+	        # $contentString .= "</table>\n</blockquote>\n";
+	        $contentString .= "</dl>\n</blockquote>\n";
 	    }
-	    $contentString .= "<hr>\n";
+	    # if (length($updated)) {
+		# $contentString .= "<b>Updated:</b> $updated\n";
+	    # }
     }
+    $contentString .= "<hr>\n";
     return $contentString;
 }
 
 sub getMethodType {
     my $self = shift;
+
 	my $declaration = shift;
 	my $methodType = "instm";
 	
-	if ($declaration =~ /^\s*static/) {
+	if ($declaration =~ /^\s*static/o) {
 	    $methodType = "clm";
+	}
+	if ($self->sublang() eq "C") {
+		# COM interfaces, C pseudoclasses
+		$methodType = "func";
 	}
 	return $methodType;
 }
 
-sub getParamSignature {
+sub old_getParamSignature {
     my $self = shift;
 	my $declaration = shift;
 	my $sig;
 	my @params;
 	
-	$declaration =~ s/^[^(]+\(([^)]*)\).*/$1/;
+	$declaration =~ s/^[^(]+\(([^)]*)\).*/$1/o;
 	@params = split (/,/, $declaration);
 	foreach my $paramString (@params) {
 	    my @paramElements = split (/\s+/, $paramString);
 	    my $lastElement = pop @paramElements;
 	    $sig .= join ("", @paramElements);
-	    if ($lastElement =~ /^\*.*/) {$sig .= "*";};  #if the arg was a pointer
+	    if ($lastElement =~ /^\*.*/o) {$sig .= "*";};  #if the arg was a pointer
 	}
 	return $sig;
 }
 
+# we add the apple_ref markup to the navigator comment to identify
+# to Project Builder and other applications indexing the documentation
+# that this is the entry point for documentation for this class
 sub docNavigatorComment {
     my $self = shift;
     my $name = $self->name();
+    $name =~ s/;//sgo;
+    # my $uid = "//apple_ref/cpp/cl/$name";
+    my $type = "cl";
+
+    if ($self->fields()) {
+	# $uid = "//apple_ref/cpp/tmplt/$name";
+	$type = "tmpl";
+    }
+    # registerUID($uid);
+
+    my $uid = $self->apiuid($type);
+
+    my $appleRef = "<a name=\"$uid\"></a>";
+    my $navComment = "<!-- headerDoc=cl; uid=$uid; name=$name-->";
     
-    return "<-- headerDoc=cl; name=$name-->";
+    return "$navComment\n$appleRef";
 }
 
 ################## Misc Functions ###################################
@@ -421,15 +487,21 @@ sub objName { # used for sorting
 }
 
 sub byLinkage { # used for sorting
-   my $obj1 = $a;
-   my $obj2 = $b;
-   return ($obj1->linkageState() cmp $obj2->linkageState());
+    my $obj1 = $a;
+    my $obj2 = $b;
+    return ($obj1->linkageState() cmp $obj2->linkageState());
 }
 
 sub byAccessControl { # used for sorting
-   my $obj1 = $a;
-   my $obj2 = $b;
-   return ($obj1->accessControl() cmp $obj2->accessControl());
+    my $obj1 = $a;
+    my $obj2 = $b;
+    return ($obj1->accessControl() cmp $obj2->accessControl());
+}
+
+sub objGroup { # used for sorting
+    my $obj1 = $a;
+    my $obj2 = $b;
+    return ($obj1->group() cmp $obj2->group());
 }
 
 sub linkageAndObjName { # used for sorting
@@ -437,7 +509,11 @@ sub linkageAndObjName { # used for sorting
    my $obj2 = $b;
    my $linkAndName1 = $obj1->linkageState() . $obj1->name();
    my $linkAndName2 = $obj2->linkageState() . $obj2->name();
-   return ($linkAndName1 cmp $linkAndName2);
+   if ($HeaderDoc::sort_entries) {
+        return ($linkAndName1 cmp $linkAndName2);
+   } else {
+        return byLinkage($obj1, $obj2);
+   }
 }
 
 ##################### Debugging ####################################

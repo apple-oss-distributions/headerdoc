@@ -1,0 +1,1 @@
+function initialize_page() {    // Called on page load to setup the page.    announce_page_loaded();}function announce_page_loaded() {    // If we're in a frameset, tell the TOC frame this page was loaded, so it can track it.    if (top.frames.length) {        top.frames[0].page_loaded(document.location);    }   }

@@ -1,25 +1,31 @@
 #! /usr/bin/perl
 #
 # Class name: Method
-# Synopsis: Holds method info parsed by headerDoc
+# Synopsis: Holds Objective C method info parsed by headerDoc (not used for C++)
 #
 # Author: SKoT McDonald  <skot@tomandandy.com> Aug 2001
 # Based on Function.pm, and modified, by Matt Morse <matt@apple.com>
 # 
-# Copyright (c) 1999-2001 Apple Computer, Inc.  All Rights Reserved.
-# The contents of this file constitute Original Code as defined in and are
-# subject to the Apple Public Source License Version 1.1 (the "License").
-# You may not use this file except in compliance with the License.  Please
-# obtain a copy of the License at http://www.apple.com/publicsource and
-# read it before using this file.
+# Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
-# This Original Code and all software distributed under the License are
-# distributed on an TAS ISU basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+# @APPLE_LICENSE_HEADER_START@
+#
+# This file contains Original Code and/or Modifications of Original Code
+# as defined in and that are subject to the Apple Public Source License
+# Version 2.0 (the 'License'). You may not use this file except in
+# compliance with the License. Please obtain a copy of the License at
+# http://www.opensource.apple.com/apsl/ and read it before using this
+# file.
+# 
+# The Original Code and all software distributed under the License are
+# distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
 # EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
-# INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY, FITNESS
-# FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT.  Please see the License for
-# the specific language governing rights and limitations under the
-# License.
+# INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
+# Please see the License for the specific language governing rights and
+# limitations under the License.
+#
+# @APPLE_LICENSE_HEADER_END@
 #
 ######################################################################
 package HeaderDoc::Method;
@@ -50,12 +56,34 @@ sub _initialize {
     my($self) = shift;
 
     $self->SUPER::_initialize();
-    $self->{RESULT} = undef;
-    $self->{OWNER} = undef;
+    # $self->{RESULT} = undef;
+    # $self->{CONFLICT} = 0;
+    # $self->{OWNER} = undef;
     $self->{ISINSTANCEMETHOD} = "UNKNOWN";
-    $self->{TAGGEDPARAMETERS} = ();
-    $self->{PARSEDPARAMETERS} = ();
+    $self->{CLASS} = "HeaderDoc::Method";
 }
+
+sub clone {
+    my $self = shift;
+    my $clone = undef;
+    if (@_) {
+	$clone = shift;
+    } else {
+	$clone = HeaderDoc::Method->new();
+    }
+
+    $self->SUPER::clone($clone);
+
+    # now clone stuff specific to function
+
+    $clone->{RESULT} = $self->{RESULT};
+    $clone->{CONFLICT} = $self->{CONFLICT};
+    $clone->{OWNER} = $self->{OWNER};
+    $clone->{ISINSTANCEMETHOD} = $self->{ISINSTANCEMETHOD};
+
+    return $clone;
+}
+
 
 sub setIsInstanceMethod {
     my $self = shift;
@@ -71,17 +99,18 @@ sub isInstanceMethod {
     return $self->{ISINSTANCEMETHOD};
 }
 
-sub owner {  # class or protocol that this method belongs to
-    my $self = shift;
-
-    if (@_) {
-        my $name = shift;
-        $self->{OWNER} = $name;
-    } else {
-    	my $n = $self->{OWNER};
-		return $n;
-	}
-}
+# Made redundant by apiOwner in HeaderElement
+# sub owner {  # class or protocol that this method belongs to
+    # my $self = shift;
+# 
+    # if (@_) {
+        # my $name = shift;
+        # $self->{OWNER} = $name;
+    # } else {
+    	# my $n = $self->{OWNER};
+		# return $n;
+	# }
+# }
 
 sub result {
     my $self = shift;
@@ -92,48 +121,29 @@ sub result {
     return $self->{RESULT};
 }
 
-sub taggedParameters {
-    my $self = shift;
-    if (@_) { 
-        @{ $self->{TAGGEDPARAMETERS} } = @_;
-    }
-    ($self->{TAGGEDPARAMETERS}) ? return @{ $self->{TAGGEDPARAMETERS} } : return ();
-}
 
-sub addTaggedParameter {
+sub conflict {
     my $self = shift;
+    my $localDebug = 0;
     if (@_) { 
-        push (@{$self->{TAGGEDPARAMETERS}}, @_);
+        $self->{CONFLICT} = @_;
     }
-    return @{ $self->{TAGGEDPARAMETERS} };
+    print "conflict $self->{CONFLICT}\n" if ($localDebug);
+    return $self->{CONFLICT};
 }
 
 
-sub parsedParameters {
-    my $self = shift;
-    if (@_) { 
-        @{ $self->{PARSEDPARAMETERS} } = @_;
-    }
-    ($self->{PARSEDPARAMETERS}) ? return @{ $self->{PARSEDPARAMETERS} } : return ();
-}
-
-sub addParsedParameter {
-    my $self = shift;
-    if (@_) { 
-        push (@{$self->{PARSEDPARAMETERS}}, @_);
-    }
-    return @{ $self->{PARSEDPARAMETERS} };
-}
-
-
-sub processMethodComment {
+sub processComment {
     my $self = shift;
     my $fieldArrayRef = shift;
     my @fields = @$fieldArrayRef;
+    my $filename = $self->filename();
+    my $linenum = $self->linenum();
+
 	foreach my $field (@fields) {
 		SWITCH: {
-			($field =~ /^\/\*\!/)&& do {last SWITCH;}; # ignore opening /*!
-			($field =~ s/^method\s+//) && 
+			($field =~ /^\/\*\!/o)&& do {last SWITCH;}; # ignore opening /*!
+			($field =~ s/^method(\s+)/$1/o) && 
 			do {
 				my ($name, $disc);
 				($name, $disc) = &getAPINameAndDisc($field); 
@@ -141,38 +151,95 @@ sub processMethodComment {
 				if (length($disc)) {$self->discussion($disc);};
 				last SWITCH;
 			};
-			($field =~ s/^abstract\s+//) && do {$self->abstract($field); last SWITCH;};
-			($field =~ s/^discussion\s+//) && do {$self->discussion($field); last SWITCH;};
-			($field =~ s/^param\s+//) && 
+			($field =~ s/^abstract\s+//o) && do {$self->abstract($field); last SWITCH;};
+			($field =~ s/^discussion\s+//o) && do {$self->discussion($field); last SWITCH;};
+			($field =~ s/^availability\s+//o) && do {$self->availability($field); last SWITCH;};
+            		($field =~ s/^since\s+//o) && do {$self->availability($field); last SWITCH;};
+            		($field =~ s/^author\s+//o) && do {$self->attribute("Author", $field, 0); last SWITCH;};
+			($field =~ s/^version\s+//o) && do {$self->attribute("Version", $field, 0); last SWITCH;};
+            		($field =~ s/^deprecated\s+//o) && do {$self->attribute("Deprecated", $field, 0); last SWITCH;};
+			($field =~ s/^updated\s+//o) && do {$self->updated($field); last SWITCH;};
+	    ($field =~ s/^attribute\s+//o) && do {
+		    my ($attname, $attdisc) = &getAPINameAndDisc($field);
+		    if (length($attname) && length($attdisc)) {
+			$self->attribute($attname, $attdisc, 0);
+		    } else {
+			warn "$filename:$linenum:Missing name/discussion for attribute\n";
+		    }
+		    last SWITCH;
+		};
+	    ($field =~ s/^attributelist\s+//o) && do {
+		    $field =~ s/^\s*//so;
+		    $field =~ s/\s*$//so;
+		    my ($name, $lines) = split(/\n/, $field, 2);
+		    $name =~ s/^\s*//so;
+		    $name =~ s/\s*$//so;
+		    $lines =~ s/^\s*//so;
+		    $lines =~ s/\s*$//so;
+		    if (length($name) && length($lines)) {
+			my @attlines = split(/\n/, $lines);
+			foreach my $line (@attlines) {
+			    $self->attributelist($name, $line);
+			}
+		    } else {
+			warn "$filename:$linenum:Missing name/discussion for attributelist\n";
+		    }
+		    last SWITCH;
+		};
+	    ($field =~ s/^attributeblock\s+//o) && do {
+		    my ($attname, $attdisc) = &getAPINameAndDisc($field);
+		    if (length($attname) && length($attdisc)) {
+			$self->attribute($attname, $attdisc, 1);
+		    } else {
+			warn "$filename:$linenum:Missing name/discussion for attributeblock\n";
+		    }
+		    last SWITCH;
+		};
+			($field =~ /^see(also|)\s+/o) &&
+				do {
+				    $self->see($field);
+				    last SWITCH;
+				};
+			($field =~ s/^param\s+//o) && 
 			do {
-				$field =~ s/^\s+|\s+$//g; # trim leading and trailing whitespace
-	            $field =~ /(\w*)\s*(.*)/s;
+				$field =~ s/^\s+|\s+$//go; # trim leading and trailing whitespace
+	            $field =~ /(\w*)\s*(.*)/so;
 	            my $pName = $1;
 	            my $pDesc = $2;
 	            my $param = HeaderDoc::MinorAPIElement->new();
+	            $param->outputformat($self->outputformat);
 	            $param->name($pName);
 	            $param->discussion($pDesc);
 	            $self->addTaggedParameter($param);
+# my $name = $self->name();
+# print "Adding $pName : $pDesc in $name\n";
+# my $class = ref($self) || $self;
+# print "class is $class\n";
 				last SWITCH;
 			};
-			($field =~ s/^result\s+//) && do {$self->result($field); last SWITCH;};
-			print "Unknown field: $field\n";
+			($field =~ s/^return\s+//o) && do {$self->result($field); last SWITCH;};
+			($field =~ s/^result\s+//o) && do {$self->result($field); last SWITCH;};
+			# my $filename = $HeaderDoc::headerObject->filename();
+			my $filename = $self->filename();
+			my $linenum = $self->linenum();
+			# print "$filename:$linenum:Unknown field in Method comment: $field\n";
+			if (length($field)) { warn "$filename:$linenum:Unknown field (\@$field) in method comment (".$self->name().")\n"; }
 		}
 	}
 }
 
-sub getAPINameAndDisc {
-    my $line = shift;
-    my ($name, $disc, $operator);
-    # first, get rid of leading space
-    $line =~ s/^\s+//;
-    ($name, $disc) = split (/\s/, $line, 2);
-    if ($name =~ /operator/) {  # this is for operator overloading in C++
-        ($operator, $name, $disc) = split (/\s/, $line, 3);
-        $name = $operator." ".$name;
-    }
-    return ($name, $disc);
-}
+# sub getAPINameAndDisc {
+    # my $line = shift;
+    # my ($name, $disc, $operator);
+    # # first, get rid of leading space
+    # $line =~ s/^\s+//o;
+    # ($name, $disc) = split (/\s/, $line, 2);
+    # if ($name =~ /operator/o) {  # this is for operator overloading in C++
+        # ($operator, $name, $disc) = split (/\s/, $line, 3);
+        # $name = $operator." ".$name;
+    # }
+    # return ($name, $disc);
+# }
 
 sub setMethodDeclaration {
     my $self = shift;
@@ -183,136 +250,41 @@ sub setMethodDeclaration {
     
     print "============================================================================\n" if ($localDebug);
     print "Raw declaration is: $dec\n" if ($localDebug);
-    
-    # regularize whitespace
-    $dec =~ s/^\s+(.*)/$1/; # remove leading whitespace
-    $dec =~ s/[ \t]+/ /g;
-    
-	my $newdec = "";
-	my @paramElements = split(/\:/, $dec);
-	my $paramCount = 0;
-	foreach my $paramTriple (@paramElements) {
-		my $elementCount = 0;
-		print "    paramTriple is |$paramTriple|\n" if ($localDebug);
-		$paramTriple =~ s/ +/ /; # regularize spaces
-		$paramTriple =~ s/^ +//; # remove leading whitespace
-		$paramTriple =~ s/\) ?/\) /; # temporarily put spaces around the type declaration
-		$paramTriple =~ s/ ?\(/ \(/; # for processing -- will be removed below
-
-		my @paramParts = split(/ /, $paramTriple);
-		foreach my $part (@paramParts) {
-			if (($paramCount < $#paramElements || $#paramElements == 0) && $elementCount == $#paramParts) {
-				if ($#paramElements == 0) {
-					$part = "<B>$part</B>";
-				} else {
-					$part = "<B>$part:</B>";
-				}	
-			}	
-			if (($paramCount > 0) && 
-			      ((($paramCount < $#paramElements) && ($elementCount == $#paramParts - 1)) || (($paramCount == $#paramElements) && ($elementCount == $#paramParts)))) {
-				$part = "<I>$part</I>";
-			}
-			$elementCount++;
-			$newdec .= "$part ";
-			#print "$newdec\n";
-		}
-		$paramCount++;
-	}       
-	
-    # remove spaces around type declarations--that is around parens
-    $newdec =~ s/\s+\(/(/g;
-    $newdec =~ s/\)\s+/)/g;
-    # reestablish space after - or +
-    $newdec =~ s/^-/- /;
-    $newdec =~ s/^\+/+ /;
-    
-    if ($newdec =~ /^\+/) {
-    	$self->setIsInstanceMethod("NO");
-    } elsif ($newdec =~ /^-/) {
-    	$self->setIsInstanceMethod("YES");
-    } else {
-        print "#### Cannot determine whether method is class or instance method:\n";
-        print "        $newdec\n";
-    	$self->setIsInstanceMethod("UNKNOWN");
-    }
-    
-	$retval = "<tt>$newdec</tt><br>\n";
-    print "Formatted declaration is: $retval\n" if ($localDebug);
-    print "============================================================================\n" if ($localDebug);
-    $self->declarationInHTML($retval);
-    return $retval;
+    $self->declaration($dec);
+    $self->declarationInHTML($dec);
+    return $dec;
 }
 
-sub documentationBlock {
-    my $self = shift;
-	my $name = $self->name();
-	my $desc = $self->discussion();
-	my $abstract = $self->abstract();
-	my $declaration = $self->declarationInHTML();
-	my $declarationRaw = $self->declaration();
-	my @params = $self->taggedParameters();
-	my $result = $self->result();
-    my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
-    my $owner = $self->owner();
-    my $contentString;
-    my $className= 'UNKNOWN_CLASSNAME';
-    	
-    if ($owner->can("className")) {  # to get the class name from Category objects
-    	$className = $owner->className();
-    } else {
-    	$className = $owner->name();
-    }
-    
-    print "#### Warning: couldn't determine owning class/protocol for method: $name\n" if ($className eq 'UNKNOWN_CLASSNAME');
-
-	if ($declaration !~ /#define/) { # not sure how to handle apple_refs with macros yet
-		my $methodType = $self->getMethodType($declarationRaw);
-		$contentString .= "<a name=\"//$apiUIDPrefix/occ/$methodType/$className/$name\"></a>\n";
-	}
-	$contentString .= "<h3><a name=\"$name\">$name</a></h3>\n";
-	if (length($abstract)) {
-		$contentString .= "<b>Abstract:</b> $abstract\n";
-	}
-	$contentString .= "<blockquote><pre>$declaration</pre></blockquote>\n";
-	$contentString .= "<p>$desc</p>\n";
-	my $arrayLength = @params;
-	if ($arrayLength > 0) {
-		my $paramContentString;
-		foreach my $element (@params) {
-			my $pName = $element->name();
-			my $pDesc = $element->discussion();
-			if (length ($pName)) {
-				$paramContentString .= "<tr><td align = \"center\"><tt>$pName</tt></td><td>$pDesc</td><tr>\n";
-			}
-		}
-		if (length ($paramContentString)){
-			$contentString .= "<h4>Parameters</h4>\n";
-			$contentString .= "<blockquote>\n";
-			$contentString .= "<table border = \"1\"  width = \"90%\">\n";
-			$contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
-				$contentString .= $paramContentString;
-			$contentString .= "</table>\n</blockquote>\n";
-		}
-	}
-	if (length($result)) {
-		$contentString .= "<b>Result:</b> $result\n";
-	}
-	$contentString .= "<hr>\n";
-}
 
 sub getMethodType {
-    my $self = shift;
+	my $self = shift;
+	my $filename = $self->filename();
+	my $linenum = $self->linenum();
 	my $declaration = shift;
 	my $methodType = "";
 		
-	if ($declaration =~ /^\s*-/) {
+	if ($declaration =~ /^\s*-/o) {
 	    $methodType = "instm";
-	} elsif ($declaration =~ /^\s*\+/) {
+	    $self->setIsInstanceMethod("YES");
+	} elsif ($declaration =~ /^\s*\+/o) {
 	    $methodType = "clm";
+	    $self->setIsInstanceMethod("NO");
+	} elsif ($declaration =~ /#define/o) {
+	    $methodType = "defn";
+	    $self->setIsInstanceMethod("NO");
 	} else {
-		print "### Unable to determine whether declaration is for an instance or class method.\n";
-		print "     '$declaration'\n";
+		my $filename = $HeaderDoc::headerObject->filename();
+		if (!$HeaderDoc::ignore_apiuid_errors) {
+			print "$filename:$linenum:Unable to determine whether declaration is for an instance or class method[method].\n";
+			print "$filename:$linenum:     '$declaration'\n";
+		}
+		# We have to take an educated guess so the UID is legal
+		$methodType = "instm";
+	    $self->setIsInstanceMethod("YES");
 	}
+
+# print "GMT NAME: ".$self->name()." TYPE: $methodType DEC:$declaration\n";
+
 	return $methodType;
 }
 
@@ -322,13 +294,6 @@ sub printObject {
     print "Method\n";
     $self->SUPER::printObject();
     print "Result: $self->{RESULT}\n";
-    print "Tagged Parameters:\n";
-    my $taggedParamArrayRef = $self->{TAGGEDPARAMETERS};
-    my $arrayLength = @{$taggedParamArrayRef};
-    if ($arrayLength > 0) {
-        &printArray(@{$taggedParamArrayRef});
-    }
-    print "\n";
 }
 
 1;

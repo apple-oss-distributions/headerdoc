@@ -1,0 +1,344 @@
+/* link classes */
+A:link			{ COLOR: #0000FF; TEXT-DECORATION: none; }
+A:link:hover	{ COLOR: #FF6600; TEXT-DECORATION: underline; }
+A:active		{ COLOR: #FF6600; TEXT-DECORATION: underline; }
+
+/* apple.com site does not explicitly define visited link properties, but we do here */ 
+A:visited		{ COLOR: #0000AA; TEXT-DECORATION: none; }
+A:visited:hover	{ COLOR: #FF6600; TEXT-DECORATION: underline; } 
+
+/* link handling for index page link images */
+/* for page and page range links, a transparent image is placed, so that the background image will show through. */
+A.index_page         { background-image: url(../Images/indexpage.gif); background-repeat: no-repeat; background-position: center center;}
+A.index_page:visited { background-image: url(../Images/vindexpage.gif); background-repeat: no-repeat; background-position: center center;}
+
+A.index_range         { background-image: url(../Images/indexpage_range.gif); background-repeat: no-repeat; background-position: center center;}
+A.index_range:visited { background-image: url(../Images/vindexpage_range.gif); background-repeat: no-repeat; background-position: center center;}
+
+/* used to convert otherCodeCharacters to code, thus saving character space in HTML for smaller file sizes */
+tt {
+	font-size: 12px; font-family:  monaco, courier, monospace
+        }
+
+/* redefine preformated text and code blocks */
+PRE {
+	FONT-SIZE: 11px; FONT-FAMILY: monaco, courier, monospace
+}
+CODE {
+	FONT-SIZE: 11px; FONT-FAMILY: monaco, courier, monospace
+}
+
+
+/* JavaScript toc frame */
+.jtoc_closed { background-color: transparent; }
+.jtoc_open { background-color: #FFFFFF; }
+
+/* frameset: toc frame */
+.toc_contents_text {
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif; font-size: 12px; 
+	color: #0000FF;
+}
+.toc_contents_text_open {
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif; font-size: 12px;
+	background: #FFFFFF; color: #0000FF;
+}
+.low_level_text {
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif; font-size: 10px;
+	color: #0000FF;
+}
+.low_level_text_on {
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif; font-size: 10px;
+	color: #0000FF;
+}
+.top_level_open {
+	background: #FFFFFF;
+}
+.third_level {
+	background: #FFFFFF;
+}
+#toc_contents_title {
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif; font-size: 14px; color: #FFFFFF; font-weight: bold;
+}
+.toc_contents_heading {
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif; font-size: 12px; font-weight: bold;
+}
+
+
+
+
+/* frameset: content frame */
+BODY {
+    margin-top: 0;
+	color: #000;
+	font: 12px 'Lucida Grande', Geneva, Verdana, Arial, Helvetica, sans-serif;
+	}
+
+/* frameset: H1,H2,H3,H4,H5 */
+
+h1{
+	font-family: Myriad Apple, Myriad, Arial, Helvetica, Lucida Grande, sans-serif; font-size: 26px; font-weight: bold;
+}
+h2{
+	font-family: Myriad Apple, Myriad, Arial, Helvetica, Lucida Grande, sans-serif; font-size: 24px; font-weight: bold;
+}
+h3{
+	font-family: Myriad Apple, Myriad, Arial, Helvetica, Lucida Grande, sans-serif; font-size: 20px; font-weight: bold;
+}
+h4{
+	font-family: Myriad Apple, Myriad, Arial, Helvetica, Lucida Grande, sans-serif; font-size: 16px; font-weight: bold;
+}
+h5{
+	font-family: Myriad Apple, Myriad, Arial, Helvetica, Lucida Grande, sans-serif; font-size: 14px; font-weight: bold;
+}
+
+.content_text {
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif; font-size: 12px; font-weight: normal;
+}
+
+
+/* frameset: content frame bold style for text*/
+b{
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif; font-size: 12px; font-weight: bold;
+}
+
+/* Used for text that is sligtly larger than bold text like lables and captions*/
+.content_text_label {
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif; font-size: 13px; font-weight: bold;
+}
+
+/* frameset: content frame italic style for text*/   
+i{
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif; font-size: 12px; font-style: italic;     
+}        
+
+/* frameset: page title */
+.page_title{
+	font-family: Myriad Apple, Myriad, Arial, Helvetica, Lucida Grande, sans-serif; font-size: 36px; font-weight: bold; color: #000000;
+}
+
+/* frameset: Unordered List */
+UL .content {
+	FONT-SIZE: 12px; FONT-FAMILY: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+/* frameset: mini navigation style (Hide/Show TOC & next/prev) */
+.mini_nav_text {
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+	font-size: 9px;
+	font-weight: normal;
+}
+
+.breadcrumb {
+	font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+	font-size: 10px;
+	font-weight: normal;
+	margin-left: 10px;
+	margin-top: 8px;
+}
+
+/*  ADC header/footer mappings for Getting Started */
+/* header */
+#adcnavheader td {
+	font: 10px 'Lucida Grande', Geneva, Helvetica, Arial, sans-serif;
+	}
+
+#adcnavheader input {
+	margin: 0 3px 0 0;
+	padding: 0;
+	}
+
+#adcnavheader .textpadding {
+	padding-top: 2px;
+	vertical-align: middle;
+	}
+	
+#adcnavheader .searchbutton {
+	border: 0;
+	}
+
+#adcnavheader h6 {
+    margin: 0;
+    padding: 0;
+    font: normal 12px 'Lucida Grande', Geneva, Verdana, Arial, Helvetica, sans-serif;
+    color: #000;
+}
+
+#adcnavheader form {
+    margin: 0;
+}
+
+
+/* footer */
+#footer td, #footer p {
+	font-size: 10px;
+	}
+	
+
+/* Getting Started styles */
+
+/* font definitions */
+
+/* keep ".gettingstarted pre, code" above ".gettingstarted h1" below otherwise,
+the main h1 tag above will be used instead of".gettingstarted h1" */
+.gettingstarted pre, code {
+	font: 11px Monaco, Courier, monospace;
+	}
+
+/* Added this style since the ADC template was trying to do this with a graphic (Note: their h2
+attached to the image tag is only used by search engines; their h2 does not function if the
+graphic is missing).--DA  */        
+.gettingstarted h2 {
+	margin: 0;
+	margin-bottom: 15px;
+	padding: 0px;
+	font: bold 32px 'Lucida Grande', Geneva, Verdana, Arial, Helvetica, sans-serif;
+	color: #000;
+	}        
+
+.gettingstarted h3	{
+	margin: 0 0 5px 0;
+	padding: 0px;
+	font: bold 16px 'Lucida Grande', Geneva, Verdana, Arial, Helvetica, sans-serif;
+	color: #000;
+	}
+	
+.gettingstarted p + .gettingstarted h3 {
+	margin-top: 20px;
+	}
+
+.gettingstarted ol + .gettingstarted h3 {
+	margin-top: 20px;
+	}
+
+.gettingstarted ul + .gettingstarted h3 {
+	margin-top: 20px;
+	}
+
+.gettingstarted h4	{
+	margin: 0px;
+	padding: 0px;
+	font: bold 12px 'Lucida Grande', Geneva, Verdana, Arial, Helvetica, sans-serif;
+	color: #000;
+	}
+
+.gettingstarted h4 + .gettingstarted table {
+	margin-top: 10px;
+	}
+
+.gettingstarted p	{
+	margin-top: 0;
+	margin-bottom: 10px;
+	padding: 0;
+	font: 12px 'Lucida Grande', Geneva, Verdana, Arial, Helvetica, sans-serif;
+	color: #000;
+	}
+	
+.gettingstarted th {
+	font-weight: bold;
+	text-align: left;
+	}
+
+
+/* list definitions */
+.gettingstarted ul	{
+	font: 12px 'Lucida Grande', Geneva, Verdana, Arial, Helvetica, sans-serif;
+	padding-left: 10px;
+	margin-top: 0;
+	margin-left: 10px;
+	margin-bottom: 10px;
+	list-style-type: none;
+	}
+
+.gettingstarted li	{
+	margin-top: 3px;
+	}
+	
+.gettingstarted ul li	{
+	padding-left: 10px;
+	background: url(../images/bullet.gif) no-repeat 0px 3px;
+	}
+	
+.gettingstarted ul ul {
+	margin-left: 20px;
+	}
+
+.gettingstarted ol {
+	font: 12px 'Lucida Grande', Geneva, Verdana, Arial, Helvetica, sans-serif;
+	margin-top: 0;
+	margin-left: 1.5em;
+	margin-bottom: 10px;
+	padding-left: 1.5em;
+	}
+
+.gettingstarted ul.inline, .gettingstarted ol.inline, .gettingstarted p.inline {
+	margin-top: -7px;
+	}
+        
+        
+        
+/* table styles */
+.sourcecodebox {
+	border: 1px solid #c7cfd5;
+	background: #f1f5f9;
+	margin: 20px 0;
+	}
+	
+	
+/* footnote definitions */
+.footnote h4, .footnote p {
+	color: #76797C;
+	font-size: 11px;
+	}
+        
+.gettingstarted .footnote {
+	font-size: 11px;
+	color: #76797C;
+	}
+        
+                               
+.notebox {
+       border: 1px solid #C7CFD5;
+	background: #E2E2E2;
+        margin-bottom: 10px;
+	padding: 10px;
+	text-align: left;
+	}                                                                          
+        
+
+/* Controller Layer Bindings styles */        
+
+.class_binding_block {
+        }
+        
+.binding_category_block {
+	margin-left: 1em
+        }
+        
+.binding_category_name {
+	font-size: 24px; font-family: "Myriad Apple", Myriad, Arial, Helvetica, "Lucida Grande", sans-serif; font-weight: bold; line-height: 35px; padding-bottom: 1px; border-top: 2px solid black
+        }
+        
+.binding_block {
+        margin-left: 2em
+        }
+        
+.binding_name {
+	font-size: 18px; font-family: monaco, courier, monospace; font-weight: 400; margin-top: 10px; border-bottom: 1px solid #69f
+        }
+
+.bindings_tablehead { font-size: 16px; font-family: "Myriad Apple", Myriad, Arial, Helvetica, Lucida Grande, sans-serif; font-weight: bold; position: relative; top: -5px; margin-left: -20px
+        }
+        
+.placeholder_options_block {
+        margin-left: 2em
+        }
+        
+.placeholder_options_block table th {
+	font: bold 12px "Lucida Grande", LucidaGrande, Lucida, Helvetica, Arial, sans-serif; text-align: left; border-bottom: 1px solid gray; border-spacing: 20px
+        }
+        
+.placeholder_options_block table td {
+        font: 12px "Lucida Grande", LucidaGrande, Lucida, Helvetica, Arial, sans-serif; text-align: left; padding-top: 5px; padding-right: 10px; border-bottom: 1px solid #b3b3b3 
+        }
+        
+         

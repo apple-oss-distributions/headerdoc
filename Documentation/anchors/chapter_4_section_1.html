@@ -1,0 +1,210 @@
+<html>
+    <head>
+        <META NAME="Generator" CONTENT="Gutenberg">
+		<META NAME="GeneratorVersion" CONTENT="v100.1">
+        <META http-equiv="content-type" CONTENT="text/html;charset=iso-8859-1">
+        <META NAME = "Copyright" CONTENT="Copyright 2004 Apple Computer, Inc. All Rights Reserved.">
+        <TITLE>HeaderDoc Unfettered: Symbol Markers for HTML-based Documentation</TITLE>
+        <base target="content">
+
+        <LINK REL="stylesheet" TYPE="text/css" HREF="../Resources/CSS/frameset_styles.css">
+        <style type="text/css"></style>
+        <script language="JavaScript" src="../Resources/JavaScript/page.js"></script>
+    </head>
+    
+    <BODY bgcolor="#ffffff" onload="initialize_page();"><a name="//apple_ref/doc/uid/TP40001215-CH347" title="Symbol Markers for HTML-based Documentation" turn_anchor="yes"></a>
+        <a name="top"></a>
+        <!-- start of header -->
+        <!--#include virtual="/includes/framesetheader" -->
+        <!-- end of header -->
+        
+        <!-- start of path -->
+<div class="breadcrumb"><a href="http://developer.apple.com/" target="_top">ADC Home</a> &gt; <!--a logicalPath="//apple_ref/doc/uid/TP30000943"  -->Reference Library<!--/a--> &gt; <!--a logicalPath="Unknown"  -->Technology TBD<!--/a--> &gt; <a logicalPath="//apple_ref/doc/uid/TP40001215-CH345" href="../intro/chapter_1_section_1.html#//apple_ref/doc/uid/TP40001215-CH345">HeaderDoc Unfettered</a> &gt; </div><br>
+<!-- end of path -->
+        
+        <table width="100%" cellpadding=0 cellspacing=0 border=0 class="mini_nav_text"><tr>
+        <td align=left scope="row">
+
+        <!-- insert Show/Hide frames -->
+        <script type="text/javascript" language="JavaScript"><!--
+  
+        if (self != top) {
+            // loaded in frames
+            document.write('<a href="'+self.location+'" target="_top"><img src="../Resources/Images/show_toc_icon.gif" width="15" height="14" border="0" style="margin-bottom: -2px;" alt=""></a> <a href="'+self.location+'" target="_top">Hide TOC</a>');
+        }
+        else {
+            // not loaded frames
+            document.write('<a href="../index.html?'+self.location+'" target="_top"><img src="../Resources/Images/show_toc_icon.gif" width="15" height="14" border="0" style="margin-bottom: -2px;" alt=""></a> <a href="../index.html?'+self.location+'" target="_top">Show TOC</a>');
+        }
+        //--></script>
+        <!-- end Show/Hide frames -->
+
+        </td><td align=right>
+        
+        <a href="../tags/chapter_3_section_11.html" target="_self">&lt; Previous Page</a><span style="margin-left: 8px"><a href="../config/chapter_5_section_1.html" target="_self">Next Page &gt;</a></span>
+        
+        </td>
+        </tr></table>
+        
+        <hr>
+        
+        <a name="//apple_ref/doc/uid/TP40001215-CH347-BABJIFFD" turn_anchor="no"></a><a name="BABJIFFD" turn_anchor="no"></a><h1 class="page_title">Symbol Markers
+for HTML-based Documentation</h1><p>As HeaderDoc generates documentation for a
+set of header files, it injects named anchors (<tt>&lt;a
+name=&#8221;<i>marker</i>&#8221;&gt;&lt;/a&gt;</tt>)
+into the HTML to mark the location of the documentation for each API
+symbol. This document describes the composition of these markers.</p>
+<p>As you will see, each marker is self describing and can answer
+questions such as:</p>
+<ul class="content_text"><li class="content_text">What is the
+name of this symbol?</li><br>
+<li class="content_text">Is this a function, typedef, method, etc.?</li><br>
+<li class="content_text">Which class does this method belong to?</li><br>
+<li class="content_text">What is the language environment: C, C++, Java, Objective-C?</li><br></ul>
+<p>With this embedded information, the HTML documentation can
+be scanned to produce API lists for various purposes. For example,
+such a list could be used to verify that all declared API has corresponding
+documentation. Or, the documentation could be scanned to produce
+indexes of various sorts. The scanning script could as well create
+hyperlinks from the indexes to the source documentation. In short,
+these anchors retain at least some of the semantic information that
+is commonly lost when converting material to HTML format.</p>
+
+<br><h2>The Marker String</h2>
+<p>A <b>marker</b> string is defined as:</p>
+<p><tt>marker := prefix '/' lang-type '/' sym-type
+'/' sym-value</tt></p>
+<p>A marker is a string composed of two or more values separated
+by '/'. The forward-slash character is used because it is not a
+legal character in the symbol names for any of the languages we
+are considering.</p>
+<p>The prefix defines this marker as conforming to our conventions
+and helps identify these markers to scanners. The language type
+defines the language of the symbol. The symbol type defines some
+semantic information about the symbol, such as whether it is a class name
+or function name. The symbol value is a string representing the
+symbol.</p>
+<p>Because the string must be encoded as part of a URL, it must
+obey a very strict set of rules. Specifically, any characters other
+than letters and numbers must be encoded as a URL entity. For example,
+the operator &#8216;+&#8217; in C++ would be encoded as &#8220;<tt>%2b</tt>&#8221;.</p>
+<p>By default, the prefix is &#8220;<tt>//apple_ref</tt>&#8221;.
+However, the prefix string can be changed using HeaderDoc's configuration
+file.</p>
+<p>The currently-defined language types are:</p>
+<dl class="content_text"><br><dt class="content_text">c</dt>
+<dd class="content_text">C</dd>
+<br><dt class="content_text">occ</dt>
+<dd class="content_text">Objective-C</dd>
+<br><dt class="content_text">java</dt>
+<dd class="content_text">Java</dd>
+<br><dt class="content_text">javascript</dt>
+<dd class="content_text">JavaScript</dd>
+<br><dt class="content_text">cpp</dt>
+<dd class="content_text">C++</dd>
+<br><dt class="content_text">php</dt>
+<dd class="content_text">PHP</dd>
+<br><dt class="content_text">pascal</dt>
+<dd class="content_text">Pascal</dd>
+<br><dt class="content_text">perl</dt>
+<dd class="content_text">perl</dd>
+<br><dt class="content_text">shell</dt>
+<dd class="content_text">Bourne, Korn, Bourne Again, or C shell script</dd></dl>
+<p>The language type defines the language binding of the symbol.
+Some logical symbols may be available in more than one language.
+The 'c' language defines symbols which can be called from the C
+family of languages (C, Objective-C, and C++).</p>
+<br><h3>Symbol Types for All Languages:</h3>
+<dl class="content_text"><br><dt class="content_text">tag</dt>
+<dd class="content_text">struct, union, or enum tag</dd>
+<br><dt class="content_text">econst</dt>
+<dd class="content_text">an enumerated constant&#8212;that is, a symbol defined inside
+an enum</dd>
+<br><dt class="content_text">tdef</dt>
+<dd class="content_text">typedef name</dd>
+<br><dt class="content_text">macro</dt>
+<dd class="content_text">macro name (without '()')</dd>
+<br><dt class="content_text">data</dt>
+<dd class="content_text">global or file-static data</dd>
+<br><dt class="content_text">func</dt>
+<dd class="content_text">function name (without '()')</dd></dl>
+<br><h3>Symbol Types for Languages
+with Classes</h3>
+<dl class="content_text"><br><dt class="content_text">cl</dt>
+<dd class="content_text">class name</dd>
+<br><dt class="content_text">intf</dt>
+<dd class="content_text">interface or protocol name</dd>
+<br><dt class="content_text">cat</dt>
+<dd class="content_text">category name, just for Objective-C</dd>
+<br><dt class="content_text">intfm</dt>
+<dd class="content_text">method defined in an interface (or protocol)</dd>
+<br><dt class="content_text">instm</dt>
+<dd class="content_text">an instance method 'clm' a class (or static [in java
+or c++]) method</dd></dl>
+<br><h3>C++ (cpp) Symbol Types</h3>
+<dl class="content_text"><br><dt class="content_text">tmplt</dt>
+<dd class="content_text">C++ class template</dd>
+<br><dt class="content_text">ftmplt</dt>
+<dd class="content_text">C++ function template</dd>
+<br><dt class="content_text">func</dt>
+<dd class="content_text">C++ scoped function (i.e. not extern 'C'); includes
+return type and signature.</dd></dl>
+<br><h3>Java (java) Symbol Types</h3>
+<dl class="content_text"><br><dt class="content_text">clconst</dt>
+<dd class="content_text">Java constant values defined inside a class</dd></dl>
+<div class="notebox"><span class="content_text"><b>Note: </b>The
+symbol value for method names includes the class name. </span></div>
+<br><h3>Objective-C (occ) Method Name
+Format</h3>
+<p><b>The format for method names for Objective-C is: </b>	</p>
+<table><table cellpadding="8" width="100%" bgcolor="#F1F5F9" style="border: 1px solid #C9D1D7;"><tr><td scope="row"><table bgcolor="#F1F5F9" width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td><pre><code>class_name '/' method_name</code></pre></td><td><code><pre></pre></code></td></tr><tr><td scope="row"><pre><code>e.g.: //apple_ref/occ/instm/NSString/stringWithCString: </code></pre></td><td><code><pre></pre></code></td></tr></table></td></tr></table></table>
+<p>For methods in Objective-C categories, the category name is <b>not</b> included
+in the method name marker. The class named used is the class the
+category is defined on. For example, for the windowDidMove: delegate
+method on in NSWindow, the marker would be:</p>
+<table><table cellpadding="8" width="100%" bgcolor="#F1F5F9" style="border: 1px solid #C9D1D7;"><tr><td scope="row"><table bgcolor="#F1F5F9" width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td><pre><code>e.g.: //apple_ref/occ/intfm/NSObject/windowDidMove:</code></pre></td><td><code><pre></pre></code></td></tr></table></td></tr></table></table>
+<br><h3>C++/Java (cpp/java) Method
+Name Format</h3>
+<p>The format for method names for Java and C++ is:</p>
+<table><table cellpadding="8" width="100%" bgcolor="#F1F5F9" style="border: 1px solid #C9D1D7;"><tr><td scope="row"><table bgcolor="#F1F5F9" width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td><pre><code>    class_name '/' method_name '/' return_type '/' '(' signature ')' e.g.: //apple_ref/java/instm/NSString/stringWithCString/NSString/(char*) </code></pre></td><td><code><pre></pre></code></td></tr></table></td></tr></table></table>
+<p>For Java and C++, signatures are part of the method name;
+signatures are enclosed in parens. The algorithm for encoding a
+signature is:</p>
+<ol class="content_text"><li class="content_text">Remove the
+parameter name	, e.g. (Foo *bar, int i) -&gt; (Foo *, int ) </li><br>
+<li class="content_text">Remove spaces	, e.g. (Foo *, int ) -&gt; (Foo*,int) </li><br></ol>
+
+        <br><br> 
+        
+        <table width="100%" cellpadding=0 cellspacing=0 border=0 class="mini_nav_text"><tr>
+        <td align=left scope="row">
+
+        <!-- insert Show/Hide frames -->
+        <script type="text/javascript" language="JavaScript"><!--
+           
+        if (self != top) {
+            // loaded in frames
+            document.write('<a href="'+self.location+'" target="_top"><img src="../Resources/Images/show_toc_icon.gif" width="15" height="14" border="0" style="margin-bottom: -2px;" alt=""></a> <a href="'+self.location+'" target="_top">Hide TOC</a>');
+        }
+        else {
+            // not loaded frames
+            document.write('<a href="../index.html?'+self.location+'" target="_top"><img src="../Resources/Images/show_toc_icon.gif" width="15" height="14" border="0" style="margin-bottom: -2px;" alt=""></a> <a href="../index.html?'+self.location+'" target="_top">Show TOC</a>');
+        }
+        //--></script>
+        <!-- end Show/Hide frames -->
+
+        </td><td align=right>
+        
+        <a href="../tags/chapter_3_section_11.html" target="_self">&lt; Previous Page</a><span style="margin-left: 8px"><a href="../config/chapter_5_section_1.html" target="_self">Next Page &gt;</a></span>
+        
+        </td>
+        </tr></table>
+
+        <br><hr><p class="content_text"> <!--#if expr="0=1" -->&#169; 1999, 2004 Apple Computer, Inc. All Rights Reserved. (<!--#endif -->Last updated: 2004-05-27<!--#if expr="0=1" -->)<!--#endif --></p>
+
+        
+        <!-- start of footer -->
+        <!--#include virtual="/includes/framesetfooter" -->
+        <!-- end of footer -->
+    </BODY>
+</html>
