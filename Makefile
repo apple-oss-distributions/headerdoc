@@ -3,7 +3,6 @@
 # Wilfredo Sanchez | wsanchez@apple.com
 ##
 
-DSTROOT = /tmp/headerdoc/Release
 
 bindir  = /usr/bin
 docsDir = /Developer/Documentation/DeveloperTools
@@ -25,7 +24,27 @@ build:
 
 clean:
 
+realinstall:
+	DSTROOT="" make installsub
+
 install:
+	DSTROOT="/tmp/headerdoc/Release" make installsub
+
+	@echo "WARNING: Make install by default installs in"
+	@echo ""
+	@echo "          ${DSTROOT}"
+	@echo ""
+	@echo "This is primarily intended for building packages."
+	@echo "If you want to actually install over your"
+	@echo "existing installation, cancel this make and run"
+	@echo "\"make realinstall\" instead."
+
+	sleep 5
+
+installsub:
+
+	@echo "Destination is:  \"${DSTROOT}\""
+
 	umask 022 && install -d $(DSTROOT)$(perl_libdir)/HeaderDoc
 	install -c -m 444 Modules/HeaderDoc/*.pm $(DSTROOT)$(perl_libdir)/HeaderDoc
 	umask 022 && install -d $(DSTROOT)$(bindir)

@@ -4,7 +4,7 @@
 # Synopsis: Root class for Function, Typedef, Constant, etc. -- used by HeaderDoc.
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2001/11/30 22:43:17 $
+# Last Updated: $Date: 2003/05/30 20:55:56 $
 #
 # Copyright (c) 1999 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
@@ -52,9 +52,26 @@ sub _initialize {
     $self->{DISCUSSION} = undef;
     $self->{DECLARATION} = undef;
     $self->{DECLARATIONINHTML} = undef;
+    $self->{OUTPUTFORMAT} = undef;
     $self->{NAME} = undef;
+    $self->{GROUP} = undef;
+    $self->{THROWS} = undef;
+    $self->{XMLTHROWS} = undef;
+    $self->{UPDATED} = undef;
     $self->{LINKAGESTATE} = undef;
     $self->{ACCESSCONTROL} = undef;
+}
+
+sub outputformat {
+    my $self = shift;
+
+    if (@_) {
+        my $outputformat = shift;
+        $self->{OUTPUTFORMAT} = $outputformat;
+    } else {
+    	my $o = $self->{OUTPUTFORMAT};
+		return $o;
+	}
 }
 
 sub name {
@@ -69,7 +86,85 @@ sub name {
 	}
 }
 
+sub group {
+    my $self = shift;
+
+    if (@_) {
+        my $group = shift;
+        $self->{GROUP} = $group;
+    } else {
+    	my $n = $self->{GROUP};
+		return $n;
+	}
+}
+
+sub appleref {
+    my $self = shift;
+    my $type = shift;
+    my $name = $self->name;
+
+    my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();    
+    my $className; 
+    my $classHeaderObject = HeaderDoc::APIOwner->headerObject();
+    if (!$classHeaderObject) {
+        # We're not in a class.  Give the file name.
+
+	if (!$HeaderDoc::headerObject) {
+		die "headerObject undefined!\n";
+	}
+        $className = $HeaderDoc::headerObject->name();
+	if (!(length($className))) {
+		die "Header Name empty!\n";
+	}
+    } else {
+        # We're in a class.  Give the class name.
+        $className = $HeaderDoc::currentClass->name();
+    }
+    my $ret .= "<a name=\"//$apiUIDPrefix/occ/$type/$className/$name\"></a>\n";
+}
+
+sub throws {
+    my $self = shift;
+
+    if (@_) {
+	my $new = shift;
+	$new =~ s/\n//smg;
+        $self->{THROWS} .= "<li>$new</li>\n";
+	$self->{XMLTHROWS} .= "<throw>$new</throw>\n";
+	# print "Added $new to throw list.\n";
+    }
+    # print "dumping throw list.\n";
+    if (length($self->{THROWS})) {
+    	return ("<ul>\n" . $self->{THROWS} . "</ul>");
+    } else {
+	return "";
+    }
+}
+
+sub XMLthrows {
+    my $self = shift;
+    my $string = $self->{XMLTHROWS};
+
+    my $ret;
+
+    if (length($string)) {
+	$ret = "<throwlist>\n$string</throwlist>\n";
+    } else {
+	$ret = "";
+    }
+    return $ret;
+}
+
 sub abstract {
+    my $self = shift;
+
+    if (@_) {
+        $self->{ABSTRACT} = shift;
+    }
+    return $self->{ABSTRACT};
+}
+
+sub XMLabstract {
     my $self = shift;
 
     if (@_) {
@@ -91,6 +186,18 @@ sub discussion {
     return $self->{DISCUSSION};
 }
 
+sub XMLdiscussion {
+    my $self = shift;
+
+    if (@_) {
+        my $discussion = "";
+        $discussion = shift;
+        # $discussion =~ s/\n\n/<br>\n/g;
+        $self->{DISCUSSION} = $discussion;
+    }
+    return $self->{DISCUSSION};
+}
+
 
 sub declaration {
     my $self = shift;
@@ -100,6 +207,9 @@ sub declaration {
     $dec =~s/<(\/)?tt>//gi;
     $dec =~s/<(\/)?b>//gi;
     $dec =~s/<(\/)?pre>//gi;
+    $dec =~s/\&nbsp;//gi;
+    $dec =~s/\&lt;/</gi;
+    $dec =~s/\&gt;/>/gi;
     $self->{DECLARATION} = $dec;  # don't really have to have this ivar
     return $dec;
 }
@@ -111,6 +221,99 @@ sub declarationInHTML {
         $self->{DECLARATIONINHTML} = shift;
     }
     return $self->{DECLARATIONINHTML};
+}
+
+sub updated {
+    my $self = shift;
+    my $localdebug = 0;
+    
+    if (@_) {
+	my $updated = shift;
+        # $self->{UPDATED} = shift;
+	my $month; my $day; my $year;
+
+	$month = $day = $year = $updated;
+
+	print "updated is $updated\n" if ($localdebug);
+	if (!($updated =~ /\d\d\d\d-\d\d-\d\d/ )) {
+	    if (!($updated =~ /\d\d-\d\d-\d\d\d\d/ )) {
+		if (!($updated =~ /\d\d-\d\d-\d\d/ )) {
+		    my $filename = $HeaderDoc::headerObject->name();
+		    print "$filename:0:Bogus date format: $updated.\n";
+		    print "Valid formats are MM-DD-YYYY, MM-DD-YY, and YYYY-MM-DD\n";
+		    return $self->{UPDATED};
+		} else {
+		    $month =~ s/(\d\d)-\d\d-\d\d/$1/smg;
+		    $day =~ s/\d\d-(\d\d)-\d\d/$1/smg;
+		    $year =~ s/\d\d-\d\d-(\d\d)/$1/smg;
+		    # @@@ FIX ME DAG @@@
+		    $year += 2000;
+		}
+	    } else {
+		print "03-25-2003 case.\n" if ($localdebug);
+		    $month =~ s/(\d\d)-\d\d-\d\d\d\d/$1/smg;
+		    $day =~ s/\d\d-(\d\d)-\d\d\d\d/$1/smg;
+		    $year =~ s/\d\d-\d\d-(\d\d\d\d)/$1/smg;
+	    }
+	} else {
+		    $year =~ s/(\d\d\d\d)-\d\d-\d\d/$1/smg;
+		    $month =~ s/\d\d\d\d-(\d\d)-\d\d/$1/smg;
+		    $day =~ s/\d\d\d\d-\d\d-(\d\d)/$1/smg;
+	}
+	$month =~ s/\n//smg;
+	$day =~ s/\n//smg;
+	$year =~ s/\n//smg;
+	$month =~ s/\s*//smg;
+	$day =~ s/\s*//smg;
+	$year =~ s/\s*//smg;
+
+	# Check the validity of the modification date
+
+	my $invalid = 0;
+	my $mdays = 28;
+	if ($month == 2) {
+		if ($year % 4) {
+			$mdays = 28;
+		} elsif ($year % 100) {
+			$mdays = 29;
+		} elsif ($year % 400) {
+			$mdays = 28;
+		} else {
+			$mdays = 29;
+		}
+	} else {
+		my $bitcheck = (($month & 1) ^ (($month & 8) >> 3));
+		if ($bitcheck) {
+			$mdays = 31;
+		} else {
+			$mdays = 30;
+		}
+	}
+
+	if ($month > 12 || $month < 1) { $invalid = 1; }
+	if ($day > $mdays || $day < 1) { $invalid = 1; }
+	if ($year < 1970) { $invalid = 1; }
+
+	if ($invalid) {
+		my $filename = $HeaderDoc::headerObject->name();
+		print "$filename:0:Invalid date (year = $year, month = $month, day = $day).\n";
+		print "$filename:0:Valid formats are MM-DD-YYYY, MM-DD-YY, and YYYY-MM-DD\n";
+		return $self->{UPDATED};
+	} else {
+		$self->{UPDATED} = "$year-$month-$day";
+		print "date set to ".$self->{UPDATED}."\n" if ($localdebug);
+	}
+    }
+    return $self->{UPDATED};
+}
+
+sub linkageState {
+    my $self = shift;
+    
+    if (@_) {
+        $self->{LINKAGESTATE} = shift;
+    }
+    return $self->{LINKAGESTATE};
 }
 
 sub linkageState {

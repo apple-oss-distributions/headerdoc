@@ -11,7 +11,7 @@
 		<hr>
 		</h1>
 		<address>Author: Matt Morse (matt@apple.com)</address>
-		<address>Last modified: 11/30/2001</address>
+		<address>Last modified: 09/13/2002</address>
 		<address>&nbsp;</address>
 		<h2>Table of Contents</h2>
 		<ul>
@@ -32,6 +32,7 @@
 				<li><a href="CPPTags.html">Tags for C++ headers</a> 
 			</ul>
 			<li><a href="HeaderDocClassHierarchy.html">HeaderDoc's Class Hierarchy</a> 
+			<li><a href="ReleaseNotes.html">Release Notes</a> 
 		</ul>
 		<h2><a name="Anchor-Purpose-58644"></a>Purpose</h2>
 		<p>HeaderDoc is a system for embedding structured commentary in C and C++ header files and producing rich HTML output from that commentary. HeaderDoc comments are similar in appearance to JavaDoc comments in a Java source file, but there are differences related to handling specifics of C and C++ and to providing a slightly more formal tag set to simplify parsing.</p>
@@ -96,6 +97,11 @@ When converted to HTML (by <b>headerDoc2HTML</b>, described below), the tagged c
 		<pre>
         &gt; headerDoc2HTML.pl -o /tmp MyHeader.h&nbsp;</pre>
 		<p>
+<p><font color="black">HeaderDoc normally lists the name of each file it processes to the Terminal. The &quot;-q&quot; switch makes HeaderDoc operate silently:</font></p>
+		<pre>
+        &gt; headerDoc2HTML.pl  -q MyHeader.h
+        &gt; headerDoc2HTML.pl  -qo /tmp MyHeader.h&nbsp;</pre>
+		<p>
 <font color="black">You can use the &quot;-v&quot; switch to make HeaderDoc report the versions of all its constituent modules. This can be useful for bug reporting purposes.</font></p>
 		<pre>
         &gt; headerDoc2HTML.pl -v&nbsp;</pre>
@@ -135,7 +141,8 @@ HeaderDoc runs on Mac OS 9 and earlier assuming MacPerl is installed. (You can g
         <dt><b>defaultFrameName</b></dt><dd>The name of the file containing the frameset instructions (by default, <tt>index.html</tt>).</dd>
         <dt><b>compositePageName</b></dt><dd>The name of the file containing the printable HTML page (by default, <tt>CompositePage.html</tt>).</dd>
         <dt><b>masterTOCName</b></dt><dd>The name of the file containing the master table of contents for a series of headers (by default, <tt>MasterTOC.html</tt>). (This variable is used by the gatherHeaderDoc script.)</dd>
-		<dt><b>apiUIDPrefix</b></dt><dd>The prefix for named anchors in the HTML (by default, <tt>apple_ref</tt>). (In the HTML, HeaderDoc adds a self-describing named anchor near each API declaration -- for example &lt;a name="//apple_ref/c/func/CFArrayAppendValue"&gt;. These can be useful for index generation and other purposes. See <a href="APIAnchors.html">Symbol Markers for HTML-based Documentation</a> for more information.)</dd>        </dl>
+		<dt><b>apiUIDPrefix</b></dt><dd>The prefix for named anchors in the HTML (by default, <tt>apple_ref</tt>). (In the HTML, HeaderDoc adds a self-describing named anchor near each API declaration -- for example &lt;a name="//apple_ref/c/func/CFArrayAppendValue"&gt;. These can be useful for index generation and other purposes. See <a href="APIAnchors.html">Symbol Markers for HTML-based Documentation</a> for more information.)</dd>
+		<dt><b>ignorePrefixes</b></dt><dd>A list of tokens to leave out of the final output if they occur at the start of a line (before any other non-whitespace characters).</dd>        </dl>
         </blockquote>
         
 <p><font color="black">HeaderDoc looks in three places for values for these variables, in this order:</font></p>

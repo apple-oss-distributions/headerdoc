@@ -4,7 +4,7 @@
 # Synopsis: Holds function info parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2001/11/30 22:43:17 $
+# Last Updated: $Date: 2003/05/31 00:02:49 $
 # 
 # Copyright (c) 1999 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
@@ -115,21 +115,27 @@ sub processFunctionComment {
 				last SWITCH;
 			};
 			($field =~ s/^abstract\s+//) && do {$self->abstract($field); last SWITCH;};
+			($field =~ s/^throws\s+//) && do {$self->throws($field); last SWITCH;};
+			($field =~ s/^exception\s+//) && do {$self->throws($field); last SWITCH;};
+			($field =~ s/^updated\s+//) && do {$self->updated($field); last SWITCH;};
 			($field =~ s/^discussion\s+//) && do {$self->discussion($field); last SWITCH;};
 			($field =~ s/^param\s+//) && 
 			do {
 				$field =~ s/^\s+|\s+$//g; # trim leading and trailing whitespace
-	            $field =~ /(\w*)\s*(.*)/s;
+	            # $field =~ /(\w*)\s*(.*)/s;
+		    $field =~ /(\S*)\s*(.*)/s;
 	            my $pName = $1;
 	            my $pDesc = $2;
 	            my $param = HeaderDoc::MinorAPIElement->new();
+	            $param->outputformat($self->outputformat);
 	            $param->name($pName);
 	            $param->discussion($pDesc);
 	            $self->addTaggedParameter($param);
 				last SWITCH;
 			};
 			($field =~ s/^result\s+//) && do {$self->result($field); last SWITCH;};
-			print "Unknown field: $field\n";
+			my $filename = $HeaderDoc::headerObject->name();
+			print "$filename:0:Unknown field: $field\n";
 		}
 	}
 }
@@ -159,12 +165,20 @@ sub setFunctionDeclaration {
     #catch the case where this is a function-like macro
     if ($dec =~/^#define/) {
         print "returning #define macro with declaration |$dec|\n" if ($localDebug);
-        $dec =~ s/\\\n/\\<br>&nbsp;/g;
-        return"<tt>$dec</tt><br>\n";
+	if ($self->outputformat() eq "html") {
+            $dec =~ s/\\\n/\\<br>&nbsp;/g;
+            return"<tt>$dec</tt><br>\n";
+	} elsif (self->outputformat() eq "hdxml") {
+            return"$dec";
+	} else {
+	    print "ERROR: UNKNOWN OUTPUT FORMAT!\n";
+	}
     }
     # regularize whitespace
     $dec =~ s/^\s+(.*)/$1/; # remove leading whitespace
-    $dec =~ s/[ \t]+/ /g;
+    $dec =~ s/ \t/ /g;
+    $dec =~ s/</&lt;/g;
+    $dec =~ s/>/&gt;/g;
     
     # remove return from parens of EXTERN_API(_C)(retval)
     if ($dec =~ /^EXTERN_API(_C)?/) {
@@ -185,11 +199,12 @@ sub setFunctionDeclaration {
     my @preParenParts = split ('\s+', $preOpeningParen);
     my $funcName = pop @preParenParts;
     my $return = join (' ', @preParenParts);
-        
+
     my $remainder = $withinParens;
     my @parensElements = split(/,/, $remainder);
     
     # now get parameters
+    my $longstring = "";
     my $position = 1;  
     foreach my $element (@parensElements) {
         $element =~ s/\n/ /g;
@@ -207,14 +222,74 @@ sub setFunctionDeclaration {
         
         if ($paramName ne "void") { # some programmers write myFunc(void)
             my $param = HeaderDoc::MinorAPIElement->new();
+	    $param->outputformat($self->outputformat);
             $param->name($paramName);
             $param->position($position);
             $param->type($type);
             $self->addParsedParameter($param);
         }
         $position++;
+
+	# print "element \"$element\".";
+	$element =~s/^\s*//;
+	$element =~s/\s+/ /g;
+	$element =~s/\s*$//;
+	if ($longstring eq "") {
+	    $longstring = "\n&nbsp;&nbsp;&nbsp;&nbsp;$element";
+	} else {
+	    $longstring = "$longstring,\n&nbsp;&nbsp;&nbsp;&nbsp;$element";
+	}
     }
-    $retval = "<tt>$return <b>$funcName</b>($remainder)$postParens</tt><br>\n";
+
+    if ($postParens =~ /\(.*\)\s*;/smg) {
+      my $longstringb;
+      my $position;
+      my $pointerparms = $postParens;
+      $pointerparms =~ s/^\s*\(//;
+      $pointerparms =~ s/\)\s*;\s*$//;
+      my @parensElements = split(/,/, $pointerparms);
+      foreach my $element (@parensElements) {
+        $element =~ s/\n/ /g;
+        $element =~ s/^\s+//;
+        print "element->|$element|\n" if ($localDebug);
+        my @paramElements = split(/\s+/, $element);
+        my $paramName = pop @paramElements;
+        my $type = join (" ", @paramElements);
+        
+        #test for pointer asterisks and move to type portion of parameter declaration
+        if ($paramName =~ /^\*/) {
+            $paramName =~ s/^(\*+)(\w+)/$2/;
+            $type .= " $1";
+        }
+        
+        if ($paramName ne "void") { # some programmers write myFunc(void)
+            my $param = HeaderDoc::MinorAPIElement->new();
+	    $param->outputformat($self->outputformat);
+            $param->name($paramName);
+            $param->position($position);
+            $param->type($type);
+            $self->addParsedParameter($param);
+        }
+        $position++;
+
+	$element =~s/^\s*//;
+	$element =~s/\s+/ /g;
+	$element =~s/\s*$//;
+	if ($longstringb eq "") {
+	    $longstringb = "&nbsp;(\n&nbsp;&nbsp;&nbsp;&nbsp;$element";
+	} else {
+	    $longstringb = "$longstringb,\n&nbsp;&nbsp;&nbsp;&nbsp;$element";
+	}
+      }
+      $longstringb .= "\n);\n";
+      $postParens = $longstringb;
+    }
+    if (!($return eq "")) { $return .= " "; }
+    if ($remainder =~/^\s*$/ || $remainder =~/^\s*void\s*$/) {
+	$retval = "<tt>$return$funcName (void)$postParens</tt><br>\n";
+    } else {
+	$retval = "<tt>$return$funcName ($longstring\n)$postParens</tt><br>\n";
+    }
     print "Function: $funcName -- returning declaration:\n\t|$retval|\n" if ($localDebug);
     print "============================================================================\n" if ($localDebug);
     $self->declarationInHTML($retval);
@@ -227,19 +302,33 @@ sub documentationBlock {
     my $contentString;
     my $name = $self->name();
     my $desc = $self->discussion();
+    my $throws = $self->throws();
     my $abstract = $self->abstract();
+    my $updated = $self->updated();
     my $declaration = $self->declarationInHTML();
     my @params = $self->taggedParameters();
     my $result = $self->result();
     my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
-    
+
+    $contentString .= "<hr>";
     $contentString .= "<a name=\"//$apiUIDPrefix/c/func/$name\"></a>\n"; # apple_ref marker
-    $contentString .= "<h3><a name=\"$name\">$name</a></h3>\n";
-    if (length($abstract)) {
-        $contentString .= "<b>Abstract:</b> $abstract\n";
+    $contentString .= "<table border=\"0\"  cellpadding=\"2\" cellspacing=\"2\" width=\"300\">";
+    $contentString .= "<tr>";
+    $contentString .= "<td valign=\"top\" height=\"12\" colspan=\"5\">";
+    $contentString .= "<h2><a name=\"$name\">$name</a></h2>\n";
+    $contentString .= "</td>";
+    $contentString .= "</tr></table>";
+    $contentString .= "<hr>";
+    if (length($throws)) {
+	$contentString .= "<b>Throws:</b>\n$throws\n";
     }
-    $contentString .= "<blockquote><pre>$declaration</pre></blockquote>\n";
-    $contentString .= "<p>$desc</p>\n";
+    if (length($abstract)) {
+        # $contentString .= "<b>Abstract:</b> $abstract\n";
+        $contentString .= "$abstract\n";
+    }
+    if (length($updated)) {
+        $contentString .= "<b>Updated:</b> $updated\n";
+    }
     my $arrayLength = @params;
     if ($arrayLength > 0) {
         my $paramContentString;
@@ -247,13 +336,13 @@ sub documentationBlock {
             my $pName = $element->name();
             my $pDesc = $element->discussion();
             if (length ($pName)) {
-                $paramContentString .= "<tr><td align = \"center\"><tt>$pName</tt></td><td>$pDesc</td><tr>\n";
+                $paramContentString .= "<tr><td align=\"center\"><tt>$pName</tt></td><td>$pDesc</td></tr>\n";
             }
         }
         if (length ($paramContentString)){
             $contentString .= "<h4>Parameters</h4>\n";
             $contentString .= "<blockquote>\n";
-            $contentString .= "<table border = \"1\"  width = \"90%\">\n";
+            $contentString .= "<table border=\"1\"  width=\"90%\">\n";
             $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
             $contentString .= $paramContentString;
             $contentString .= "</table>\n</blockquote>\n";
@@ -262,7 +351,58 @@ sub documentationBlock {
     if (length($result)) {
         $contentString .= "<b>Result:</b> $result\n";
     }
-    $contentString .= "<hr>\n";
+    $contentString .= "<blockquote><pre>$declaration</pre></blockquote>\n";
+    if (length($desc)) {$contentString .= "<p>$desc</p>\n"; }
+    # $contentString .= "<hr>\n";
+    return $contentString;
+}
+
+sub XMLdocumentationBlock {
+    my $self = shift;
+    my $contentString;
+    my $name = $self->name();
+    my $desc = $self->discussion();
+    my $throws = $self->XMLthrows();
+    my $abstract = $self->abstract();
+    my $updated = $self->updated();
+    my $declaration = $self->declarationInHTML();
+    my @params = $self->taggedParameters();
+    my $result = $self->result();
+    my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
+    
+    $contentString .= "<function id=\"//$apiUIDPrefix/c/func/$name\">\n"; # apple_ref marker
+    $contentString .= "<name>$name</name>\n";
+    if (length($updated)) {
+        $contentString .= "<updated>$updated</updated>\n";
+    }
+    if (length($abstract)) {
+        $contentString .= "<abstract>$abstract</abstract>\n";
+    }
+    if (length($throws)) {
+	$contentString .= "$throws\n";
+    }
+    $contentString .= "<declaration>$declaration</declaration>\n";
+    $contentString .= "<description>$desc</description>\n";
+    my $arrayLength = @params;
+    if ($arrayLength > 0) {
+        my $paramContentString;
+        foreach my $element (@params) {
+            my $pName = $element->name();
+            my $pDesc = $element->discussion();
+            if (length ($pName)) {
+                $paramContentString .= "<parameter><name>$pName</name><desc>$pDesc</desc></parameter>\n";
+            }
+        }
+        if (length ($paramContentString)){
+	    $contentString .= "<parameterlist>\n";
+            $contentString .= $paramContentString;
+	    $contentString .= "</parameterlist>\n";
+        }
+    }
+    if (length($result)) {
+        $contentString .= "<result>$result</result>\n";
+    }
+    $contentString .= "</function>\n";
     return $contentString;
 }
 

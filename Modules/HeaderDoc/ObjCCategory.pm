@@ -6,7 +6,7 @@
 #
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2001/11/30 22:43:17 $
+# Last Updated: $Date: 2003/05/30 20:55:56 $
 # 
 # Copyright (c) 1999-2001 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
@@ -72,14 +72,14 @@ sub _initialize {
 
 sub className {
     my $self = shift;
-    my ($className, $catagoryName) = &getClassAndCatagoryName($self->name());
+    my ($className, $categoryName) = &getClassAndCategoryName($self->name());
     return $className;
 }
 
 sub categoryName {
     my $self = shift;
-    my ($className, $catagoryName) = &getClassAndCatagoryName($self->name());
-    return $catagoryName;
+    my ($className, $categoryName) = &getClassAndCategoryName($self->name());
+    return $categoryName;
 }
 
 sub getMethodType {
@@ -92,17 +92,27 @@ sub getMethodType {
 	} elsif ($declaration =~ /^\s*\+/) {
 	    $methodType = "clm";
 	} else {
-		print "### Unable to determine whether declaration is for an instance or class method.\n";
-		print "     '$declaration'\n";
+		my $filename = $HeaderDoc::headerObject->name();
+		print "$filename:0:Unable to determine whether declaration is for an instance or class method.\n";
+		print "$filename:0:     '$declaration'\n";
 	}
 	return $methodType;
 }
 
+# we add the apple_ref markup to the navigator comment to identify
+# to Project Builder and other applications indexing the documentation
+# that this is the entry point for documentation for this category
 sub docNavigatorComment {
     my $self = shift;
     my $name = $self->name();
     
-    return "<-- headerDoc=ObjCCategory; name=$name-->";
+    # regularize name by removing spaces, if any
+    $name =~ s/\s+//g;
+    
+    my $navComment = "<!-- headerDoc=cat; name=$name-->";
+    my $appleRef = "<a name=\"//apple_ref/occ/cat/$name\"></a>";
+    
+    return "$navComment\n$appleRef";
 }
 
 ################## Misc Functions ###################################
@@ -112,26 +122,30 @@ sub objName { # used for sorting
    return ($obj1->name() cmp $obj2->name());
 }
 
-sub getClassAndCatagoryName {
+sub getClassAndCategoryName {
     my $fullName = shift;
 	my $className = '';
 	my $categoryName = '';
 
-    if ($fullName =~ /(\w+)(\((.*)\))?/) {
+    if ($fullName =~ /(\w+)\s*(\((.*)\))?/) {
     	$className = $1;
     	$categoryName =$3;
     	if (!length ($className)) {
-            print "#### Couldn't determine class name from category name '$fullName'.\n";
+	    my $filename = $HeaderDoc::headerObject->name();
+            print "$filename:0:Couldn't determine class name from category name '$fullName'.\n";
     	}
     	if (!length ($categoryName)) {
-            print "#### Couldn't determine category name from category name '$fullName'.\n";
+	    my $filename = $HeaderDoc::headerObject->name();
+            print "$filename:0:Couldn't determine category name from category name '$fullName'.\n";
     	}
     } else {
-        print "#### Specified category name '$fullName' isn't complete.\n";
-        print "#### Expecting a name of the form 'MyClass(CategoryName)'\n";
+	my $filename = $HeaderDoc::headerObject->name();
+        print "$filename:0:Specified category name '$fullName' isn't complete.\n";
+        print "$filename:0:Expecting a name of the form 'MyClass(CategoryName)'\n";
     }
     return ($className, $categoryName);
 }
+
 
 ##################### Debugging ####################################
 

@@ -5,11 +5,11 @@
 #           file from the comments it finds.
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2001/11/30 22:43:15 $
+# Last Updated: $Date: 2003/05/31 01:20:36 $
 #
 # ObjC additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
-# Copyright (c) 1999 Apple Computer, Inc.  All Rights Reserved.
+# Copyright (c) 1999-2002 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
 # subject to the Apple Public Source License Version 1.1 (the "License").
 # You may not use this file except in compliance with the License.  Please
@@ -24,7 +24,7 @@
 # the specific language governing rights and limitations under the
 # License.
 #
-# $Revision: 1.24 $
+# $Revision: 1.28.2.5 $
 #####################################################################
 
 my $VERSION = 2.1;
@@ -36,6 +36,9 @@ my $export;
 my $debugging;
 my $testingExport = 0;
 my $printVersion;
+my $quietLevel;
+my $xml_output;
+my $write_control_file;
 #################### Locations #####################################
 # Look-up tables are used when exporting API and doc to tab-delimited
 # data files, which can be used for import to a database.  
@@ -50,6 +53,10 @@ my $typesFilename;
 my $enumsFilename;
 my $masterTOCName;
 my @inputFiles;
+my @ignorePrefixes = ();
+my @perHeaderIgnorePrefixes = ();
+my $reprocess_input = 0;
+my $functionGroup = "";
 my @headerObjects;	# holds finished objects, ready for printing
 					# we defer printing until all header objects are ready
 					# so that we can merge ObjC category methods into the 
@@ -64,7 +71,9 @@ $| = 1;
 
 # Check options in BEGIN block to avoid overhead of loading supporting 
 # modules in error cases.
+my $modulesPath;
 BEGIN {
+	use FindBin qw ($Bin);
     use Cwd;
     use Getopt::Std;
     use File::Find;
@@ -78,23 +87,39 @@ BEGIN {
     $scriptDir = cwd();
 
     if ($^O =~ /MacOS/i) {
-            $pathSeparator = ":";
-            $isMacOS = 1;
+		$pathSeparator = ":";
+		$isMacOS = 1;
+		#$Bin seems to return a colon after the path on certain versions of MacPerl
+		#if it's there we take it out. If not, leave it be
+		#WD-rpw 05/09/02
+		($modulesPath = $FindBin::Bin) =~ s/([^:]*):$/$1/;
     } else {
-            $pathSeparator = "/";
-            $isMacOS = 0;
+		$pathSeparator = "/";
+		$isMacOS = 0;
     }
+	$modulesPath = "$FindBin::Bin"."$pathSeparator"."Modules";
+	
 	foreach (qw(Mac::Files)) {
 	    $MOD_AVAIL{$_} = eval "use $_; 1";
     }
 
-    &getopts("dvxo:", \%options);
+    &getopts("Xhdvxqo:", \%options);
     if ($options{v}) {
     	print "Getting version information for all modules.  Please wait...\n";
 		$printVersion = 1;
 		return;
     }
 
+    if ($options{h}) {
+	$write_control_file = "1";
+    } else {
+	$write_control_file = "0";
+    }
+    if ($options{q}) {
+	$quietLevel = "1";
+    } else {
+	$quietLevel = "0";
+    }
     if ($options{d}) {
             print "\tDebugging on...\n\n";
             $debugging = 1;
@@ -111,7 +136,9 @@ BEGIN {
         } elsif (! -w $specifiedOutputDir) {
             die "Error: Output directory $specifiedOutputDir is not writable. Exiting.\n$!\n";
         }
-        print "\nDocumentation will be written to $specifiedOutputDir\n";
+		if ($quietLevel eq "0") {
+			print "\nDocumentation will be written to $specifiedOutputDir\n";
+		}
     }
     $lookupTableDir = "$scriptDir$pathSeparator$lookupTableDirName";
     if (($options{x}) || ($testingExport)) {
@@ -124,6 +151,16 @@ BEGIN {
                 $testingExport = 0;
         }
     }
+    if ($quietLevel eq "0") {
+      if ($options{X}) {
+	print "XML output mode.\n";
+	$xml_output = 1;
+      } else {
+	print "HTML output mode.\n";
+	$xml_output = 0;
+      }
+    }
+# print "output mode is $xml_output\n";
     
     if (($#ARGV == 0) && (-d $ARGV[0])) {
         my $inputDir = $ARGV[0];
@@ -148,7 +185,7 @@ BEGIN {
         if ($isMacOS) {
             die "\tTo use HeaderDoc, drop a header file or folder of header files on this application.\n\n";
             } else {
-                    die "\tUsage: headerdoc2html [-d] [-o <output directory>] <input file(s) or directory>.\n\n";
+                    die "\tUsage: headerdoc2html [-dq] [-o <output directory>] <input file(s) or directory>.\n\n";
             }
     }
     
@@ -162,17 +199,16 @@ BEGIN {
     }
 }
 
-
 use strict;
 use File::Copy;
-use FindBin qw ($Bin);
-use lib "$Bin". "$pathSeparator"."Modules";
+use lib $modulesPath;
 
 # Classes and other modules specific to HeaderDoc
 use HeaderDoc::DBLookup;
 use HeaderDoc::Utilities qw(findRelativePath safeName getAPINameAndDisc printArray linesFromFile
                             printHash updateHashFromConfigFiles getHashFromConfigFile);
 use HeaderDoc::Header;
+use HeaderDoc::CClass;
 use HeaderDoc::CPPClass;
 use HeaderDoc::ObjCClass;
 use HeaderDoc::ObjCProtocol;
@@ -193,10 +229,19 @@ my $preferencesConfigFileName = "com.apple.headerDoc2HTML.config";
 my $homeDir;
 my $usersPreferencesPath;
 #added WD-rpw 07/30/01 to support running on MacPerl
+#modified WD-rpw 07/01/02 to support the MacPerl 5.8.0
 if ($^O =~ /MacOS/i) {
-	require "FindFolder.pl";
-	$homeDir = MacPerl::FindFolder("D");	#D = Desktop. Arbitrary place to put things
-	$usersPreferencesPath = MacPerl::FindFolder("P");	#P = Preferences
+	eval 
+	{
+		require "FindFolder.pl";
+		$homeDir = MacPerl::FindFolder("D");	#D = Desktop. Arbitrary place to put things
+		$usersPreferencesPath = MacPerl::FindFolder("P");	#P = Preferences
+	};
+	if ($@) {
+		import Mac::Files;
+		$homeDir = Mac::Files::FindFolder(kOnSystemDisk(), kDesktopFolderType());
+		$usersPreferencesPath = Mac::Files::FindFolder(kOnSystemDisk(), kPreferencesFolderType());
+	}
 } else {
 	$homeDir = (getpwuid($<))[7];
 	$usersPreferencesPath = $homeDir.$pathSeparator."Library".$pathSeparator."Preferences";
@@ -212,10 +257,20 @@ my %config = (
     defaultFrameName => "index.html",
     compositePageName => "CompositePage.html",
     masterTOCName => "MasterTOC.html",
-    apiUIDPrefix => "apple_ref"
+    apiUIDPrefix => "apple_ref",
+    ignorePrefixes => ""
 );
 
 %config = &updateHashFromConfigFiles(\%config,\@configFiles);
+
+if (defined $config{"ignorePrefixes"}) {
+    my $localDebug = 0;
+    my @prefixlist = split(/\|/, $config{"ignorePrefixes"});
+    foreach my $prefix (@prefixlist) {
+	print "ignoring $prefix\n" if ($localDebug);
+	push(@ignorePrefixes, $prefix);
+    }
+}
 
 if (defined $config{"copyrightOwner"}) {
     HeaderDoc::APIOwner->copyrightOwner($config{"copyrightOwner"});
@@ -242,17 +297,19 @@ if ($export || $testingExport) {
 }
 
 ################### States ###########################################
-my $inHeader    = 0;
-my $inCPPHeader = 0;
-my $inClass     = 0; #includes CPPClass, ObjCClass ObjCProtocol
-my $inFunction  = 0;
-my $inTypedef   = 0;
-my $inStruct    = 0;
-my $inConstant  = 0;
-my $inVar       = 0;
-my $inPDefine   = 0;
-my $inEnum      = 0;
-my $inMethod    = 0;
+my $inHeader        = 0;
+my $inCPPHeader     = 0;
+my $inClass         = 0; #includes CPPClass, ObjCClass ObjCProtocol
+my $inFunction      = 0;
+my $inFunctionGroup = 0;
+my $inTypedef       = 0;
+my $inStruct        = 0;
+my $inUnion         = 0;
+my $inConstant      = 0;
+my $inVar           = 0;
+my $inPDefine       = 0;
+my $inEnum          = 0;
+my $inMethod        = 0;
 
 ################ Processing starts here ##############################
 my $headerObject;  # this is the Header object that will own the HeaderElement objects for this file.
@@ -271,7 +328,11 @@ foreach my $inputFile (@inputFiles) {
 	
     my @path = split (/$pathSeparator/, $inputFile);
     my $filename = pop (@path);
-    print "\nProcessing $filename\n";
+    if ($quietLevel eq "0") {
+	print "\nProcessing $filename\n";
+    }
+    @perHeaderIgnorePrefixes = ();
+    $reprocess_input = 0;
     
     my $headerDir = join("$pathSeparator", @path);
     ($rootFileName = $filename) =~ s/\.(h|i)$//;
@@ -285,17 +346,46 @@ foreach my $inputFile (@inputFiles) {
     }
     
 	my @rawInputLines = &linesFromFile($inputFile);
+
+    my @cookedInputLines;
+    my $localDebug = 0;
+
+    foreach my $line (@rawInputLines) {
+	foreach my $prefix (@ignorePrefixes) {
+	    if ($line =~ s/^\s*$prefix\s*//g) {
+		print "ignored $prefix\n" if ($localDebug);
+	    }
+	}
+	push(@cookedInputLines, $line);
+    }
+    @rawInputLines = @cookedInputLines;
 	
+REDO:
     # check for HeaderDoc comments -- if none, move to next file
     my @headerDocCommentLines = grep(/^\s*\/\*\!/, @rawInputLines);
     if (!@headerDocCommentLines) {
-        print "    Skipping. No HeaderDoc comments found.\n";
+	if ($quietLevel eq "0") {
+            print "    Skipping. No HeaderDoc comments found.\n";
+	}
         next;
     }
     
     $headerObject = HeaderDoc::Header->new();
+    $HeaderDoc::headerObject = $headerObject;
+
+    # print "output mode is $xml_output\n";
+
+    if ($quietLevel eq "0") {
+      if ($xml_output) {
+	$headerObject->outputformat("hdxml");
+      } else { 
+	$headerObject->outputformat("html");
+      }
+    }
 	$headerObject->outputDir($rootOutputDir);
 	$headerObject->name($filename);
+	my $fullpath=cwd()."/$inputFile";
+	$headerObject->fullpath($fullpath);
 	
     # scan input lines for class declarations
     # return an array of array refs, the first array being the header-wide lines
@@ -305,6 +395,7 @@ foreach my $inputFile (@inputFiles) {
     my $localDebug = 0;
 
     foreach my $arrayRef (@lineArrays) {
+
         my @inputLines = @$arrayRef;
 	    # look for /*! comments and collect all comment fields into a the appropriate objects
         my $apiOwner = $headerObject;  # switches to a class/protocol/category object, when within a those declarations
@@ -315,7 +406,19 @@ foreach my $inputFile (@inputFiles) {
 			my $line = "";           
 	        
 	        	print "Input line number: $inputCounter\n" if ($localDebug);
-	        	if ($inputLines[$inputCounter] =~ /^\s*(public:|private:|protected:)/) {$cppAccessControlState = $&;}
+	        	if ($inputLines[$inputCounter] =~ /^\s*(public|private|protected)/) {
+				$cppAccessControlState = $&;
+	        		if ($inputLines[$inputCounter] =~ /^\s*(public|private|protected)\s*:/) {
+					# trim leading whitespace and tabulation
+					$cppAccessControlState =~ s/^\s+//;
+					# trim ending ':' and whitespace
+					$cppAccessControlState =~ s/\s*:\s*$/$1/s;
+					# set back the ':'
+					$cppAccessControlState = "$cppAccessControlState:";
+				}
+			}
+
+
 	        	if ($inputLines[$inputCounter] =~ /^\s*\/\*\!/) {  # entering headerDoc comment
 				# slurp up comment as line
 				if ($inputLines[$inputCounter] =~ /\s*\*\//) { # closing comment marker on same line
@@ -335,23 +438,44 @@ foreach my $inputFile (@inputFiles) {
 	           
 				SWITCH: { # determine which type of comment we're in
 					($line =~ /^\/\*!\s+\@header\s*/i) && do {$inHeader = 1; last SWITCH;};
+					($line =~ /^\/\*!\s+\@template\s*/i) && do {$inClass = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@class\s*/i) && do {$inClass = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@protocol\s*/i) && do {$inClass = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@category\s*/i) && do {$inClass = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@language\s+.*c\+\+\s*/i) && do {$inCPPHeader = 1; last SWITCH;};
+					($line =~ /^\/\*!\s+\@functiongroup\s*/i) && do {$inFunctionGroup = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@function\s*/i) && do {$inFunction = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@method\s*/i) && do {$inMethod = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@typedef\s*/i) && do {$inTypedef = 1;last SWITCH;};
+					($line =~ /^\/\*!\s+\@union\s*/i) && do {$inUnion = 1;$inStruct = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@struct\s*/i) && do {$inStruct = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@const(ant)?\s*/i) && do {$inConstant = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@var\s*/i) && do {$inVar = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@define(d)?\s*/i) && do {$inPDefine = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@enum\s*/i) && do {$inEnum = 1;last SWITCH;};
-					print "HeaderDoc comment is not of known type. Comment text is:\n";
-					print "$line\n";
+					my $linenum = $inputCounter - 1;
+					print "$filename:$linenum:HeaderDoc comment is not of known type. Comment text is:\n";
+					print "    $line\n";
 				}
+				my $linenum = $inputCounter - 1;
 				$line =~ s/\n\n/\n<br><br>\n/g; # change newline pairs into HTML breaks, for para formatting
 				my @fields = split(/\@/, $line);
+				my @newfields = ();
+				my $lastappend = "";
+				foreach my $field (@fields) {
+				    if ($field =~ s/\\$/\@/) {
+					$lastappend .= $field;
+				    } else {
+					if ($lastappend eq "") {
+					    push(@newfields, $field);
+					} else {
+					    $lastappend .= $field;
+					    push(@newfields, $lastappend);	
+					    $lastappend = "";
+					}
+				    }
+				}
+				@fields = @newfields;
 				if ($inCPPHeader) {print "inCPPHeader\n" if ($debugging); &processCPPHeaderComment();};
 				if ($inClass) {
 					$classType = &determineClassType($inputCounter, $apiOwner, \@inputLines);
@@ -362,10 +486,43 @@ foreach my $inputFile (@inputFiles) {
 				if ($inHeader) {
 					print "inHeader\n" if ($debugging); 
 					$apiOwner = &processHeaderComment($apiOwner, $rootOutputDir, \@fields);
+					if ($reprocess_input == 1) {
+					    my @cookedInputLines;
+					    my $localDebug = 0;
+
+					    foreach my $line (@rawInputLines) {
+						foreach my $prefix (@perHeaderIgnorePrefixes) {
+						    if ($line =~ s/^\s*$prefix\s*//g) {
+							print "ignored $prefix\n" if ($localDebug);
+						    }
+						}
+						push(@cookedInputLines, $line);
+					    }
+					    @rawInputLines = @cookedInputLines;
+					    $reprocess_input = 2;
+					    goto REDO;
+					}
+				};
+				if ($inFunctionGroup) {
+					print "inFunctionGroup\n" if ($debugging); 
+					my $name = $line;
+					$name =~ s/.*\/\*!\s+\@functiongroup\s*//i;
+					$name =~ s/\s*\*\/.*//;
+					$name =~ s/\n//smg;
+					$name =~ s/^\s+//smg;
+					$name =~ s/\s+$//smg;
+					# print "group name is $name\n";
+					$functionGroup = $name;
 				};
 				if ($inFunction) {
 					print "inFunction $line\n" if ($localDebug);
 					$funcObj = HeaderDoc::Function->new;
+					if ($xml_output) {
+					    $funcObj->outputformat("hdxml");
+					} else { 
+					    $funcObj->outputformat("html");
+					}
+\					$funcObj->group($functionGroup);
 					$funcObj->processFunctionComment(\@fields);
 	 				while (($inputLines[$inputCounter] !~ /\w/)  && ($inputCounter <= $#inputLines)){ 
 	 					$inputCounter++;
@@ -417,6 +574,11 @@ foreach my $inputFile (@inputFiles) {
 				    my $methodDebug = 0;
 					print "inMethod $line\n" if ($methodDebug);
 					$methObj = HeaderDoc::Method->new;
+					if ($xml_output) {
+					    $methObj->outputformat("hdxml");
+					} else { 
+					    $methObj->outputformat("html");
+					}
 					$methObj->processMethodComment(\@fields);
 	 				while (($inputLines[$inputCounter] !~ /\w/)  && ($inputCounter <= $#inputLines)){ 
 	 					$inputCounter++;
@@ -448,6 +610,11 @@ foreach my $inputFile (@inputFiles) {
 
 				if ($inTypedef) {
 					$typedefObj = HeaderDoc::Typedef->new;
+					if ($xml_output) {
+					    $typedefObj->outputformat("hdxml");
+					} else { 
+					    $typedefObj->outputformat("html");
+					}
 					$typedefObj->processTypedefComment(\@fields);
 					my $typedefName = $typedefObj->name();
 					
@@ -464,25 +631,50 @@ foreach my $inputFile (@inputFiles) {
 						};
 					} else {
 					    if ($declaration =~ /{/) { # taking care of a typedef'd block
-							while (($inputLines[$inputCounter] !~ /}/) && ($inputCounter <= $#inputLines)) {$declaration .= $inputLines[++$inputCounter]; print "Input line number: $inputCounter\n" if ($localDebug);};
+							print "Entered case for $declaration, $typedefName\n" if ($localDebug);
+							my $bracecount=0;
+							my $test = $inputLines[$inputCounter];
+							$bracecount += ($test =~ tr/{//);
+# while ($test =~ /\{/gs) { $bracecount++; };
+							$test = $inputLines[$inputCounter];
+							$bracecount -= ($test =~ tr/}//);
+# while ($test =~ /\}/gs) { $bracecount--; };
+							print "Entered with count $bracecount\n" if ($localDebug);
+							while ((($inputLines[$inputCounter] !~ /}/) 
+							        || ($bracecount > 0)) 
+							       && ($inputCounter <= $#inputLines)) {
+# print "bc3 $bracecount";
+							    $declaration .= $inputLines[++$inputCounter];
+							    $test = $inputLines[$inputCounter];
+							    $bracecount += ($test =~ tr/{//);
+# while ($test =~ /\{/gs) { $bracecount++; };
+							    $test = $inputLines[$inputCounter];
+							    $bracecount -= ($test =~ tr/}//);
+# while ($test =~ /\}/gs) { $bracecount--; };
+								print "count $bracecount\n" if ($localDebug);
+							    print "Input line number: $inputCounter\n" if ($localDebug);
+							};
+							print "count $bracecount left with declaration $declaration\n" if ($localDebug);
 						} else {
-						    if ($declaration !~ /$typedefName/) { # find type name at end of declaration
-								while (($inputLines[$inputCounter] !~ /$typedefName/) && ($inputCounter <= $#inputLines)){
-								    $declaration .= $inputLines[++$inputCounter]; 
-								    print "Input line number: $inputCounter\n" if ($localDebug);
-								}
-						    } else { # find final semicolon
+						    # if ($declaration !~ /$typedefName/) { # find type name at end of declaration
+								# while (($inputLines[$inputCounter] !~ /$typedefName/) && ($inputCounter <= $#inputLines)){
+								    # $declaration .= $inputLines[++$inputCounter]; 
+								    # print "Input line number: $inputCounter\n" if ($localDebug);
+								# }
+						    # } else { # find final semicolon
 								while (($inputLines[$inputCounter] !~ /;/) && ($inputCounter <= $#inputLines)){
 								    $declaration .= $inputLines[++$inputCounter]; 
 								    print "Input line number: $inputCounter\n" if ($localDebug);
 								}
-						    }
+						    # }
 						}
 					}
 	                if (length($declaration)) {
+			# DAG FIXME
+			#$declaration .= "\n{";
                         $typedefObj->setTypedefDeclaration($declaration);
 					} else {
-						warn "Couldn't find a declaration for typedef near line: $inputCounter\n";
+						print "$filename:$linenum:Couldn't find a declaration for typedef\n";
 					}
 					if (length($typedefObj->name())) {
 						if (ref($apiOwner) ne "HeaderDoc::Header") {
@@ -496,14 +688,24 @@ foreach my $inputFile (@inputFiles) {
 				
 				if ($inStruct) { 
 					$structObj = HeaderDoc::Struct->new;
+					if ($inUnion) {
+					    $structObj->isUnion(1);
+					} else {
+					    $structObj->isUnion(0);
+					}
+					if ($xml_output) {
+					    $structObj->outputformat("hdxml");
+					} else { 
+					    $structObj->outputformat("html");
+					}
 					$structObj->processStructComment(\@fields);
 	 				while (($inputLines[$inputCounter] !~ /\w/)  && ($inputCounter <= $#inputLines)){ $inputCounter++; print "Input line number: $inputCounter\n" if ($localDebug);}; # move beyond blank lines
 					my  $declaration = $inputLines[$inputCounter];
-					while ($inputLines[$inputCounter] !~ /}/) {$declaration .= $inputLines[++$inputCounter]; print "Input line number: $inputCounter\n" if ($localDebug);}; # simplistic
+					while ($inputLines[$inputCounter] !~ /}/ && ($inputCounter <= $#inputLines)) {$declaration .= $inputLines[++$inputCounter]; print "Input line number: $inputCounter\n" if ($localDebug);}; # simplistic
 	                if (length($declaration)) {
 						$structObj->setStructDeclaration($declaration);
 					} else {
-						warn "Couldn't find a declaration for struct near line: $inputCounter\n";
+						warn "$filename:$linenum:Couldn't find a declaration for struct\n";
 					}
 					if (length($structObj->name())) {
 						if (ref($apiOwner) ne "HeaderDoc::Header") {
@@ -517,6 +719,11 @@ foreach my $inputFile (@inputFiles) {
 		       	       
 				if ($inConstant) {
 					$constantObj = HeaderDoc::Constant->new;
+					if ($xml_output) {
+					    $constantObj->outputformat("hdxml");
+					} else { 
+					    $constantObj->outputformat("html");
+					}
 					$constantObj->processConstantComment(\@fields);
 					while (($inputLines[$inputCounter] !~ /\w/)  && ($inputCounter <= $#inputLines)){$inputCounter++; print "Input line number: $inputCounter\n" if ($localDebug);};
 			        if ($inputLines[$inputCounter] =~ /^\s*(const|extern|CF_EXPORT)/) {
@@ -541,6 +748,11 @@ foreach my $inputFile (@inputFiles) {
 				
 				if ($inVar) {
 					$varObj = HeaderDoc::Var->new;
+					if ($xml_output) {
+					    $varObj->outputformat("hdxml");
+					} else { 
+					    $varObj->outputformat("html");
+					}
 					$varObj->processVarComment(\@fields);
 					while (($inputLines[$inputCounter] !~ /\w/)  && ($inputCounter <= $#inputLines)){  $inputCounter++; print "Input line number: $inputCounter\n" if ($localDebug);};
 					my $declaration = &removeSlashSlashComment($inputLines[$inputCounter]);
@@ -555,15 +767,21 @@ foreach my $inputFile (@inputFiles) {
 							$varObj->accessControl($cppAccessControlState);
 						    $apiOwner->addToVars($varObj);
 						} else { # headers group by type
-						    warn "### \@var tag found outside of a class declaration. \n";
+						    # warn "### \@var tag found outside of a class declaration. \n";
+						    warn "$filename:$linenum:\@var tag found outside of a class declaration. \n";
 						    $varObj->printObject();
 							$apiOwner->addToVars($varObj);  # we add it anyway
 					    }
 					}
 				} ## end inVar
-				
+
 				if ($inPDefine) {
 					$pDefineObj = HeaderDoc::PDefine->new;
+					if ($xml_output) {
+					    $pDefineObj->outputformat("hdxml");
+					} else { 
+					    $pDefineObj->outputformat("html");
+					}
 					$pDefineObj->processPDefineComment(\@fields);
 					while (($inputLines[$inputCounter] !~ /\w/) && ($inputCounter <= $#inputLines)){  $inputCounter++;print "Input line number: $inputCounter\n" if ($localDebug);};
 					my $declaration;
@@ -571,15 +789,21 @@ foreach my $inputFile (@inputFiles) {
 					    while (($inputLines[$inputCounter] =~ /^\s*#define/) && ($inputCounter <= $#inputLines)){
     						$declaration .= $inputLines[$inputCounter];
     						if ($declaration =~ /\\\n$/) {  # escaped newlines
-								while (($declaration =~ /\\\n$/) && ($inputCounter <= $#inputLines)){$inputCounter++; $declaration .= $inputLines[$inputCounter];print "Input line number: $inputCounter\n" if ($localDebug);};
+								while (($declaration =~ /\\\n$/) && ($inputCounter <= $#inputLines)){ $inputCounter++; $declaration .= $inputLines[$inputCounter];print "Input line number: $inputCounter\n" if ($localDebug);};
     						}
     						$inputCounter++;
 							print "Input line number: $inputCounter\n" if ($localDebug);
 					    }
+					    # We want to point to the last line
+					    # copied, as this is incremented at
+					    # the bottom of this function,
+					    # and otherwise, we skip a line
+					    # of parsing after each define.
+					    $inputCounter--;
                     } else { 
-                    	warn "Can't find declaration for \@define comment with name:\n";
+			warn "$filename:$linenum:Can't find declaration for \@define comment with name:\n";
                     	my $name = $pDefineObj->name();
-                    	print "$name\n\n";
+                    	warn "$filename:$linenum:$name\n\n";
                     }
 					$pDefineObj->setPDefineDeclaration($declaration);
 					
@@ -595,7 +819,13 @@ foreach my $inputFile (@inputFiles) {
 				
 				if ($inEnum) {
 					$enumObj = HeaderDoc::Enum->new;
+					if ($xml_output) {
+					    $enumObj->outputformat("hdxml");
+					} else { 
+					    $enumObj->outputformat("html");
+					}
 					$enumObj->processEnumComment(\@fields);
+print "HERE\n";
 	 				while (($inputLines[$inputCounter] !~ /\w/) && ($inputCounter <= $#inputLines)){ $inputCounter++;print "Input line number: $inputCounter\n" if ($localDebug);};  # move beyond blank lines
 					my  $declaration = $inputLines[$inputCounter];
 					while (($inputLines[$inputCounter] !~ /}/) && ($inputCounter <= $#inputLines)){$declaration .= $inputLines[++$inputCounter];print "Input line number: $inputCounter\n" if ($localDebug);}; # simplistic
@@ -603,7 +833,7 @@ foreach my $inputFile (@inputFiles) {
 	                if (length($declaration)) {
 						$enumObj->declarationInHTML($enumObj->getEnumDeclaration($declaration));
 					} else {
-						warn "Couldn't find a declaration for enum near line: $inputCounter\n";
+                    	warn "$filename:$linenum:Couldn't find a declaration for enum near line: $inputCounter\n";
 					}
 					if (length($enumObj->name())) {
 						if (ref($apiOwner) ne "HeaderDoc::Header") {
@@ -615,7 +845,7 @@ foreach my $inputFile (@inputFiles) {
 					}
 				}  ## end inEnum
 	        }
-			$inHeader = $inFunction = $inTypedef = $inStruct = $inConstant = $inVar = $inPDefine = $inEnum = $inMethod = $inClass = 0;
+			$inHeader = $inFunction = $inFunctionGroup = $inTypedef = $inUnion = $inStruct = $inConstant = $inVar = $inPDefine = $inEnum = $inMethod = $inClass = 0;
 	        $inputCounter++;
 		print "Input line number: $inputCounter\n" if ($localDebug);
 	    } # end processing individual line array
@@ -627,6 +857,9 @@ foreach my $inputFile (@inputFiles) {
 			# print "$classType : ";
 			SWITCH: {
 				($classType eq "cpp" ) && do { 
+					$headerObject->addToClasses($apiOwner); 
+					last SWITCH; };
+				($classType eq "cppt" ) && do { 
 					$headerObject->addToClasses($apiOwner); 
 					last SWITCH; };
 				($classType eq "occ") && do { 
@@ -642,7 +875,13 @@ foreach my $inputFile (@inputFiles) {
 					$headerObject->addToCategories($apiOwner); 
 					last SWITCH; 
 				};           
-				print "Unknown class type '$classType' (known: cpp, objC, intf, occCat)\n";		
+				($classType eq "C") && do {
+					$cppAccessControlState = "public:";
+					$headerObject->addToClasses($apiOwner);
+					last SWITCH;
+				};
+			my $linenum = $inputCounter - 1;
+                    	print "$filename:$linenum:Unknown class type '$classType' (known: cpp, objC, intf, occCat)\n";		
 			}
 	    }
     } # end processing array of line arrays
@@ -651,7 +890,7 @@ foreach my $inputFile (@inputFiles) {
 
 # we merge ObjC methods declared in categories into the owning class,
 # if we've seen it during processing
-if (@categoryObjects) {
+if (@categoryObjects && !$xml_output) {
     foreach my $obj (@categoryObjects) {
         my $nameOfAssociatedClass = $obj->className();
         my $categoryName = $obj->categoryName();
@@ -673,7 +912,8 @@ if (@categoryObjects) {
 				print "Number of categories before: $numCatsBefore after:$numCatsAfter\n" if ($localDebug);
 			    
 			} else {
-				print "### Couldn't find Header object that owns the category with name $categoryName.\n";
+				my $filename = $HeaderDoc::headerObject->name();
+                    		print "$filename:0:Couldn't find Header object that owns the category with name $categoryName.\n";
 			}
 		} else {
 			print "Found category with name $categoryName and associated class $nameOfAssociatedClass\n" if ($localDebug);
@@ -683,15 +923,26 @@ if (@categoryObjects) {
 }
 
 foreach my $obj (@headerObjects) {
-    $obj->createFramesetFile();
-    $obj->createContentFile();
-    $obj->createTOCFile();
-    $obj->writeHeaderElements(); 
-    $obj->writeHeaderElementsToCompositePage();
-    $obj->writeExportsWithName($rootFileName) if (($export) || ($testingExport));
+    if ($xml_output) {
+	$obj->writeHeaderElementsToXMLPage();
+    } else {
+	$obj->createFramesetFile();
+	$obj->createContentFile();
+	$obj->createTOCFile();
+	$obj->writeHeaderElements(); 
+	$obj->writeHeaderElementsToCompositePage();
+	$obj->writeExportsWithName($rootFileName) if (($export) || ($testingExport));
+    }
+    if ("$write_control_file" eq "1") {
+	print "Writing Apple Doc Server control file... ";
+	$obj->createMetaFile();
+	print "done.\n";
+    }
 }
 
-print "...done\n";
+if ($quietLevel eq "0") {
+    print "...done\n";
+}
 exit 0;
 
 
@@ -734,17 +985,30 @@ sub getLineArrays {
 				($className = $headerDocComment) =~ s/.*\@class|\@protocol|\@category\s+(\w+)\s+.*/$1/s;
 				push (@classLines, $headerDocComment);
 
-				while (($line !~ /class|\@interface|\@protocol/) && ($inputCounter <= $lastArrayIndex)) {
+				while (($line !~ /class\s|\@interface\s|\@protocol\s|typedef\s+struct\s/) && ($inputCounter <= $lastArrayIndex)) {
 					$line = ${$rawLineArrayRef}[$inputCounter];
 					push (@classLines, $line);  
 					$inputCounter++;
 				}
+				my $initial_bracecount = ($line =~ tr/{//) - ($line =~ tr/}//);
 
 				SWITCH: {
 					($line =~ s/^\@protocol\s+// ) && 
 						do { 
 							$classType = "objCProtocol";  
 							# print "FOUND OBJCPROTOCOL\n"; 
+							last SWITCH; 
+						};
+					($line =~ s/^typedef\s+struct\s+// ) && 
+						do { 
+							$classType = "C";  
+							# print "FOUND C CLASS\n"; 
+							last SWITCH; 
+						};
+					($line =~ s/^template\s+// ) && 
+						do { 
+							$classType = "cppt";  
+							# print "FOUND CPP TEMPLATE CLASS\n"; 
 							last SWITCH; 
 						};
 					($line =~ s/^class\s+// ) && 
@@ -765,24 +1029,35 @@ sub getLineArrays {
 						    }
 							last SWITCH; 
 						};
-					print "Unknown class type (known: cpp, objC)\n";		
+					print "Unknown class type (known: cpp, cppt, objCCategory, objCProtocol, C,)\n";		
 				}
 
-				# now we're at the opening brace of the class declaration
+				# now we're at the opening line of the class declaration
 				# push it into the array
 				# print "INCLASS! (line: $inputCounter $line)\n";
+				my $inClassBraces = $initial_bracecount;
+				my $leftBraces = 0;
+				my $rightBraces = 0;
 
-				$line = ${$rawLineArrayRef}[$inputCounter];
-				push (@classLines, $line);
-				$inputCounter++;
+				# make sure we've seen at least one left brace
+				# at the start of the class
+
+				do {
+					$line = ${$rawLineArrayRef}[$inputCounter];
+					push (@classLines, $line);
+					$inputCounter++;
+                                        $leftBraces = $line =~ tr/{//;
+                                        $rightBraces = $line =~ tr/}//;
+                                        $inClassBraces += $leftBraces;
+                                        $inClassBraces -= $rightBraces;
+				} while (($inputCounter <= $lastArrayIndex)
+					    && (!($leftBraces)));
 			   
-				# now collect class lines until
-				my $inClassBraces = 1;
-				my $leftBraces;
-				my $rightBraces;
+				# now collect class lines until the closing
+				# curly brace
 
-				if ($classType =~ s/cpp//) {
-		           	while ($inClassBraces) {
+				if (($classType =~ s/cpp//) || ($classType =~ s/C//) || ($classType =~ s/cppt//)) {
+		           	while ($inClassBraces && ($inputCounter <= $lastArrayIndex)) {
 						$line = ${$rawLineArrayRef}[$inputCounter];
 						push (@classLines, $line);
 						$leftBraces = $line =~ tr/{//;
@@ -801,6 +1076,7 @@ sub getLineArrays {
 				}
 				push (@arrayOfLineArrays, \@classLines);
 			# print "OUT OF CLASS! (line: $inputCounter $line)\n";
+				$inputCounter--;
 			} else {
 				push (@generalHeaderLines, $headerDocComment);
 			}
@@ -832,14 +1108,20 @@ sub determineClassType {
 	my $tempLine = "";
 
  	do {
+	# print "inc\n";
 		$tempLine = $inputLines[$lineCounter];
 		$lineCounter++;
-	} while (($tempLine !~ /class|\@interface|\@protocol/) && ($lineCounter <= $#inputLines));
+	} while (($tempLine !~ /class|\@interface|\@protocol|typedef\s+struct/) && ($lineCounter <= $#inputLines));
 
-	if ($tempLine =~ s/class//) {
+	if ($tempLine =~ s/class\s//) {
 	 	$classType = "cpp";  
 	}
-	if ($tempLine =~ s/\@interface//) { 
+	if ($tempLine =~ s/typedef\s+struct\s//) {
+	    # print "===>Cat: $tempLine\n";
+	    $classType = "C"; # standard C "class", such as a
+		                       # COM interface
+	}
+	if ($tempLine =~ s/\@interface\s//) { 
 	    if ($tempLine =~ /\(.*\)/) {
 			# print "===>Cat: $tempLine\n";
 			$classType = "occCat";  # a temporary distinction--not in apple_ref spec
@@ -849,7 +1131,7 @@ sub determineClassType {
 			$classType = "occ"; 
 		}
 	}
-	if ($tempLine =~ s/\@protocol//) {
+	if ($tempLine =~ s/\@protocol\s//) {
 	 	$classType = "intf";  
 	}
 	return $classType;
@@ -865,12 +1147,20 @@ sub processClassComment {
 	
 	SWITCH: {
 		($classType eq "cpp" ) && do { $apiOwner = HeaderDoc::CPPClass->new; last SWITCH; };
+		($classType eq "cppt" ) && do { $apiOwner = HeaderDoc::CPPClass->new; last SWITCH; };
 		($classType eq "occ") && do { $apiOwner = HeaderDoc::ObjCClass->new; last SWITCH; };           
 		($classType eq "occCat") && do { $apiOwner = HeaderDoc::ObjCCategory->new; last SWITCH; };           
 		($classType eq "intf") && do { $apiOwner = HeaderDoc::ObjCProtocol->new; last SWITCH; };           
+		($classType eq "C") && do { $apiOwner = HeaderDoc::CClass->new; last SWITCH; };
 		print "Unknown type (known: classes (ObjC and C++), ObjC categories and protocols)\n";		
 	}
+	$HeaderDoc::currentClass = $apiOwner;
 
+	if ($xml_output) {
+	    $apiOwner->outputformat("hdxml");
+	} else { 
+	    $apiOwner->outputformat("html");
+	}
 	$apiOwner->headerObject($headerObj);
 	$apiOwner->outputDir($rootOutputDir);
 	foreach my $field (@fields) {
@@ -884,7 +1174,8 @@ sub processClassComment {
 					if (length($name)) {
 						$apiOwner->name($name);
 					} else {
-						warn "    Did not find class name following \@class tag!\n";
+						my $filename = $HeaderDoc::headerObject->name();
+                    				print "$filename:0:Did not find class name following \@class tag!\n";
 					}
 					if (length($disc)) {$apiOwner->discussion($disc);};
                 	last SWITCH;
@@ -896,7 +1187,8 @@ sub processClassComment {
 					if (length($name)) {
 						$apiOwner->name($name);
 					} else {
-						warn "    Did not find protocol name following \@protocol tag!\n";
+						my $filename = $HeaderDoc::headerObject->name();
+                    				warn "$filename:0:Did not find protocol name following \@protocol tag!\n";
 					}
 					if (length($disc)) {$apiOwner->discussion($disc);};
 					last SWITCH;
@@ -908,11 +1200,27 @@ sub processClassComment {
 					if (length($name)) {
 						$apiOwner->name($name);
 					} else {
-						warn "    Did not find category name following \@protocol tag!\n";
+						my $filename = $HeaderDoc::headerObject->name();
+                    				warn "$filename:0:Did not find category name following \@protocol tag!\n";
 					}
 					if (length($disc)) {$apiOwner->discussion($disc);};
 					last SWITCH;
 				};
+            			($field =~ s/^templatefield\s+//) && do {     
+                                	$field =~ s/^\s+|\s+$//g;
+                    			$field =~ /(\w*)\s*(.*)/s;
+                    			my $fName = $1;
+                    			my $fDesc = $2;
+                    			my $fObj = HeaderDoc::MinorAPIElement->new();
+                    			$fObj->outputformat($apiOwner->outputformat);
+                    			$fObj->name($fName);
+                    			$fObj->discussion($fDesc);
+                    			$apiOwner->addToFields($fObj);
+# print "inserted field $fName : $fDesc";
+                                	last SWITCH;
+                        	};
+			($field =~ s/^throws\s+//) && do {$apiOwner->throws($field); last SWITCH;};
+			($field =~ s/^exception\s+//) && do {$apiOwner->throws($field); last SWITCH;};
 			($field =~ s/^abstract\s+//) && do {$apiOwner->abstract($field); last SWITCH;};
 			($field =~ s/^discussion\s+//) && do {$apiOwner->discussion($field); last SWITCH;};
 			print "Unknown field in class comment: $field\n";
@@ -927,6 +1235,7 @@ sub processHeaderComment {
     my $rootOutputDir = shift;
     my $fieldArrayRef = shift;
     my @fields = @$fieldArrayRef;
+    my $localDebug = 0;
 
 	foreach my $field (@fields) {
 	    # print "header field: |$field|\n";
@@ -942,11 +1251,15 @@ sub processHeaderComment {
 				if (length($disc)) {$apiOwner->discussion($disc);};
 				last SWITCH;
 			};
+            ($field =~ s/^updated\s+//) && do {$apiOwner->updated($field); last SWITCH;};
             ($field =~ s/^abstract\s+//) && do {$apiOwner->abstract($field); last SWITCH;};
             ($field =~ s/^discussion\s+//) && do {$apiOwner->discussion($field); last SWITCH;};
+            ($field =~ s/^ignore\s+//) && do { $field =~ s/\n//smg; push(@perHeaderIgnorePrefixes, $field); if (!($reprocess_input)) {$reprocess_input = 1;} print "ignoring $field" if ($localDebug); last SWITCH;};
             print "Unknown field in header comment: $field\n";
 		}
 	}
+
+
 	return $apiOwner;
 }
 

@@ -4,7 +4,7 @@
 # Synopsis: Holds struct info parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2001/11/30 22:43:17 $
+# Last Updated: $Date: 2003/05/31 00:02:49 $
 # 
 # Copyright (c) 1999 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
@@ -85,6 +85,7 @@ sub processEnumComment {
             };
             ($field =~ s/^abstract\s+//) && do {$self->abstract($field); last SWITCH;};
             ($field =~ s/^discussion\s+//) && do {$self->discussion($field); last SWITCH;};
+            ($field =~ s/^updated\s+//) && do {$self->updated($field); last SWITCH;};
             ($field =~ s/^constant\s+//) && 
             do {
 				$field =~ s/^\s+|\s+$//g;
@@ -92,12 +93,19 @@ sub processEnumComment {
 	            my $cName = $1;
 	            my $cDesc = $2;
 	            my $cObj = HeaderDoc::MinorAPIElement->new();
+	            $cObj->outputformat($self->outputformat);
 	            $cObj->name($cName);
 	            $cObj->discussion($cDesc);
                 $self->addConstant($cObj); 
+		my $name = $self->name();
+		if ($name eq "") {
+		    $name = "$cName";
+		    $self->name($name);
+		}
                 last SWITCH;
             };
-            print "Unknown field: $field\n";
+	    my $filename = $HeaderDoc::headerObject->name();
+            print "$filename:0:Unknown field: $field\n";
 		}
 	}
 }
@@ -110,7 +118,9 @@ sub getEnumDeclaration {
     print "============================================================================\n" if ($localDebug);
     print "Raw declaration is: $dec\n" if ($localDebug);
     
-    $dec =~ s/[ \t]+/  /g;
+    $dec =~ s/\t/  /g;
+    $dec =~ s/</&lt;/g;
+    $dec =~ s/>/&gt;/g;
     if (length ($dec)) {$dec = "<pre>\n$dec</pre>\n";};
     
     print "Enum: returning declaration:\n\t|$dec|\n" if ($localDebug);
@@ -122,16 +132,28 @@ sub documentationBlock {
     my $self = shift;
     my $name = $self->name();
     my $abstract = $self->abstract();
+    my $updated = $self->updated();
     my $desc = $self->discussion();
     my $declaration = $self->declarationInHTML();
     my @constants = $self->constants();
     my $contentString;
     my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
     
+    $contentString .= "<hr>";
     $contentString .= "<a name=\"//$apiUIDPrefix/c/tag/$name\"></a>\n"; # apple_ref marker
-    $contentString .= "<h3><a name=\"$name\">$name</a></h3>\n";
+    $contentString .= "<table border=\"0\"  cellpadding=\"2\" cellspacing=\"2\" width=\"300\">";
+    $contentString .= "<tr>";
+    $contentString .= "<td valign=\"top\" height=\"12\" colspan=\"5\">";
+    $contentString .= "<h2><a name=\"$name\">$name</a></h2>\n";
+    $contentString .= "</td>";
+    $contentString .= "</tr></table>";
+    $contentString .= "<hr>";
     if (length($abstract)) {
-        $contentString .= "<b>Abstract:</b> $abstract\n";
+        # $contentString .= "<b>Abstract:</b> $abstract\n";
+        $contentString .= "$abstract\n";
+    }
+    if (length($updated)) {
+        $contentString .= "<b>Updated:</b> $updated\n";
     }
     $contentString .= "<blockquote>$declaration</blockquote>\n";
     $contentString .= "<p>$desc</p>\n";
@@ -139,16 +161,54 @@ sub documentationBlock {
     if ($arrayLength > 0) {
         $contentString .= "<h4>Constants</h4>\n";
         $contentString .= "<blockquote>\n";
-        $contentString .= "<table border = \"1\"  width = \"90%\">\n";
+        $contentString .= "<table border=\"1\"  width=\"90%\">\n";
         $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
         foreach my $element (@constants) {
             my $cName = $element->name();
             my $cDesc = $element->discussion();
-            $contentString .= "<tr><td align = \"center\"><a name=\"//$apiUIDPrefix/c/econst/$cName\"><tt>$cName</tt></a></td><td>$cDesc</td><tr>\n";
+            $contentString .= "<tr><td align=\"center\"><a name=\"//$apiUIDPrefix/c/econst/$cName\"><tt>$cName</tt></a></td><td>$cDesc</td></tr>\n";
         }
         $contentString .= "</table>\n</blockquote>\n";
     }
-    $contentString .= "<hr>\n";
+    # $contentString .= "<hr>\n";
+    return $contentString;
+}
+
+sub XMLdocumentationBlock {
+    my $self = shift;
+    my $name = $self->name();
+    my $abstract = $self->abstract();
+    my $updated = $self->updated();
+    my $desc = $self->discussion();
+    my $declaration = $self->declarationInHTML();
+    my @constants = $self->constants();
+    my $contentString;
+    my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
+    
+    $contentString .= "<enum id=\"//$apiUIDPrefix/c/tag/$name\">\n"; # apple_ref marker
+    $contentString .= "<name>$name</name>\n";
+    if (length($abstract)) {
+        $contentString .= "<abstract>$abstract</abstract>\n";
+    }
+    if (length($updated)) {
+        $contentString .= "<updated>$updated</updated>\n";
+    }
+    $contentString .= "<declaration>$declaration</declaration>\n";
+    $contentString .= "<description>$desc</description>\n";
+    my $arrayLength = @constants;
+    if ($arrayLength > 0) {
+        $contentString .= "<constantlist>\n";
+        foreach my $element (@constants) {
+            my $cName = $element->name();
+            my $cDesc = $element->discussion();
+            $contentString .= "<constant id=\"//$apiUIDPrefix/c/econst/$cName\">\n";
+	    $contentString .= "<name>$cName</name>\n";
+	    $contentString .= "<description>$cDesc</description>\n";
+	    $contentString .= "</constant>\n";
+        }
+        $contentString .= "</constantlist>\n";
+    }
+    $contentString .= "</enum>\n";
     return $contentString;
 }
 

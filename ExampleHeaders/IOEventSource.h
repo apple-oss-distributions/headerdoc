@@ -38,7 +38,7 @@ __END_DECLS
 class IOWorkLoop;
 
 /*!
-     @class IOEventSource : public OSObject
+     @class IOEventSource
      @abstract Abstract class for all work-loop event sources.
      @discussion The IOEventSource declares the abstract super class that all
 event sources must inherit from if an IOWorkLoop is to receive events 
