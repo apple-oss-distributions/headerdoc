@@ -4,7 +4,7 @@
 # Synopsis: Holds header-wide comments parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2003/05/31 01:43:26 $
+# Last Updated: $Date: 2003/07/29 19:17:32 $
 # 
 # Copyright (c) 1999-2001 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
@@ -74,6 +74,8 @@ sub _initialize {
     $self->{CLASSES} = ();
     $self->{CLASSESDIR} = undef;
     $self->{UPDATED}= undef;
+    $self->{COPYRIGHT}= "";
+    $self->{HTMLMETA}= "";
     $self->{CATEGORIES}= ();
     $self->{CATEGORIESDIR} = undef;
     $self->{PROTOCOLS}= ();
@@ -184,6 +186,15 @@ sub categoriesDir {
     return $self->{CATEGORIESDIR};
 }
 
+sub availability {
+    my $self = shift;
+
+    if (@_) {
+        $self->{AVAILABILITY} = shift;
+    }
+    return $self->{AVAILABILITY};
+}
+
 sub updated {
     my $self = shift;
     my $localDebug = 0;
@@ -199,7 +210,7 @@ sub updated {
 	if (!($updated =~ /\d\d\d\d-\d\d-\d\d/ )) {
 	    if (!($updated =~ /\d\d-\d\d-\d\d\d\d/ )) {
 		if (!($updated =~ /\d\d-\d\d-\d\d/ )) {
-		    my $filename = $HeaderDoc::headerObject->name();
+		    my $filename = $HeaderDoc::headerObject->filename();
 		    print "$filename:0:Bogus date format: $updated.\n";
 		    print "Valid formats are MM-DD-YYYY, MM-DD-YY, and YYYY-MM-DD\n";
 		    return $self->{UPDATED};
@@ -207,8 +218,13 @@ sub updated {
 		    $month =~ s/(\d\d)-\d\d-\d\d/$1/smg;
 		    $day =~ s/\d\d-(\d\d)-\d\d/$1/smg;
 		    $year =~ s/\d\d-\d\d-(\d\d)/$1/smg;
-		    # @@@ FIX ME DAG @@@
-		    $year += 2000;
+
+		    my $century;
+		    $century = `date +%C`;
+		    $century *= 100;
+		    $year += $century;
+		    # $year += 2000;
+		    print "YEAR: $year" if ($localDebug);
 		}
 	    } else {
 		print "03-25-2003 case.\n" if ($localDebug);
@@ -256,7 +272,7 @@ sub updated {
 	if ($year < 1970) { $invalid = 1; }
 
 	if ($invalid) {
-		my $filename = $HeaderDoc::headerObject->name();
+		my $filename = $HeaderDoc::headerObject->filename();
 		print "$filename:0:Invalid date (year = $year, month = $month, day = $day).\n";
 		print "$filename:0:Valid formats are MM-DD-YYYY, MM-DD-YY, and YYYY-MM-DD\n";
 		return $self->{UPDATED};
@@ -315,6 +331,44 @@ sub removeFromCategories {
 	@{ $self->{CATEGORIES} } = @tempArray;
 }
 
+sub headerCopyrightOwner {
+    my $self = shift;
+
+    if (@_) {     
+	my $test = shift;
+	$self->{COPYRIGHT} = $test;
+    }
+    return $self->{COPYRIGHT};
+}
+
+sub HTMLmeta {
+    my $self = shift;
+
+    if (@_) {
+	my $text = shift;
+
+	if ($text =~ /=/) {
+		# @meta blah="blah" this="that"
+		#    becomes
+		# <meta blah="blah" this="that">
+		$text =~ s/\n.*//smg;
+		$self->{HTMLMETA} .= "<meta $text>\n";
+	} else {
+		# @meta nameparm contentparm
+		#    becomes
+		# <meta name="nameparm" content="contentparm">
+		$text =~ /^(.*?)\s/;
+		my $name = $1;
+		$text =~ s/^$name\s+//;
+		$text =~ s/\n.*//smg;
+
+		$self->{HTMLMETA} .= "<meta name=\"$name\" content=\"$text\">\n";
+	}
+    }
+    
+    return $self->{HTMLMETA};
+}
+
 sub metaFileText {
     my $self = shift;
     my $text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
@@ -344,6 +398,7 @@ sub metaFileText {
     $text .= "</dict>\n";
     $text .= "</plist>\n";
 
+    return $text;
 }
 
 sub writeHeaderElements {
@@ -455,7 +510,8 @@ sub createTOCFile {
     my $outputFileName = "toc.html";    
     my $outputFile = "$rootDir$pathSeparator$outputFileName";    
     my $fileString = $self->tocString();    
-    my $filename = $self->name();    
+    my $name = $self->name();    
+    my $filename = $self->filename();    
 
 	open(OUTFILE, ">$outputFile") || die "Can't write $outputFile.\n$!\n";
     if ($isMacOS) {MacPerl::SetFileInfo('MSIE', 'TEXT', "$outputFile");};
@@ -470,7 +526,7 @@ sub createTOCFile {
 	print OUTFILE "h4 {text-decoration: none; font-family: Verdana,Geneva,Arial,Helvetica,sans-serif; size: tiny; font-weight: bold}"; # bold
 	print OUTFILE "-->";
 	print OUTFILE "</style>";
-	print OUTFILE "<head>\n    <title>Documentation for $filename</title>\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</head>\n";
+	print OUTFILE "<head>\n    <title>Documentation for $name</title>\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</head>\n";
 	print OUTFILE "<body bgcolor=\"#cccccc\" link=\"#000099\" vlink=\"#660066\"\n";
 	print OUTFILE "leftmargin=\"0\" topmargin=\"0\" marginwidth=\"1\"\n";
 	print OUTFILE "marginheight=\"0\">\n";
@@ -529,7 +585,11 @@ sub tocString {
 	    }
     }
     $tocString .= "<br><hr><a href=\"$compositePageName\" target=\"_blank\">[Printable HTML Page]</a>\n";
+    my $availability = $self->availability();
     my $updated = $self->updated();
+    if (length($updated)) {
+	$tocString .= "<p><i>Availability: $availability</i><p>";
+    }
     if (length($updated)) {
 	$tocString .= "<p><i>Updated: $updated</i><p>";
     }
@@ -549,7 +609,11 @@ sub docNavigatorComment {
 sub objName { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-   return ($obj1->name() cmp $obj2->name());
+   if ($HeaderDoc::sort_entries) {
+        return ($obj1->name() cmp $obj2->name());
+   } else {
+        return (1 cmp 2);
+   }
 }
 
 ##################### Debugging ####################################

@@ -5,7 +5,7 @@
 #           file from the comments it finds.
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2003/05/31 01:20:36 $
+# Last Updated: $Date: 2003/08/20 17:50:30 $
 #
 # ObjC additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -24,7 +24,7 @@
 # the specific language governing rights and limitations under the
 # License.
 #
-# $Revision: 1.28.2.5 $
+# $Revision: 1.28.2.16 $
 #####################################################################
 
 my $VERSION = 2.1;
@@ -103,7 +103,7 @@ BEGIN {
 	    $MOD_AVAIL{$_} = eval "use $_; 1";
     }
 
-    &getopts("Xhdvxqo:", \%options);
+    &getopts("HXhdvxquo:", \%options);
     if ($options{v}) {
     	print "Getting version information for all modules.  Please wait...\n";
 		$printVersion = 1;
@@ -114,6 +114,16 @@ BEGIN {
 	$write_control_file = "1";
     } else {
 	$write_control_file = "0";
+    }
+    if ($options{u}) {
+	$HeaderDoc::sort_entries = 0;
+    } else {
+	$HeaderDoc::sort_entries = 1;
+    }
+    if ($options{H}) {
+	$HeaderDoc::insert_header = 1;
+    } else {
+	$HeaderDoc::insert_header = 0;
     }
     if ($options{q}) {
 	$quietLevel = "1";
@@ -258,7 +268,8 @@ my %config = (
     compositePageName => "CompositePage.html",
     masterTOCName => "MasterTOC.html",
     apiUIDPrefix => "apple_ref",
-    ignorePrefixes => ""
+    ignorePrefixes => "",
+    htmlHeader => ""
 );
 
 %config = &updateHashFromConfigFiles(\%config,\@configFiles);
@@ -283,6 +294,9 @@ if (defined $config{"compositePageName"}) {
 }
 if (defined $config{"apiUIDPrefix"}) {
     HeaderDoc::APIOwner->apiUIDPrefix($config{"apiUIDPrefix"});
+}
+if (defined $config{"htmlHeader"}) {
+    HeaderDoc::APIOwner->htmlHeader($config{"htmlHeader"});
 }
 
 ################ Version Info ##############################
@@ -325,6 +339,7 @@ foreach my $inputFile (@inputFiles) {
 	my $typedefObj;
 	my $varObj;
 	my $cppAccessControlState = "protected:"; # the default in C++
+	my $objcAccessControlState = "private:"; # the default in Objective C
 	
     my @path = split (/$pathSeparator/, $inputFile);
     my $filename = pop (@path);
@@ -361,6 +376,7 @@ foreach my $inputFile (@inputFiles) {
     @rawInputLines = @cookedInputLines;
 	
 REDO:
+print "REDO" if ($debugging);
     # check for HeaderDoc comments -- if none, move to next file
     my @headerDocCommentLines = grep(/^\s*\/\*\!/, @rawInputLines);
     if (!@headerDocCommentLines) {
@@ -384,6 +400,7 @@ REDO:
     }
 	$headerObject->outputDir($rootOutputDir);
 	$headerObject->name($filename);
+	$headerObject->filename($filename);
 	my $fullpath=cwd()."/$inputFile";
 	$headerObject->fullpath($fullpath);
 	
@@ -417,6 +434,17 @@ REDO:
 					$cppAccessControlState = "$cppAccessControlState:";
 				}
 			}
+	        	if ($inputLines[$inputCounter] =~ /^\s*(\@public|\@private|\@protected)/) {
+				$objcAccessControlState = $&;
+	        		if ($inputLines[$inputCounter] =~ /^\s*(\@public|\@private|\@protected)\s+/) {
+					# trim leading whitespace and tabulation
+					$objcAccessControlState =~ s/^\s+//;
+					# trim ending ':' and whitespace
+					$objcAccessControlState =~ s/\s*:\s*$/$1/s;
+					# set back the ':'
+					$objcAccessControlState = "$objcAccessControlState:";
+				}
+			}
 
 
 	        	if ($inputLines[$inputCounter] =~ /^\s*\/\*\!/) {  # entering headerDoc comment
@@ -425,12 +453,24 @@ REDO:
 					$line .= $inputLines[$inputCounter++];
 	        			print "Input line number: $inputCounter\n" if ($localDebug);
 				} else {                                       # multi-line comment
+					my $in_textblock = 0;
 					do {
-						$inputLines[$inputCounter] =~ s/^[\t ]*[*]?[\t ]+(.*)$/$1/; # remove leading whitespace, and any leading asterisks
-						$line .= $inputLines[$inputCounter++];
+						my $templine = $inputLines[$inputCounter];
+						while ($templine =~ s/\@textblock//) { $in_textblock++; }  
+						while ($templine =~ s/\@\/textblock//) { $in_textblock--; }
+						if (!$in_textblock) {
+							$inputLines[$inputCounter] =~ s/^[\t ]*[*]?[\t ]+(.*)$/$1/; # remove leading whitespace, and any leading asterisks
+						}
+						my $newline = $inputLines[$inputCounter++];
+						$newline =~ s/^ \*//;
+						$line .= $newline;
 	        				print "Input line number: $inputCounter\n" if ($localDebug);
 					} while (($inputLines[$inputCounter] !~ /\*\//) && ($inputCounter <= $#inputLines));
-					$line .= $inputLines[$inputCounter++];     # get the closing comment marker
+					my $newline = $inputLines[$inputCounter++];
+					if ($newline !~ /^ \*\//) {
+						$newline =~ s/^ \*//;
+					}
+					$line .= $newline;              # get the closing comment marker
 	        		print "Input line number: $inputCounter\n" if ($localDebug);
 			    }
 			    $line =~ s/^\s+//;              # trim leading whitespace
@@ -445,7 +485,15 @@ REDO:
 					($line =~ /^\/\*!\s+\@language\s+.*c\+\+\s*/i) && do {$inCPPHeader = 1; last SWITCH;};
 					($line =~ /^\/\*!\s+\@functiongroup\s*/i) && do {$inFunctionGroup = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@function\s*/i) && do {$inFunction = 1;last SWITCH;};
-					($line =~ /^\/\*!\s+\@method\s*/i) && do {$inMethod = 1;last SWITCH;};
+					($line =~ /^\/\*!\s+\@method\s*/i) && do {
+						    if ($classType eq "occ" ||
+							$classType eq "intf" ||
+							$classType eq "occCat") {
+							    $inMethod = 1;last SWITCH;
+						    } else {
+							    $inFunction = 1;last SWITCH;
+						    }
+					};
 					($line =~ /^\/\*!\s+\@typedef\s*/i) && do {$inTypedef = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@union\s*/i) && do {$inUnion = 1;$inStruct = 1;last SWITCH;};
 					($line =~ /^\/\*!\s+\@struct\s*/i) && do {$inStruct = 1;last SWITCH;};
@@ -462,25 +510,97 @@ REDO:
 				my @fields = split(/\@/, $line);
 				my @newfields = ();
 				my $lastappend = "";
+				my $in_textblock = 0;
 				foreach my $field (@fields) {
-				    if ($field =~ s/\\$/\@/) {
-					$lastappend .= $field;
-				    } else {
-					if ($lastappend eq "") {
-					    push(@newfields, $field);
-					} else {
-					    $lastappend .= $field;
-					    push(@newfields, $lastappend);	
+				  print "processing $field\n" if ($localDebug);
+				  if ($in_textblock) {
+				    if ($field =~ /^\/textblock/) {
+					print "out of textblock\n" if ($localDebug);
+					if ($in_textblock == 1) {
+					    my $cleanfield = $field;
+					    $cleanfield =~ s/^\/textblock//;
+					    $lastappend .= $cleanfield;
+					    push(@newfields, $lastappend);
+					    print "pushed \"$lastappend\"\n" if ($localDebug);
 					    $lastappend = "";
 					}
+					$in_textblock = 0;
+				    } else {
+					# clean up text block
+					$field =~ s/\</\&lt\;/g;
+					$field =~ s/\>/\&gt\;/g;
+					$lastappend .= "\@$field";
+					print "new field is \"$lastappend\"\n" if ($localDebug);
 				    }
+				  } else {
+				    $field =~ s/^\/link\s*/<\/hd_link>/;
+				    if ($field =~ s/^link\s+//) {
+					my $target = "";
+					my $lastfield;
+
+					if ($lastappend eq "") {
+					    $lastfield = pop(@newfields);
+					} else {
+					    $lastfield = "";
+					}
+					# print "lastfield is $lastfield";
+					$lastappend .= $lastfield; 
+					if ($field =~ /^(\S*?)\s/) {
+					    $target = $1;
+					} else {
+					    # print "$filename:$linenum:MISSING TARGET FOR LINK!\n";
+					    $target = $field;
+					}
+					my $localDebug = 0;
+					print "target $target\n" if ($localDebug);
+					$field =~ s/^$target//g;
+					$field =~ s/\\$/\@/;
+					$lastappend .= "<hd_link $target>";
+					$lastappend .= "$field";
+				    } elsif ($field =~ /^textblock\s/) {
+					if ($lastappend eq "") {
+					    $in_textblock = 1;
+					    print "in textblock\n" if ($localDebug);
+					    $lastappend = pop(@newfields);
+					} else {
+					    $in_textblock = 2;
+					    print "in textblock (continuation)\n" if ($localDebug);
+					}
+					$field =~ s/^textblock\s+//;
+					# clean up text block
+					$field =~ s/\</\&lt\;/g;
+					$field =~ s/\>/\&gt\;/g;
+					$lastappend .= "$field";
+					print "in textblock.\n" if ($localDebug);
+				    } elsif ($field =~ s/\\$/\@/) {
+					$lastappend .= $field;
+				    } elsif ($lastappend eq "") {
+					push(@newfields, $field);
+				    } else {
+					$lastappend .= $field;
+					push(@newfields, $lastappend);	
+					$lastappend = "";
+				    }
+				  }
+				}
+				if (!($lastappend eq "")) {
+				    push(@newfields, $lastappend);
 				}
 				@fields = @newfields;
 				if ($inCPPHeader) {print "inCPPHeader\n" if ($debugging); &processCPPHeaderComment();};
 				if ($inClass) {
+					my $classdec = "";
+					my $pos=$inputCounter;
+					do {
+						$classdec .= $inputLines[$pos];
+					} while (($pos < $#inputLines) && ($inputLines[$pos++] !~ /{/));
 					$classType = &determineClassType($inputCounter, $apiOwner, \@inputLines);
 					print "inClass 1 - $classType \n" if ($debugging); 
 					$apiOwner = &processClassComment($apiOwner, $rootOutputDir, \@fields, $classType);
+					my $superclass = &get_super($classType, $classdec);
+					if (length($superclass)) {
+					    $apiOwner->attribute("Superclass", $superclass, 0);
+					}
 					print "inClass 2\n" if ($debugging); 
 				};
 				if ($inHeader) {
@@ -524,12 +644,13 @@ REDO:
 					}
 \					$funcObj->group($functionGroup);
 					$funcObj->processFunctionComment(\@fields);
-	 				while (($inputLines[$inputCounter] !~ /\w/)  && ($inputCounter <= $#inputLines)){ 
+	 				while ((($inputLines[$inputCounter] =~ /^%CPassThru/) || ($inputLines[$inputCounter] !~ /\w/))  && ($inputCounter <= $#inputLines)){ 
 	 					$inputCounter++;
 	 					print "Input line number: $inputCounter\n" if ($localDebug);
 					}; # move beyond blank lines
 					
 					if ($inputLines[$inputCounter] =~ /^#define/) { # if function-like macro
+					print "macro\n" if ($localDebug);
 						my $declaration = $inputLines[$inputCounter];
 						while (($declaration =~ /\\\n$/)  && ($inputCounter <= $#inputLines)){ 
 							$inputCounter++;
@@ -564,7 +685,13 @@ REDO:
 
 					if (length($funcObj->name())) {
 						if (ref($apiOwner) ne "HeaderDoc::Header") {
-							$funcObj->accessControl($cppAccessControlState);
+						    if ($classType eq "occ" ||
+							$classType eq "intf" ||
+							$classType eq "occCat") {
+							    $funcObj->accessControl($objcAccessControlState);
+						    } else {
+							    $funcObj->accessControl($cppAccessControlState);
+						    }
 						}
 						$apiOwner->addToFunctions($funcObj);
 					}
@@ -602,6 +729,15 @@ REDO:
 					$methObj->setMethodDeclaration($declaration, $classType);
 
 					if (length($methObj->name())) {
+						if (ref($apiOwner) ne "HeaderDoc::Header") {
+						    if ($classType eq "occ" ||
+							$classType eq "intf" ||
+							$classType eq "occCat") {
+							    $methObj->accessControl($objcAccessControlState);
+						    } else {
+							    $methObj->accessControl($cppAccessControlState);
+						    }
+						}
 						$apiOwner->addToMethods($methObj);
 						$methObj->owner($apiOwner); # methods need to know the class/protocol they belong to
 						print "added method $declaration\n" if ($localDebug);
@@ -764,7 +900,14 @@ REDO:
 					$varObj->setVarDeclaration($declaration);
 					if (length($varObj->name())) {
 						if (ref($apiOwner) ne "HeaderDoc::Header") {
-							$varObj->accessControl($cppAccessControlState);
+							# $varObj->accessControl($cppAccessControlState);
+						    if ($classType eq "occ" ||
+							$classType eq "intf" ||
+							$classType eq "occCat") {
+							    $varObj->accessControl($objcAccessControlState);
+						    } else {
+							    $varObj->accessControl($cppAccessControlState);
+						    }
 						    $apiOwner->addToVars($varObj);
 						} else { # headers group by type
 						    # warn "### \@var tag found outside of a class declaration. \n";
@@ -825,7 +968,6 @@ REDO:
 					    $enumObj->outputformat("html");
 					}
 					$enumObj->processEnumComment(\@fields);
-print "HERE\n";
 	 				while (($inputLines[$inputCounter] !~ /\w/) && ($inputCounter <= $#inputLines)){ $inputCounter++;print "Input line number: $inputCounter\n" if ($localDebug);};  # move beyond blank lines
 					my  $declaration = $inputLines[$inputCounter];
 					while (($inputLines[$inputCounter] !~ /}/) && ($inputCounter <= $#inputLines)){$declaration .= $inputLines[++$inputCounter];print "Input line number: $inputCounter\n" if ($localDebug);}; # simplistic
@@ -912,7 +1054,7 @@ if (@categoryObjects && !$xml_output) {
 				print "Number of categories before: $numCatsBefore after:$numCatsAfter\n" if ($localDebug);
 			    
 			} else {
-				my $filename = $HeaderDoc::headerObject->name();
+				my $filename = $HeaderDoc::headerObject->filename();
                     		print "$filename:0:Couldn't find Header object that owns the category with name $categoryName.\n";
 			}
 		} else {
@@ -927,14 +1069,14 @@ foreach my $obj (@headerObjects) {
 	$obj->writeHeaderElementsToXMLPage();
     } else {
 	$obj->createFramesetFile();
-	$obj->createContentFile();
 	$obj->createTOCFile();
 	$obj->writeHeaderElements(); 
 	$obj->writeHeaderElementsToCompositePage();
+	$obj->createContentFile();
 	$obj->writeExportsWithName($rootFileName) if (($export) || ($testingExport));
     }
     if ("$write_control_file" eq "1") {
-	print "Writing Apple Doc Server control file... ";
+	print "Writing doc server control file... ";
 	$obj->createMetaFile();
 	print "done.\n";
     }
@@ -967,15 +1109,22 @@ sub getLineArrays {
 			my $classType = "";
 			{
 				local $^W = 0;  # turn off warnings since -w is overly sensitive here
+				my $in_textblock = 0;
 				while (($line !~ /\*\//) && ($inputCounter <= $lastArrayIndex)) {
-				    $line =~ s/^[ \t]*//; # remove leading whitespace
+				    my $templine = $line;
+				    while ($templine =~ s/\@textblock//) { $in_textblock++; }
+				    while ($templine =~ s/\@\/textblock//) { $in_textblock--; }
+				    if (!$in_textblock) {
+					$line =~ s/^[ \t]*//; # remove leading whitespace
+				    }
 				    $line =~ s/^[*]\s*$/\n/; # replace sole asterisk with paragraph divider
 				    $line =~ s/^[*]\s+(.*)/$1/; # remove asterisks that precede text
 				    $headerDocComment .= $line;
 			            $line = ${$rawLineArrayRef}[++$inputCounter];
 				}
+				$headerDocComment .= $line
 			}
-			
+
 			# test for @class, @protocol, or @category comment
 			# here is where we create an array of class-specific lines
 			# first, get the class name
@@ -993,31 +1142,31 @@ sub getLineArrays {
 				my $initial_bracecount = ($line =~ tr/{//) - ($line =~ tr/}//);
 
 				SWITCH: {
-					($line =~ s/^\@protocol\s+// ) && 
+					($line =~ s/^\s*\@protocol\s+// ) && 
 						do { 
 							$classType = "objCProtocol";  
 							# print "FOUND OBJCPROTOCOL\n"; 
 							last SWITCH; 
 						};
-					($line =~ s/^typedef\s+struct\s+// ) && 
+					($line =~ s/^\s*typedef\s+struct\s+// ) && 
 						do { 
 							$classType = "C";  
 							# print "FOUND C CLASS\n"; 
 							last SWITCH; 
 						};
-					($line =~ s/^template\s+// ) && 
+					($line =~ s/^\s*template\s+// ) && 
 						do { 
 							$classType = "cppt";  
 							# print "FOUND CPP TEMPLATE CLASS\n"; 
 							last SWITCH; 
 						};
-					($line =~ s/^class\s+// ) && 
+					($line =~ s/^\s*class\s+// ) && 
 						do { 
 							$classType = "cpp";  
 							# print "FOUND CPP CLASS\n"; 
 							last SWITCH; 
 						};
-					($line =~ s/^\@interface\s+// ) && 
+					($line =~ s/^\s*\@interface\s+// ) && 
 						do { 
 						    # it's either an ObjC class or category
 						    if ($line =~ /\(.*\)/) {
@@ -1029,7 +1178,7 @@ sub getLineArrays {
 						    }
 							last SWITCH; 
 						};
-					print "Unknown class type (known: cpp, cppt, objCCategory, objCProtocol, C,)\n";		
+					print "Unknown class type (known: cpp, cppt, objCCategory, objCProtocol, C,)\nline=\"$line\"";		
 				}
 
 				# now we're at the opening line of the class declaration
@@ -1056,7 +1205,7 @@ sub getLineArrays {
 				# now collect class lines until the closing
 				# curly brace
 
-				if (($classType =~ s/cpp//) || ($classType =~ s/C//) || ($classType =~ s/cppt//)) {
+				if (($classType =~ s/cpp//) || ($classType =~ s/^C//) || ($classType =~ s/cppt//)) {
 		           	while ($inClassBraces && ($inputCounter <= $lastArrayIndex)) {
 						$line = ${$rawLineArrayRef}[$inputCounter];
 						push (@classLines, $line);
@@ -1097,6 +1246,48 @@ sub removeSlashSlashComment {
     my $line = shift;
     $line =~ s/\/\/.*$//;
     return $line;
+}
+
+sub get_super {
+my $classType = shift;
+my $dec = shift;
+my $super = "";
+my $localDebug = 0;
+
+    $dec =~ s/\n/ /smg;
+
+    if ($classType =~ /^occ/) {
+	if ($dec !~ s/^\s*\@interface\s*//s) {
+	    $dec =~ s/^\s*\@protocol\s*//s;
+	}
+        if (!($dec =~ s/.*?://s)) {
+	    $super = "";
+	} else {
+	    $dec =~ s/\(.*//sg;
+	    $dec =~ s/\{.*//sg;
+	    $super = $dec;
+	}
+    } elsif ($classType =~ /^cpp$/) {
+	$dec !~ s/^\s*\class\s*//s;
+        if (!($dec =~ s/.*?://s)) {
+	    $super = "";
+	} else {
+	    $dec =~ s/\(.*//sg;
+	    $dec =~ s/\{.*//sg;
+	    $dec =~ s/^\s*//sg;
+	    $dec =~ s/^public//g;
+	    $dec =~ s/^private//g;
+	    $dec =~ s/^protected//g;
+	    $dec =~ s/^virtual//g;
+	    $super = $dec;
+	}
+    }
+
+    $super =~ s/^\s*//;
+    $super =~ s/\s.*//;
+
+    print "$super is super\n" if ($localDebug);
+    return $super;
 }
 
 sub determineClassType {
@@ -1144,14 +1335,15 @@ sub processClassComment {
 	my $fieldArrayRef = shift;
 	my @fields = @$fieldArrayRef;
 	my $classType = shift;
+	my $filename = $HeaderDoc::headerObject->filename();
 	
 	SWITCH: {
-		($classType eq "cpp" ) && do { $apiOwner = HeaderDoc::CPPClass->new; last SWITCH; };
-		($classType eq "cppt" ) && do { $apiOwner = HeaderDoc::CPPClass->new; last SWITCH; };
-		($classType eq "occ") && do { $apiOwner = HeaderDoc::ObjCClass->new; last SWITCH; };           
-		($classType eq "occCat") && do { $apiOwner = HeaderDoc::ObjCCategory->new; last SWITCH; };           
-		($classType eq "intf") && do { $apiOwner = HeaderDoc::ObjCProtocol->new; last SWITCH; };           
-		($classType eq "C") && do { $apiOwner = HeaderDoc::CClass->new; last SWITCH; };
+		($classType eq "cpp" ) && do { $apiOwner = HeaderDoc::CPPClass->new; $apiOwner->filename($filename); last SWITCH; };
+		($classType eq "cppt" ) && do { $apiOwner = HeaderDoc::CPPClass->new; $apiOwner->filename($filename); last SWITCH; };
+		($classType eq "occ") && do { $apiOwner = HeaderDoc::ObjCClass->new; $apiOwner->filename($filename); last SWITCH; };           
+		($classType eq "occCat") && do { $apiOwner = HeaderDoc::ObjCCategory->new; $apiOwner->filename($filename); last SWITCH; };           
+		($classType eq "intf") && do { $apiOwner = HeaderDoc::ObjCProtocol->new; $apiOwner->filename($filename); last SWITCH; };           
+		($classType eq "C") && do { $apiOwner = HeaderDoc::CClass->new; $apiOwner->filename($filename); last SWITCH; };
 		print "Unknown type (known: classes (ObjC and C++), ObjC categories and protocols)\n";		
 	}
 	$HeaderDoc::currentClass = $apiOwner;
@@ -1174,7 +1366,7 @@ sub processClassComment {
 					if (length($name)) {
 						$apiOwner->name($name);
 					} else {
-						my $filename = $HeaderDoc::headerObject->name();
+						my $filename = $HeaderDoc::headerObject->filename();
                     				print "$filename:0:Did not find class name following \@class tag!\n";
 					}
 					if (length($disc)) {$apiOwner->discussion($disc);};
@@ -1187,7 +1379,7 @@ sub processClassComment {
 					if (length($name)) {
 						$apiOwner->name($name);
 					} else {
-						my $filename = $HeaderDoc::headerObject->name();
+						my $filename = $HeaderDoc::headerObject->filename();
                     				warn "$filename:0:Did not find protocol name following \@protocol tag!\n";
 					}
 					if (length($disc)) {$apiOwner->discussion($disc);};
@@ -1200,7 +1392,7 @@ sub processClassComment {
 					if (length($name)) {
 						$apiOwner->name($name);
 					} else {
-						my $filename = $HeaderDoc::headerObject->name();
+						my $filename = $HeaderDoc::headerObject->filename();
                     				warn "$filename:0:Did not find category name following \@protocol tag!\n";
 					}
 					if (length($disc)) {$apiOwner->discussion($disc);};
@@ -1223,6 +1415,21 @@ sub processClassComment {
 			($field =~ s/^exception\s+//) && do {$apiOwner->throws($field); last SWITCH;};
 			($field =~ s/^abstract\s+//) && do {$apiOwner->abstract($field); last SWITCH;};
 			($field =~ s/^discussion\s+//) && do {$apiOwner->discussion($field); last SWITCH;};
+			($field =~ s/^availability\s+//) && do {$apiOwner->availability($field); last SWITCH;};
+			($field =~ s/^updated\s+//) && do {$apiOwner->updated($field); last SWITCH;};
+			($field =~ s/^namespace\s+//) && do {$apiOwner->namespace($field); last SWITCH;};
+			($field =~ s/^instancesize\s+//) && do {$apiOwner->attribute("Instance Size", $field, 0); last SWITCH;};
+			($field =~ s/^performance\s+//) && do {$apiOwner->attribute("Performance", $field, 1); last SWITCH;};
+			# ($field =~ s/^subclass\s+//) && do {$apiOwner->attributelist("Subclasses", $field); last SWITCH;};
+			($field =~ s/^nestedclass\s+//) && do {$apiOwner->attributelist("Nested Classes", $field); last SWITCH;};
+			($field =~ s/^coclass\s+//) && do {$apiOwner->attributelist("Co-Classes", $field); last SWITCH;};
+			($field =~ s/^helper(class|)\s+//) && do {$apiOwner->attributelist("Helper Classes", $field); last SWITCH;};
+			($field =~ s/^helps\s+//) && do {$apiOwner->attribute("Helps", $field, 0); last SWITCH;};
+			($field =~ s/^classdesign\s+//) && do {$apiOwner->attribute("Class Design", $field, 1); last SWITCH;};
+			($field =~ s/^dependency\s+//) && do {$apiOwner->attributelist("Dependencies", $field); last SWITCH;};
+			($field =~ s/^ownership\s+//) && do {$apiOwner->attribute("Ownership Model", $field, 1); last SWITCH;};
+			($field =~ s/^security\s+//) && do {$apiOwner->attribute("Security", $field, 1); last SWITCH;};
+			($field =~ s/^whysubclass\s+//) && do {$apiOwner->attribute("Reason to Subclass", $field, 1); last SWITCH;};
 			print "Unknown field in class comment: $field\n";
 		}
 	}
@@ -1245,15 +1452,27 @@ sub processHeaderComment {
 			do {
 				my ($name, $disc);
 				($name, $disc) = &getAPINameAndDisc($field); 
-				print "Setting header name to $name\n" if ($debugging);
+				my $longname = $name; #." (".$apiOwner->name().")";
+				if (length($name)) {
+					print "Setting header name to $longname\n" if ($debugging);
+					$apiOwner->name($longname);
+				}
 				print "Discussion is:\n" if ($debugging);
 				print "$disc\n" if ($debugging);
 				if (length($disc)) {$apiOwner->discussion($disc);};
 				last SWITCH;
 			};
+            ($field =~ s/^availability\s+//) && do {$apiOwner->availability($field); last SWITCH;};
             ($field =~ s/^updated\s+//) && do {$apiOwner->updated($field); last SWITCH;};
             ($field =~ s/^abstract\s+//) && do {$apiOwner->abstract($field); last SWITCH;};
             ($field =~ s/^discussion\s+//) && do {$apiOwner->discussion($field); last SWITCH;};
+            ($field =~ s/^copyright\s+//) && do { $apiOwner->headerCopyrightOwner($field); last SWITCH;};
+            ($field =~ s/^meta\s+//) && do {$apiOwner->HTMLmeta($field); last SWITCH;};
+            ($field =~ s/^CFBundleIdentifier\s+//i) && do {$apiOwner->attribute("CFBundleIdentifier", $field, 0); last SWITCH;};
+            ($field =~ s/^related\s+//i) && do {$apiOwner->attributelist("Related Headers", $field); last SWITCH;};
+            ($field =~ s/^(compiler|)flag\s+//) && do {$apiOwner->attributelist("Compiler Flags", $field); last SWITCH;};
+            ($field =~ s/^preprocinfo\s+//) && do {$apiOwner->attribute("Preprocessor Behavior", $field, 1); last SWITCH;};
+	    ($field =~ s/^whyinclude\s+//) && do {$apiOwner->attribute("Reason to Include", $field, 1); last SWITCH;};
             ($field =~ s/^ignore\s+//) && do { $field =~ s/\n//smg; push(@perHeaderIgnorePrefixes, $field); if (!($reprocess_input)) {$reprocess_input = 1;} print "ignoring $field" if ($localDebug); last SWITCH;};
             print "Unknown field in header comment: $field\n";
 		}

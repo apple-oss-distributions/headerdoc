@@ -28,18 +28,20 @@ realinstall:
 	DSTROOT="" make installsub
 
 install:
-	DSTROOT="/tmp/headerdoc/Release" make installsub
-
-	@echo "WARNING: Make install by default installs in"
-	@echo ""
-	@echo "          ${DSTROOT}"
-	@echo ""
-	@echo "This is primarily intended for building packages."
-	@echo "If you want to actually install over your"
-	@echo "existing installation, cancel this make and run"
-	@echo "\"make realinstall\" instead."
-
-	sleep 5
+	@echo ; \
+	export DSTROOT="/tmp/headerdoc/Release" ; \
+ \
+	echo "WARNING: Make install by default installs in" ; \
+	echo "" ; \
+	echo "          $$DSTROOT" ; \
+	echo "" ; \
+	echo "This is primarily intended for building packages." ; \
+	echo "If you want to actually install over your" ; \
+	echo "existing installation, cancel this make and run" ; \
+	echo "\"sudo make realinstall\" instead." ; \
+ \
+	sleep 5 ; \
+	make installsub
 
 installsub:
 
@@ -57,3 +59,6 @@ installsub:
 	chmod 555 $(DSTROOT)$(bindir)/$(program2)
 	umask 022 && install -d $(DSTROOT)$(docsDir)/HeaderDoc
 	install -c -m 444 Documentation/*.html $(DSTROOT)$(docsDir)/HeaderDoc
+	umask 022 && install -d $(DSTROOT)/usr/share/man/man1
+	install -c -m 444 Documentation/man/*.1 $(DSTROOT)/usr/share/man/man1
+

@@ -12,7 +12,7 @@
 
 struct _structTag {
     short firstField;
-    unsigned long secondField
+    unsigned long secondField;
 } SimpleStruct;
 
 

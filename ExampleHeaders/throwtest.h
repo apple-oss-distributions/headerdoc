@@ -40,6 +40,8 @@ class IOWorkLoop;
 /*!
      @class IOEventSource
      @abstract Abstract class for all work-loop event sources.
+     @namespace I/O Kit
+     @updated 2007-03-07
      @discussion The IOEventSource declares the abstract super class that all
 event sources must inherit from if an IOWorkLoop is to receive events 
 from them.
@@ -105,8 +107,7 @@ protected:
          The next event source in the event chain. nil at end of chain. */
      IOEventSource *eventChainNext;
 
-/*! @var owner The owner object called when an event has been delivered.
-*/
+/*! @var owner The owner object called when an event has been delivered. */
      OSObject *owner;
 
 /*! @var action
@@ -130,6 +131,9 @@ int getID() {
 
 /*! @function init
      @abstract Primary initialiser for the IOEventSource class.
+     @throws halibut
+     @throws mackeral
+     @throws peanuts
      @param owner
          Owner of this instance of an event source.  Used as the first parameter
 of the action callout.  Owner will generally be an OSObject it doesn't have to

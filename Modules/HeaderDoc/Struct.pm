@@ -4,7 +4,7 @@
 # Synopsis: Holds struct info parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2003/05/31 00:02:49 $
+# Last Updated: $Date: 2003/07/29 21:57:54 $
 # 
 # Copyright (c) 1999-2001 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
@@ -95,6 +95,7 @@ sub processStructComment {
             };
             ($field =~ s/^abstract\s+//) && do {$self->abstract($field); last SWITCH;};
             ($field =~ s/^discussion\s+//) && do {$self->discussion($field); last SWITCH;};
+            ($field =~ s/^availability\s+//) && do {$self->availability($field); last SWITCH;};
             ($field =~ s/^updated\s+//) && do {$self->updated($field); last SWITCH;};
             ($field =~ s/^field\s+//) && 
             do {
@@ -134,7 +135,11 @@ sub setStructDeclaration {
     $endline =~ s/.*}\s*//smg;
     my $mid = $dec;
     print "mid $mid\n" if ($localDebug);
-    $mid =~ s/{\s*(.*)\s*}/$1/smg;
+    # $mid =~ s/{\s*(.*)\s*}.*?/$1/smg;
+    $mid =~ s/^$decline.*?{//sm;
+    $mid =~ s/}.*?$endline$//sm;
+    $mid =~ s/^\n*//smg;
+    $mid =~ s/\n+$/\n/smg;
     print "mid $mid\n" if ($localDebug);
 
     my $newdec = "$decline {\n";
@@ -167,6 +172,7 @@ sub documentationBlock {
     my $contentString;
     my $name = $self->name();
     my $abstract = $self->abstract();
+    my $availability = $self->availability();
     my $updated = $self->updated();
     my $desc = $self->discussion();
     my $declaration = $self->declarationInHTML();
@@ -175,7 +181,9 @@ sub documentationBlock {
 
     
     $contentString .= "<hr>";
-    $contentString .= "<a name=\"//$apiUIDPrefix/c/tag/$name\"></a>\n"; # apple_ref marker
+    my $uid = "//$apiUIDPrefix/c/tag/$name";
+    HeaderDoc::APIOwner->register_uid($uid);
+    $contentString .= "<a name=\"$uid\"></a>\n"; # apple_ref marker
     $contentString .= "<table border=\"0\"  cellpadding=\"2\" cellspacing=\"2\" width=\"300\">";
     $contentString .= "<tr>";
     $contentString .= "<td valign=\"top\" height=\"12\" colspan=\"5\">";
@@ -187,23 +195,28 @@ sub documentationBlock {
         # $contentString .= "<b>Abstract:</b> $abstract\n";
         $contentString .= "$abstract\n";
     }
+    if (length($availability)) {
+        $contentString .= "<b>availability:</b> $availability\n";
+    }
     if (length($updated)) {
         $contentString .= "<b>updated:</b> $updated\n";
     }
     $contentString .= "<blockquote>$declaration</blockquote>\n";
-    $contentString .= "<p>$desc</p>\n";
+    # $contentString .= "<p>$desc</p>\n";
+    if (length($desc)) {$contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Discussion</font></h5><p>$desc</p>\n"; }
     my $arrayLength = @fields;
     if ($arrayLength > 0) {
-        $contentString .= "<h4>Fields</h4>\n";
+        $contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Field Descriptions</font></h5>\n";
         $contentString .= "<blockquote>\n";
-        $contentString .= "<table border=\"1\"  width=\"90%\">\n";
-        $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+        # $contentString .= "<table border=\"1\"  width=\"90%\">\n";
+        # $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+	$contentString .= "<dl>\n";
         foreach my $element (@fields) {
             my $fName = $element->name();
             my $fDesc = $element->discussion();
-            $contentString .= "<tr><td align=\"center\"><tt>$fName</tt></td><td>$fDesc</td></tr>\n";
+            $contentString .= "<dt><tt>$fName</tt></dt><dd>$fDesc</dd>\n";
         }
-        $contentString .= "</table>\n</blockquote>\n";
+        $contentString .= "</dl>\n</blockquote>\n";
     }
     # $contentString .= "<hr>\n";
     return $contentString;
@@ -214,6 +227,7 @@ sub XMLdocumentationBlock {
     my $contentString;
     my $name = $self->name();
     my $abstract = $self->abstract();
+    my $availability = $self->availability();
     my $updated = $self->updated();
     my $desc = $self->discussion();
     my $declaration = $self->declarationInHTML();
@@ -224,10 +238,15 @@ sub XMLdocumentationBlock {
     if ($self->isUnion()) {
 	$type = "union";
     }
-    $contentString .= "<struct id=\"//$apiUIDPrefix/c/tag/$name\" type=\"$type\">\n"; # apple_ref marker
+    my $uid = "//$apiUIDPrefix/c/tag/$name";
+    HeaderDoc::APIOwner->register_uid($uid);
+    $contentString .= "<struct id=\"$uid\" type=\"$type\">\n"; # apple_ref marker
     $contentString .= "<name>$name</name>\n";
     if (length($abstract)) {
         $contentString .= "<abstract>$abstract</abstract>\n";
+    }
+    if (length($availability)) {
+        $contentString .= "<availability>$availability</availability>\n";
     }
     if (length($updated)) {
         $contentString .= "<updated>$updated</updated>\n";
@@ -253,7 +272,7 @@ sub printObject {
  
     print "Struct\n";
     $self->SUPER::printObject();
-    print "Fields:\n";
+    print "Field Descriptions:\n";
     my $fieldArrayRef = $self->{FIELDS};
     my $arrayLength = @{$fieldArrayRef};
     if ($arrayLength > 0) {

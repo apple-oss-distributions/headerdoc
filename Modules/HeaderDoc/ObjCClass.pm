@@ -6,7 +6,7 @@
 # Initial modifications: SKoT McDonald <skot@tomandandy.com> Aug 2001
 #
 # Based on CPPClass by Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2003/05/30 20:55:56 $
+# Last Updated: $Date: 2003/07/23 23:00:55 $
 # 
 # Copyright (c) 1999-2001 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
@@ -80,7 +80,7 @@ sub getMethodType {
 	} elsif ($declaration =~ /^\s*\+/) {
 	    $methodType = "clm";
 	} else {
-		my $filename = $HeaderDoc::headerObject->name();
+		my $filename = $HeaderDoc::headerObject->filename();
 		print "$filename:0:Unable to determine whether declaration is for an instance or class method.\n";
 		print "$filename:0:     '$declaration'\n";
 	}
@@ -103,7 +103,11 @@ sub docNavigatorComment {
 sub objName { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-   return ($obj1->name() cmp $obj2->name());
+   if ($HeaderDoc::sort_entries) {
+        return ($obj1->name() cmp $obj2->name());
+   } else {
+        return (1 cmp 2);
+   }
 }
 
 

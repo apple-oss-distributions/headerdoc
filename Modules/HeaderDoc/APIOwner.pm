@@ -4,7 +4,7 @@
 # Synopsis: Abstract superclass for Header and OO structures
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2003/05/31 00:02:48 $
+# Last Updated: $Date: 2003/08/12 01:25:21 $
 # 
 # Method additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -61,12 +61,15 @@ $year += 1900;
 my $dateStamp = "$moy/$dom/$year";
 ######################################################################
 
+my @uid_list = ();
+
 
 # class variables and accessors
 {
     my $_copyrightOwner;
     my $_defaultFrameName;
     my $_compositePageName;
+    my $_htmlHeader;
     my $_apiUIDPrefix;
     my $_headerObject;
     
@@ -92,6 +95,14 @@ my $dateStamp = "$moy/$dom/$year";
             $_compositePageName = shift;
         }
         return $_compositePageName;
+    }
+
+    sub htmlHeader {
+        my $class = shift;
+        if (@_) {
+            $_htmlHeader = shift;
+        }
+        return $_htmlHeader;
     }
 
     sub apiUIDPrefix {    
@@ -149,6 +160,8 @@ sub _initialize {
     $self->{EXPORTINGFORDB} = 0;
     $self->{TOCTITLEPREFIX} = 'GENERIC_OWNER:';
     $self->{HEADEROBJECT} = undef;
+    $self->{NAMESPACE} = "";
+    $self->{UPDATED} = "";
 } 
 
 sub outputDir {
@@ -180,6 +193,38 @@ sub outputDir {
     }
     return $self->{OUTPUTDIR};
 }
+
+# /*! @function make_classref
+#     @abstract This function turns a classname into a pseudo-link
+#  */
+sub make_classref
+{
+    my $self = shift;
+    my $classname = shift;
+    my $apiUIDPrefix = $self->apiUIDPrefix();
+    my $localDebug = 0;
+    my $retval = "";
+
+    # Not yet implemented
+    # my $lang = $self->lang();
+
+    my $lang = "c";
+    my $class = ref($self) || $self;
+
+    if ($class =~ /^HeaderDoc::CPPClass$/) {
+	$lang = "cpp";
+    } elsif ($class =~ /^HeaderDoc::ObjC/) {
+	$lang = "occ";
+    }
+
+    $retval = "//$apiUIDPrefix/$lang/cl/$classname";
+
+    print "make_classref: ref is $retval\n" if ($localDebug);;
+
+    return $retval;
+}
+
+
 
 sub tocTitlePrefix {
     my $self = shift;
@@ -284,7 +329,7 @@ sub methodsDir {
 
 sub tocString {
     my $self = shift;
-    my $contentFrameName = $self->name();
+    my $contentFrameName = $self->filename();
     $contentFrameName =~ s/(.*)\.h/$1/; 
     $contentFrameName = &safeName(filename => $contentFrameName);  
     $contentFrameName = $contentFrameName . ".html";
@@ -560,6 +605,115 @@ sub addToFields {
     return @{ $self->{FIELDS} };
 }
 
+sub namespace {
+    my $self = shift;
+    my $localDebug = 0;
+
+    if (@_) { 
+        $self->{NAMESPACE} = shift;
+    }
+    print "namespace ".$self->{NAMESPACE}."\n" if ($localDebug);
+    return $self->{NAMESPACE};
+}
+
+sub availability {
+    my $self = shift;
+
+    if (@_) {
+        $self->{AVAILABILITY} = shift;
+    }
+    return $self->{AVAILABILITY};
+}
+
+sub updated {
+    my $self = shift;
+    my $localDebug = 0;
+    
+    if (@_) {
+	my $updated = shift;
+        # $self->{UPDATED} = shift;
+	my $month; my $day; my $year;
+
+	$month = $day = $year = $updated;
+
+	print "updated is $updated\n" if ($localDebug);
+	if (!($updated =~ /\d\d\d\d-\d\d-\d\d/ )) {
+	    if (!($updated =~ /\d\d-\d\d-\d\d\d\d/ )) {
+		if (!($updated =~ /\d\d-\d\d-\d\d/ )) {
+		    my $filename = $HeaderDoc::headerObject->filename();
+		    print "$filename:0:Bogus date format: $updated.\n";
+		    print "Valid formats are MM-DD-YYYY, MM-DD-YY, and YYYY-MM-DD\n";
+		    return $self->{UPDATED};
+		} else {
+		    $month =~ s/(\d\d)-\d\d-\d\d/$1/smg;
+		    $day =~ s/\d\d-(\d\d)-\d\d/$1/smg;
+		    $year =~ s/\d\d-\d\d-(\d\d)/$1/smg;
+
+		    my $century;
+		    $century = `date +%C`;
+		    $century *= 100;
+		    $year += $century;
+		    # $year += 2000;
+		    print "YEAR: $year" if ($localDebug);
+		}
+	    } else {
+		print "03-25-2003 case.\n" if ($localDebug);
+		    $month =~ s/(\d\d)-\d\d-\d\d\d\d/$1/smg;
+		    $day =~ s/\d\d-(\d\d)-\d\d\d\d/$1/smg;
+		    $year =~ s/\d\d-\d\d-(\d\d\d\d)/$1/smg;
+	    }
+	} else {
+		    $year =~ s/(\d\d\d\d)-\d\d-\d\d/$1/smg;
+		    $month =~ s/\d\d\d\d-(\d\d)-\d\d/$1/smg;
+		    $day =~ s/\d\d\d\d-\d\d-(\d\d)/$1/smg;
+	}
+	$month =~ s/\n*//smg;
+	$day =~ s/\n*//smg;
+	$year =~ s/\n*//smg;
+	$month =~ s/\s*//smg;
+	$day =~ s/\s*//smg;
+	$year =~ s/\s*//smg;
+
+	# Check the validity of the modification date
+
+	my $invalid = 0;
+	my $mdays = 28;
+	if ($month == 2) {
+		if ($year % 4) {
+			$mdays = 28;
+		} elsif ($year % 100) {
+			$mdays = 29;
+		} elsif ($year % 400) {
+			$mdays = 28;
+		} else {
+			$mdays = 29;
+		}
+	} else {
+		my $bitcheck = (($month & 1) ^ (($month & 8) >> 3));
+		if ($bitcheck) {
+			$mdays = 31;
+		} else {
+			$mdays = 30;
+		}
+	}
+
+	if ($month > 12 || $month < 1) { $invalid = 1; }
+	if ($day > $mdays || $day < 1) { $invalid = 1; }
+	if ($year < 1970) { $invalid = 1; }
+
+	if ($invalid) {
+		my $filename = $HeaderDoc::headerObject->filename();
+		print "$filename:0:Invalid date (year = $year, month = $month, day = $day).\n";
+		print "$filename:0:Valid formats are MM-DD-YYYY, MM-DD-YY, and YYYY-MM-DD\n";
+		return $self->{UPDATED};
+	} else {
+		$self->{UPDATED} = "$year-$month-$day";
+		print "date set to ".$self->{UPDATED}."\n" if ($localDebug);
+	}
+    }
+    return $self->{UPDATED};
+}
+
 
 ##################################################################
 
@@ -581,17 +735,26 @@ sub createFramesetFile {
     my $class = ref($self);
     my $defaultFrameName = $class->defaultFrameName();
 
-    my $filename = $self->name();
+    my $filename = $self->filename();
+    my $name = $self->name();
+    my $title = $filename;
+    if (!length($name)) {
+	$name = "$filename";
+    } else {
+	$title = "$name ($filename)";
+    }
+
     my $outDir = $self->outputDir();
     
     my $outputFile = "$outDir$pathSeparator$defaultFrameName";    
-    my $rootFileName = $self->name();
+    my $rootFileName = $self->filename();
     $rootFileName =~ s/(.*)\.h/$1/; 
     $rootFileName = &safeName(filename => $rootFileName);
+
     open(OUTFILE, ">$outputFile") || die "Can't write $outputFile. \n$!\n";
     if ($isMacOS) {MacPerl::SetFileInfo('MSIE', 'TEXT', "$outputFile");};
 	print OUTFILE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\"\n    \"http://www.w3.org/TR/1999/REC-html401-19991224/frameset.dtd\">\n";
-    print OUTFILE "<html><head>\n    <title>Documentation for $filename</title>\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</head>\n";
+    print OUTFILE "<html><head>\n    <title>Documentation for $title</title>\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</head>\n";
     print OUTFILE "<frameset cols=\"190,100%\">\n";
     print OUTFILE "<frame src=\"toc.html\" name=\"toc\">\n";
     print OUTFILE "<frame src=\"$rootFileName.html\" name=\"doc\">\n";
@@ -615,7 +778,15 @@ sub createTOCFile {
     my $outputFileName = "toc.html";    
     my $outputFile = "$rootDir$pathSeparator$outputFileName";    
     my $fileString = $self->tocString();    
-    my $filename = $self->name();    
+
+    my $filename = $self->filename();
+    my $name = $self->name();
+    my $title = $filename;
+    if (!length($name)) {
+	$name = "$filename";
+    } else {
+	$title = "$name ($filename)";
+    }
 
 	open(OUTFILE, ">$outputFile") || die "Can't write $outputFile.\n$!\n";
     if ($isMacOS) {MacPerl::SetFileInfo('MSIE', 'TEXT', "$outputFile");};
@@ -630,7 +801,7 @@ sub createTOCFile {
 	print OUTFILE "h4 {text-decoration: none; font-family: Verdana,Geneva,Arial,Helvetica,sans-serif; size: tiny; font-weight: bold}"; # bold
 	print OUTFILE "-->";
 	print OUTFILE "</style>";
-	print OUTFILE "<head>\n    <title>Documentation for $filename</title>\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</head>\n";
+	print OUTFILE "<head>\n    <title>Documentation for $title</title>\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</head>\n";
 	print OUTFILE "<body bgcolor=\"#cccccc\" link=\"#000099\" vlink=\"#660066\"\n";
 	print OUTFILE "leftmargin=\"0\" topmargin=\"0\" marginwidth=\"1\"\n"; 
 	print OUTFILE "marginheight=\"0\">\n";
@@ -649,11 +820,35 @@ sub createTOCFile {
 }
 
 sub createContentFile {
+
     my $self = shift;
     my $class = ref($self);
     my $copyrightOwner = $class->copyrightOwner();
-    my $headerName = $self->name();    
-    my $rootFileName = $headerName;    
+    my $filename = $self->filename();
+    my $name = $self->name();
+    my $title = $filename;
+    if (!length($name)) {
+	$name = "$filename";
+    } else {
+	$title = "$name ($filename)";
+    }
+
+    my $rootFileName = $self->filename();
+
+    if ($class eq "HeaderDoc::Header") {
+	my $headercopyright = $self->headerCopyrightOwner();
+	if (!($headercopyright eq "")) {
+	    $copyrightOwner = $headercopyright;
+	}
+    }
+
+    my $HTMLmeta = "";
+    if ($class eq "HeaderDoc::Header") {
+	$HTMLmeta = $self->HTMLmeta();
+    }
+
+    my $fileString = "";
+
     $rootFileName =~ s/(.*)\.h/$1/; 
     # for now, always shorten long names since some files may be moved to a Mac for browsing
     if (1 || $isMacOS) {$rootFileName = &safeName(filename => $rootFileName);};
@@ -667,42 +862,98 @@ sub createContentFile {
     my $headerDiscussion = $self->discussion();    
     my $headerAbstract = $self->abstract();  
     if ((length($headerDiscussion)) || (length($headerAbstract))) {
-		print OUTFILE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"\n    \"http://www.w3.org/TR/1998/REC-html40-19980424/loose.dtd\">\n";
-		print OUTFILE "<html><HEAD>\n    <title>API Documentation</title>\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</HEAD>\n<BODY bgcolor=\"#ffffff\">\n";
-		print OUTFILE "<H1>$headerName</H1><hr>\n";
-		if (length($headerAbstract)) {
-		    # print OUTFILE "<b>Abstract: </b>$headerAbstract<hr><br>\n";    
-		    print OUTFILE "$headerAbstract<hr><br>\n";    
+		$fileString .= "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"\n    \"http://www.w3.org/TR/1998/REC-html40-19980424/loose.dtd\">\n";
+		$fileString .= "<html><HEAD>\n    <title>API Documentation</title>\n	$HTMLmeta <meta name=\"generator\" content=\"HeaderDoc\">\n</HEAD>\n<BODY bgcolor=\"#ffffff\">\n";
+		if ($HeaderDoc::insert_header) {
+			$fileString .= "<!-- start of header -->\n";
+			$fileString .= $self->htmlHeader()."\n";
+			$fileString .= "<!-- end of header -->\n";
 		}
-		print OUTFILE "$headerDiscussion<br><br>\n";
+		$fileString .= "<H1>$name</H1><hr>\n";
+		if (length($headerAbstract)) {
+		    # $fileString .= "<b>Abstract: </b>$headerAbstract<hr><br>\n";    
+		    $fileString .= "$headerAbstract<br>\n";    
+		}
+
+		my $namespace = $self->namespace();
+		my $availability = $self->availability();
+		my $updated = $self->updated();
+	 	if (length($updated) || length($namespace)) {
+		    $fileString .= "<p></p>\n";
+		}
+
+		if (length($namespace)) {
+		    $fileString .= "<b>Namespace:</b> $namespace<br>\n";
+		}
+		if (length($availability)) {      
+		    $fileString .= "<b>Availability:</b> $availability<br>\n";
+		}
+		if (length($updated)) {      
+		    $fileString .= "<b>Updated:</b> $updated<br>\n";
+		}
+                my $short_attributes = $self->getAttributes(0);
+                my $long_attributes = $self->getAttributes(1);
+                my $list_attributes = $self->getAttributeLists();
+                if (length($short_attributes)) {
+                        $fileString .= "$short_attributes";
+                }
+                if (length($list_attributes)) {
+                        $fileString .= "$list_attributes";
+                }
+	 	if (length($updated) || length($availability) || length($namespace) || length($headerAbstract) || length($short_attributes) || length($list_attributes)) {
+		    $fileString .= "<p></p>\n";
+		    $fileString .= "<hr><br>\n";
+		}
+
+		$fileString .= "$headerDiscussion<br><br>\n";
+                if (length($long_attributes)) {
+                        $fileString .= "$long_attributes";
+                }
     } else {
         # warn "No header-wide comment found. Creating dummy file for default content page.\n";
-		print OUTFILE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"\n    \"http://www.w3.org/TR/1998/REC-html40-19980424/loose.dtd\">\n";
-		print OUTFILE "<html><HEAD>\n    <title>API Documentation</title>\n	<meta name=\"generator\" content=\"HeaderDoc\">\n</HEAD>\n<BODY bgcolor=\"#ffffff\">\n";
-		print OUTFILE "<H1>Documentation for $headerName</H1>\n";
-		print OUTFILE "<hr>Use the links in the table of contents to the left to access documentation.<br>\n";    
+		$fileString .= "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"\n    \"http://www.w3.org/TR/1998/REC-html40-19980424/loose.dtd\">\n";
+		$fileString .= "<html><HEAD>\n    <title>API Documentation</title>\n	$HTMLmeta <meta name=\"generator\" content=\"HeaderDoc\">\n</HEAD>\n<BODY bgcolor=\"#ffffff\">\n";
+		if ($HeaderDoc::insert_header) {
+			$fileString .= "<!-- start of header -->\n";
+			$fileString .= $self->htmlHeader()."\n";
+			$fileString .= "<!-- end of header -->\n";
+		}
+
+		$fileString .= "<H1>$name</H1>\n";
+		$fileString .= "<hr>Use the links in the table of contents to the left to access documentation.<br>\n";    
     }
 		my @fields = $self->fields();
 		if (@fields) {
-			print OUTFILE "<hr><h4>Template Parameters</h4>";
+			$fileString .= "<hr><h5><font face=\"Lucida Grande,Helvetica,Arial\">Template Parameter Descriptions</font></h5>";
 			# print "\nGOT fields.\n";
-			print OUTFILE "<table width=\"90%\" border=1>";
-			print OUTFILE "<thead><tr><th>Name</th><th>Description</th></tr></thead>";
+			# $fileString .= "<table width=\"90%\" border=1>";
+			# $fileString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>";
+			$fileString .= "<dl>";
 			for my $field (@fields) {
 				my $name = $field->name();
 				my $desc = $field->discussion();
 				# print "field $name $desc\n";
-				print OUTFILE "<tr><td><tt>$name</tt></td><td>$desc</td></tr>";
+				# $fileString .= "<tr><td><tt>$name</tt></td><td>$desc</td></tr>";
+				$fileString .= "<dt><tt>$name</tt></dt><dd>$desc</dd>";
 			}
-			print OUTFILE "</table>\n";
+			# $fileString .= "</table>\n";
+			$fileString .= "</dl>\n";
 		}
-	print OUTFILE "<hr><br><center>";
-	print OUTFILE "&#169; $copyrightOwner " if (length($copyrightOwner));
-	print OUTFILE "(Last Updated $dateStamp)\n";
-	print OUTFILE "<br>";
-	print OUTFILE "<font size=\"-1\">HTML documentation generated by <a href=\"http://www.opensource.apple.com/projects\" target=\"_blank\">HeaderDoc</a></font>\n";    
-	print OUTFILE "</center>\n";
-	print OUTFILE "</BODY>\n</HTML>\n";
+	$fileString .= "<hr><br><center>";
+	$fileString .= "&#169; $copyrightOwner " if (length($copyrightOwner));
+	my $filedate = $self->updated();
+	if (length($filedate)) {
+	    $fileString .= "(Last Updated $filedate)\n";
+	} else {
+	    $fileString .= "(Last Updated $dateStamp)\n";
+	}
+	$fileString .= "<br>";
+	$fileString .= "<font size=\"-1\">HTML documentation generated by <a href=\"http://www.opensource.apple.com/projects\" target=\"_blank\">HeaderDoc</a></font>\n";    
+	$fileString .= "</center>\n";
+	$fileString .= "</BODY>\n</HTML>\n";
+
+	print OUTFILE toplevel_html_fixup_links($self, $fileString);
+
 	close OUTFILE;
 }
 
@@ -780,7 +1031,7 @@ sub writeHeaderElements {
 sub writeHeaderElementsToXMLPage { # All API in a single XML page
     my $self = shift;
     my $class = ref($self);
-    my $compositePageName = $self->name();
+    my $compositePageName = $self->filename();
     $compositePageName =~ s/\.(h|i)$//;
     $compositePageName .= ".xml";
     my $rootOutputDir = $self->outputDir();
@@ -792,7 +1043,7 @@ sub writeHeaderElementsToXMLPage { # All API in a single XML page
 	if (! -e $rootOutputDir) {
 		unless (mkdir ("$rootOutputDir", 0777)) {die ("Can't create output folder $rootOutputDir. $!");};
     }
-    $self->_createXMLOutputFile($outputFile, $XMLPageString, "$name");
+    $self->_createXMLOutputFile($outputFile, xml_fixup_links($self, $XMLPageString), "$name");
 }
 
 sub writeHeaderElementsToCompositePage { # All API in a single HTML page -- for printing
@@ -807,7 +1058,8 @@ sub writeHeaderElementsToCompositePage { # All API in a single HTML page -- for 
 	if (! -e $rootOutputDir) {
 		unless (mkdir ("$rootOutputDir", 0777)) {die ("Can't create output folder $rootOutputDir. $!");};
     }
-    $self->_createHTMLOutputFile($outputFile, $compositePageString, "$name");
+    my $processed_string = toplevel_html_fixup_links($self, $compositePageString);
+    $self->_createHTMLOutputFile($outputFile, $processed_string, "$name");
 }
 
 sub _getXMLPageString {
@@ -1168,6 +1420,7 @@ sub _getMethodDetailString {
     my $self = shift;
     my @methObjs = $self->methods();
     my $contentString = "";
+    my $localDebug = 0;
 
     foreach my $obj (sort objName @methObjs) {
         my $documentationBlock = $obj->documentationBlock();
@@ -1895,6 +2148,18 @@ sub _createXMLOutputFile {
     my $heading = shift;
     my $fullpath = $self->fullpath();
 
+    if ($class eq "HeaderDoc::Header") {
+	my $headercopyright = $self->headerCopyrightOwner();
+	if (!($headercopyright eq "")) {
+	    $copyrightOwner = $headercopyright;
+	}
+    }
+
+    my $HTMLmeta = "";
+    if ($class eq "HeaderDoc::Header") {
+	$HTMLmeta = $self->HTMLmeta();
+    }
+
 	open(OUTFILE, ">$outputFile") || die "Can't write $outputFile.\n";
     if ($^O =~ /MacOS/i) {MacPerl::SetFileInfo('MSIE', 'TEXT', "$outputFile");};
 	print OUTFILE "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
@@ -1920,8 +2185,22 @@ sub _createHTMLOutputFile {
     my $class = ref($self);
     my $copyrightOwner = $class->copyrightOwner();
     my $outputFile = shift;    
-    my $fileString = shift;    
+    my $orig_fileString = shift;    
     my $heading = shift;    
+
+    if ($class eq "HeaderDoc::Header") {
+	my $headercopyright = $self->headerCopyrightOwner();
+	if (!($headercopyright eq "")) {
+	    $copyrightOwner = $headercopyright;
+	}
+    }
+
+    my $HTMLmeta = "";
+    if ($class eq "HeaderDoc::Header") {
+	$HTMLmeta = $self->HTMLmeta();
+    }
+
+	my $fileString = html_fixup_links($self, $orig_fileString);
 
 	open(OUTFILE, ">$outputFile") || die "Can't write $outputFile.\n";
     if ($^O =~ /MacOS/i) {MacPerl::SetFileInfo('MSIE', 'TEXT', "$outputFile");};
@@ -1929,24 +2208,31 @@ sub _createHTMLOutputFile {
 	print OUTFILE "<html>";
         print OUTFILE "<style type=\"text/css\">";
         print OUTFILE "<!--";
-        print OUTFILE "a:link {text-decoration: none; font-family: Verdana, Gene
-va, Helvetica, Arial, sans-serif; font-size: small}";
-        print OUTFILE "a:visited {text-decoration: none; font-family: Verdana, G
-eneva, Helvetica, Arial, sans-serif; font-size: small}";
-        print OUTFILE "a:active {text-decoration: none; font-family: Verdana, Ge
-neva, Helvetica, Arial, sans-serif; font-size: small}";
-        print OUTFILE "a:hover {text-decoration: underline; font-family: Verdana
-, Geneva, Helvetica, Arial, sans-serif; font-size: small}";
-        print OUTFILE "h4 {text-decoration: none; font-family: Verdana,Geneva,Ar
-ial,Helvetica,sans-serif; size: tiny; font-weight: bold}"; # bold 
+        print OUTFILE "a:link {text-decoration: none; font-family: Verdana, Geneva, Helvetica, Arial, sans-serif; font-size: small}";
+        print OUTFILE "a:visited {text-decoration: none; font-family: Verdana, Geneva, Helvetica, Arial, sans-serif; font-size: small}";
+        print OUTFILE "a:active {text-decoration: none; font-family: Verdana, Geneva, Helvetica, Arial, sans-serif; font-size: small}";
+        print OUTFILE "a:hover {text-decoration: underline; font-family: Verdana, Geneva, Helvetica, Arial, sans-serif; font-size: small}";
+        print OUTFILE "h4 {text-decoration: none; font-family: Verdana,Geneva,Arial,Helvetica,sans-serif; size: tiny; font-weight: bold}"; # bold 
         print OUTFILE "-->";
         print OUTFILE "</style>";
-	print OUTFILE "<head>\n    <title>$heading</title>\n	<meta name=\"generator\" content=\"HeaderDoc\">\n";
-	print OUTFILE "</head><body bgcolor=\"#ffffff\"><h1><font face=\"Geneva,Arial,Helvtica\">$heading</font></h1><br>\n";
+	print OUTFILE "<head>\n    <title>$heading</title>\n	$HTMLmeta <meta name=\"generator\" content=\"HeaderDoc\">\n";
+	print OUTFILE "</head><body bgcolor=\"#ffffff\">\n";
+	if ($HeaderDoc::insert_header) {
+		print OUTFILE "<!-- start of header -->\n";
+		print OUTFILE $self->htmlHeader()."\n";
+		print OUTFILE "<!-- end of header -->\n";
+	}
+	print OUTFILE "<h1><font face=\"Geneva,Arial,Helvtica\">$heading</font></h1><br>\n";
 	print OUTFILE $fileString;
     print OUTFILE "<p>";
     print OUTFILE "<p>&#169; $copyrightOwner " if (length($copyrightOwner));
-    print OUTFILE "(Last Updated $dateStamp)\n";
+    # print OUTFILE "(Last Updated $dateStamp)\n";
+    my $filedate = $self->updated();
+    if (length($filedate)) {
+	    print OUTFILE "(Last Updated $filedate)\n";
+    } else {
+	    print OUTFILE "(Last Updated $dateStamp)\n";
+    }
     print OUTFILE "</p>";
 	print OUTFILE "</body></html>\n";
 	close OUTFILE;
@@ -1955,13 +2241,21 @@ ial,Helvetica,sans-serif; size: tiny; font-weight: bold}"; # bold
 sub objGroup { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-   return ($obj1->group() cmp $obj2->group());
+   # if ($HeaderDoc::sort_entries) {
+	return ($obj1->group() cmp $obj2->group());
+   # } else {
+	# return (1 cmp 2);
+   # }
 }
 
 sub objName { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-   return ($obj1->name() cmp $obj2->name());
+   if ($HeaderDoc::sort_entries) {
+        return ($obj1->name() cmp $obj2->name());
+   } else {
+	return (1 cmp 2);
+   }
 }
 
 ##################### Debugging ####################################
@@ -1989,6 +2283,133 @@ sub printObject {
     &printArray(@{$self->{STRUCTS}});
     print "Inherits from:\n";
     $self->SUPER::printObject();
+}
+
+sub fixup_links
+{
+    my $self = shift;
+    my $string = shift;
+    my $mode = shift;
+    my $ret = "";
+    my $localDebug = 0;
+    my $toplevel = 0;
+
+    if ($mode > 1) {
+	$mode = $mode - 2;
+	$toplevel = 1;
+    }
+
+    my @elements = split(/</, $string);
+    foreach my $element (@elements) {
+	if ($element =~ /^hd_link (.*?)>/) {
+	    # print "found.\n";
+	    my $oldtarget = $1;
+	    my $newtarget = $oldtarget;
+	    my $prefix = $self->apiUIDPrefix();
+
+	    if (!($oldtarget =~ /\/\/$prefix/)) {
+		print "link needs to be resolved.\n" if ($localDebug);
+		print "target is $oldtarget\n" if ($localDebug);
+		$newtarget = resolve_link($oldtarget);
+		# print "new target is $newtarget\n" if ($localDebug);
+	    }
+
+	    # print "element is $element\n";
+	    $element =~ s/^hd_link $oldtarget>\s//;
+	    # print "link name is $element\n";
+	    if ($mode) {
+		$ret .= "<hd_link apple_ref=\"$newtarget\">";
+		$ret .= $element;
+		$ret .= "</hd_link>";
+	    } else {
+		# if ($newtarget eq $oldtarget) {
+		    $ret .= "<!-- a logicalPath=\"$newtarget\" -->";
+		    $ret .= $element;
+		    $ret .= "<!-- /a -->";
+		# } else {
+		    # if ($toplevel) {
+			# $ret .= "<a href=\"CompositePage.html#$newtarget\">";
+		    # } else {
+			# $ret .= "<a href=\"../CompositePage.html#$newtarget\">";
+		    # }
+		    # $ret .= $element;
+		    # $ret .= "</a>\n";
+		# }
+	    }
+	} else {
+	    if ($element =~ s/^\/hd_link>//) {
+		$ret .= $element;
+	    } else {
+		$ret .= "<$element";
+	    }
+	}
+    }
+    $ret =~ s/^<//;
+
+    return $ret;
+}
+
+sub toplevel_html_fixup_links
+{
+    my $self = shift;
+    my $string = shift;
+    my $resolver_output = fixup_links($self, $string, 2);
+
+    return $resolver_output;
+}
+
+sub html_fixup_links
+{
+    my $self = shift;
+    my $string = shift;
+    my $resolver_output = fixup_links($self, $string, 0);
+
+    return $resolver_output;
+}
+
+sub xml_fixup_links
+{
+    my $self = shift;
+    my $string = shift;
+    my $resolver_output = fixup_links($self, $string, 1);
+
+    return $resolver_output;
+}
+
+sub resolve_link
+{
+    my $symbol = shift;
+    my $ret = "";
+    my $filename = $HeaderDoc::headerObject->filename();
+
+    foreach my $uid (@uid_list) {
+	if ($uid =~ /\/$symbol$/) {
+	    if ($ret eq "" || $ret eq $uid) {
+		$ret = $uid;
+	    } else {
+		print "$filename:0:WARNING: multiple matches found for symbol \"$symbol\"!!!\n";
+		print "$filename:0:Only the first matching symbol will be linked.\n";
+		print "$filename:0:Replace the symbol with a specific api ref tag\n";
+		print "$filename:0:(e.g. apple_ref) in header file to fix this conflict.\n";
+	    }
+	}
+    }
+    if ($ret eq "") {
+	print "$filename:0:WARNING: no symbol matching \"$symbol\" found.  If this\n";
+	print "$filename:0:symbol is not in this file or class, you need to specify it\n";
+	print "$filename:0:with an api ref tag (e.g. apple_ref).\n";
+    }
+    return $ret;
+}
+
+sub register_uid
+{
+    my $self = shift;
+    my $uid = shift;
+    my $localDebug = 0;
+
+    print "pushing $uid\n" if ($localDebug);;
+    push(@uid_list, $uid);
 }
 
 1;

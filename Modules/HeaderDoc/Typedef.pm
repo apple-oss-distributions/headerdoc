@@ -4,7 +4,7 @@
 # Synopsis: Holds typedef info parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2003/05/31 00:02:49 $
+# Last Updated: $Date: 2003/07/29 20:41:19 $
 # 
 # Copyright (c) 1999-2001 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
@@ -120,6 +120,7 @@ sub processTypedefComment {
                     last SWITCH;
                 };
             ($field =~ s/^abstract\s+//) && do {$self->abstract($field); last SWITCH;};
+            ($field =~ s/^availability\s+//) && do {$self->availability($field); last SWITCH;};
             ($field =~ s/^updated\s+//) && do {$self->updated($field); last SWITCH;};
             ($field =~ s/^discussion\s+//) && do {$self->discussion($field); last SWITCH;};
             ($field =~ s/^field\s+//) &&
@@ -344,6 +345,7 @@ sub documentationBlock {
     my $self = shift;
     my $name = $self->name();
     my $abstract = $self->abstract();
+    my $availability = $self->availability();
     my $updated = $self->updated();
     my $desc = $self->discussion();
     my $result = $self->result();
@@ -354,13 +356,15 @@ sub documentationBlock {
     my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
     
     SWITCH: {
-        if ($self->isFunctionPointer()) {$fieldHeading = "Parameters"; last SWITCH; }
+        if ($self->isFunctionPointer()) {$fieldHeading = "Parameter Descriptions"; last SWITCH; }
         if ($self->isEnumList()) {$fieldHeading = "Constants"; last SWITCH; }
-        $fieldHeading = "Fields";
+        $fieldHeading = "Field Descriptions";
     }
 
     $contentString .= "<hr>";
-    $contentString .= "<a name=\"//$apiUIDPrefix/c/tdef/$name\"></a>\n"; # apple_ref marker
+    my $uid = "//$apiUIDPrefix/c/tdef/$name";
+    HeaderDoc::APIOwner->register_uid($uid);
+    $contentString .= "<a name=\"$uid\"></a>\n"; # apple_ref marker
     $contentString .= "<table border=\"0\"  cellpadding=\"2\" cellspacing=\"2\" width=\"300\">";
     $contentString .= "<tr>";
     $contentString .= "<td valign=\"top\" height=\"12\" colspan=\"5\">";
@@ -369,19 +373,26 @@ sub documentationBlock {
     $contentString .= "</tr></table>";
     $contentString .= "<hr>";
     if (length($abstract)) {
-        # $contentString .= "<b>Abstract:</b> $abstract\n";
+        # $contentString .= "<b>Abstract:</b> $abstract<br>\n";
         $contentString .= "$abstract\n";
     }
+    if (length($availability)) {
+        $contentString .= "<b>Availability:</b> $availability<br>\n";
+    }
     if (length($updated)) {
-        $contentString .= "<b>Updated:</b> $updated\n";
+        $contentString .= "<b>Updated:</b> $updated<br>\n";
     }
     $contentString .= "<blockquote>$declaration</blockquote>\n";
+
+    if (length($desc)) {$contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Discussion</font></h5><p>$desc</p>\n"; }
+
     my $arrayLength = @fields;
     if ($arrayLength > 0) {
-        $contentString .= "<h4>$fieldHeading</h4>\n";
+        $contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">$fieldHeading</font></h5>\n";
         $contentString .= "<blockquote>\n";
-        $contentString .= "<table border=\"1\"  width=\"90%\">\n";
-        $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+        # $contentString .= "<table border=\"1\"  width=\"90%\">\n";
+        # $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+	$contentString .= "<dl>";
         
         foreach my $element (@fields) {
             my $fName = $element->name();
@@ -389,7 +400,8 @@ sub documentationBlock {
             my $fType = $element->type();
             
             if (($fType eq 'field') || ($fType eq 'constant') || ($fType eq 'funcPtr')){
-                $contentString .= "<tr><td><tt>$fName</tt></td><td>$fDesc</td></tr>\n";
+                # $contentString .= "<tr><td><tt>$fName</tt></td><td>$fDesc</td></tr>\n";
+                $contentString .= "<dt><tt>$fName</tt></dt><dd>$fDesc</dd>\n";
             } elsif ($fType eq 'callback') {
                 my @userDictArray = $element->userDictArray(); # contains elements that are hashes of param name to param doc
                 my $paramString;
@@ -397,21 +409,23 @@ sub documentationBlock {
                     while (my ($param, $disc) = each %{$hashRef}) {
                         $paramString .= "<dt><b><tt>$param</tt></b></dt>\n<dd>$disc</dd>\n";
                     }
-                    if (length($paramString)) {$paramString = "<dl>\n".$paramString."\n<dl>\n";};
+                    if (length($paramString)) {$paramString = "<dl>\n".$paramString."\n</dl>\n";};
                 }
-                $contentString .= "<tr><td><tt>$fName</tt></td><td>$fDesc<br>$paramString</td></tr>\n";
+                # $contentString .= "<tr><td><tt>$fName</tt></td><td>$fDesc<br>$paramString</td></tr>\n";
+                $contentString .= "<dt><tt>$fName</tt></dt><dd>$fDesc<br>$paramString</dd>\n";
             } else {
 		my $filename = $HeaderDoc::headerObject->name();
                 print "$filename:0:warning: Typedef field with name $fName has unknown type: $fType\n";
             }
         }
         
-        $contentString .= "</table>\n</blockquote>\n";
+        # $contentString .= "</table>\n</blockquote>\n";
+        $contentString .= "</dl>\n</blockquote>\n";
     }
     if (length($result)) {
-        $contentString .= "<b>Result:</b> $result\n";
+        $contentString .= "<dl><dt><i>function result</i></dt><dd>$result</dd></dl>\n";
     }
-    if (length($desc)) {$contentString .= "<p>$desc</p>\n"; }
+    # if (length($desc)) {$contentString .= "<p>$desc</p>\n"; }
     # $contentString .= "<hr>\n";
     return $contentString;
 }
@@ -420,6 +434,7 @@ sub XMLdocumentationBlock {
     my $self = shift;
     my $name = $self->name();
     my $abstract = $self->abstract();
+    my $availability = $self->availability();
     my $updated = $self->updated();
     my $desc = $self->discussion();
     my $result = $self->result();
@@ -430,19 +445,24 @@ sub XMLdocumentationBlock {
     my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
     
     SWITCH: {
-        if ($self->isFunctionPointer()) {$fieldHeading = "Parameters"; last SWITCH; }
+        if ($self->isFunctionPointer()) {$fieldHeading = "Parameter Descriptions"; last SWITCH; }
         if ($self->isEnumList()) {$fieldHeading = "Constants"; last SWITCH; }
-        $fieldHeading = "Fields";
+        $fieldHeading = "Field Descriptions";
     }
 
     my $type = "simple";
     if ($self->isFunctionPointer()) {
 	$type = "funcPtr";
     }
-    $contentString .= "<typedef id=\"//$apiUIDPrefix/c/tdef/$name\" type=\"$type\">\n"; # apple_ref marker
+    my $uid = "//$apiUIDPrefix/c/tdef/$name";
+    HeaderDoc::APIOwner->register_uid($uid);
+    $contentString .= "<typedef id=\"$uid\" type=\"$type\">\n"; # apple_ref marker
     $contentString .= "<name>$name</name>\n";
     if (length($abstract)) {
         $contentString .= "<abstract>$abstract</abstract>\n";
+    }
+    if (length($availability)) {
+        $contentString .= "<availability>$availability</availability>\n";
     }
     if (length($updated)) {
         $contentString .= "<updated>$updated</updated>\n";
@@ -492,9 +512,9 @@ sub printObject {
     print "Typedef\n";
     $self->SUPER::printObject();
     SWITCH: {
-        if ($self->isFunctionPointer()) {print "Parameters:\n"; last SWITCH; }
+        if ($self->isFunctionPointer()) {print "Parameter Descriptions:\n"; last SWITCH; }
         if ($self->isEnumList()) {print "Constants:\n"; last SWITCH; }
-        print "Fields:\n";
+        print "Field Descriptions:\n";
     }
 
     my $fieldArrayRef = $self->{FIELDS};

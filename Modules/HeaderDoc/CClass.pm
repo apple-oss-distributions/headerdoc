@@ -5,7 +5,7 @@
 # from a C++ header
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2003/05/31 01:43:26 $
+# Last Updated: $Date: 2003/08/27 23:55:51 $
 # 
 # Copyright (c) 1999-2001 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
@@ -372,6 +372,7 @@ sub _getFunctionDetailString {
         my $desc = $obj->discussion();
 	my $throws = $obj->throws();
         my $abstract = $obj->abstract();
+        my $availability = $obj->availability();
         my $updated = $obj->updated();
         my $declaration = $obj->declarationInHTML();
         my $declarationRaw = $obj->declaration();
@@ -383,7 +384,9 @@ sub _getFunctionDetailString {
 	# if ($declaration !~ /#define/) { # not sure how to handle apple_refs with macros yet
 	        my $paramSignature = $self->getParamSignature($declarationRaw);
 	        my $methodType = $self->getMethodType($declarationRaw);
-        	$contentString .= "<a name=\"//$apiUIDPrefix/cpp/$methodType/$className/$name/$paramSignature\"></a>\n";
+        	my $uid = "//$apiUIDPrefix/cpp/$methodType/$className/$name/$paramSignature";
+		HeaderDoc::APIOwner->register_uid($uid);
+        	$contentString .= "<a name=\"$uid\"></a>\n";
         # }
 	$contentString .= "<table border=\"0\"  cellpadding=\"2\" cellspacing=\"2\" width=\"300\">";
 	$contentString .= "<tr>";
@@ -400,10 +403,14 @@ sub _getFunctionDetailString {
             # $contentString .= "<b>Abstract:</b> $abstract<BR>\n";
             $contentString .= "$abstract<BR>\n";
         }
+	if (length($availability)) {
+	    $contentString .= "<b>Availability:</b> $availability<BR>\n";
+	}
 	if (length($updated)) {
 	    $contentString .= "<b>Updated:</b> $updated<BR>\n";
 	}
         $contentString .= "<blockquote><pre><tt>$accessControl</tt>\n<br>$declaration</pre></blockquote>\n";
+        if (length($desc)) {$contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Discussion</font></h5><p>$desc</p>\n"; }
 	    my $arrayLength = @params;
 	    if ($arrayLength > 0) {
 	        my $paramContentString;
@@ -411,22 +418,24 @@ sub _getFunctionDetailString {
 	            my $pName = $element->name();
 	            my $pDesc = $element->discussion();
 	            if (length ($pName)) {
-	                $paramContentString .= "<tr><td align=\"center\"><tt>$pName</tt></td><td>$pDesc</td></tr>\n";
+	                # $paramContentString .= "<tr><td align=\"center\"><tt>$pName</tt></td><td>$pDesc</td></tr>\n";
+	                $paramContentString .= "<dt><tt><em>$pName</em></tt></dt><dd>$pDesc</dd>\n";
 	            }
 	        }
 	        if (length ($paramContentString)){
-		        $contentString .= "<h4>Parameters</h4>\n";
+		        $contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Parameter Descriptions</font></h5>\n";
 		        $contentString .= "<blockquote>\n";
-		        $contentString .= "<table border=\"1\"  width=\"90%\">\n";
-		        $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+		        # $contentString .= "<table border=\"1\"  width=\"90%\">\n";
+		        # $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+			$contentString .= "<dl>\n";
 	            $contentString .= $paramContentString;
-		        $contentString .= "</table>\n</blockquote>\n";
+		        # $contentString .= "</table>\n</blockquote>\n";
+		        $contentString .= "</dl>\n</blockquote>\n";
 		    }
 	    }
 	if (length($result)) {
-            $contentString .= "<b>Result:</b> $result\n";
+            $contentString .= "<dl><dt><i>function result</i></dt><dd>$result</dd></dl>\n";
         }
-        if (length($desc)) {$contentString .= "<p>$desc</p>\n"; }
 	    # $contentString .= "<hr>\n";
     }
     return $contentString;
@@ -436,6 +445,7 @@ sub XMLdocumentationBlock {
     my $self = shift;
     my $compositePageString = "";
     my $name = $self->name();
+    my $availability = $self->availability();
     my $updated = $self->updated();
     my $abstract = $self->abstract();
     my $discussion = $self->discussion();
@@ -449,6 +459,9 @@ sub XMLdocumentationBlock {
 
     if (length($abstract)) {
 	$compositePageString .= "<abstract>$abstract</abstract>\n";
+    }
+    if (length($availability)) {
+	$contentString .= "<b>Availabilty:</b> $availability\n";
     }
     if (length($updated)) {
 	$contentString .= "<b>Updated:</b> $updated\n";
@@ -517,6 +530,7 @@ sub _getVarDetailString {
     foreach my $obj (sort objName @varObjs) {
         my $name = $obj->name();
 	my $abstract = $obj->abstract();
+	my $availability = $obj->availability();
 	my $updated = $obj->updated();
         my $desc = $obj->discussion();
         my $declaration = $obj->declarationInHTML();
@@ -525,14 +539,14 @@ sub _getVarDetailString {
         my $fieldHeading;
         if ($obj->can('fields')) { # for Structs and Typedefs
             @fields = $obj->fields();
-            $fieldHeading = "Fields";
+            $fieldHeading = "Field Descriptions";
         } elsif ($obj->can('constants')) { # for enums
             @fields = $obj->constants();
             $fieldHeading = "Constants";
         }
         if ($obj->can('isFunctionPointer')) {
         	if ($obj->isFunctionPointer()) {
-            	$fieldHeading = "Parameters";
+            	$fieldHeading = "Parameter Descriptions";
         	}
         }
 
@@ -541,7 +555,9 @@ sub _getVarDetailString {
 	my $headerObject = HeaderDoc::APIOwner->headerObject();
 	my $className = (HeaderDoc::APIOwner->headerObject())->name();
 	$contentString .= "<hr>";
-	$contentString .= "<a name=\"//$apiUIDPrefix/occ/$methodType/$className/$name\"></a>\n";
+	my $uid = "//$apiUIDPrefix/c/$methodType/$className/$name";
+	HeaderDoc::APIOwner->register_uid($uid);
+	$contentString .= "<a name=\"$uid\"></a>\n";
         
 	$contentString .= "<table border=\"0\"  cellpadding=\"2\" cellspacing=\"2\" width=\"300\">";
 	$contentString .= "<tr>";
@@ -554,17 +570,23 @@ sub _getVarDetailString {
 		# $contentString .= "<b>Abstract:</b> $abstract<BR>\n";
 		$contentString .= "$abstract<BR>\n";
 	}
+	if (length($availability)) {
+		$contentString .= "<b>Availability:</b> $availability<BR>\n";
+	}
 	if (length($updated)) {
 		$contentString .= "<b>Updated:</b> $updated<BR>\n";
 	}
         $contentString .= "<blockquote><tt>$accessControl</tt> $declaration</blockquote>\n";
-        $contentString .= "<p>$desc</p>\n";
+        if (length($desc)) {$contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Discussion</font></h5><p>$desc</p>\n"; }
+        # $contentString .= "<p>$desc</p>\n";
 	    my $arrayLength = @fields;
 	    if ($arrayLength > 0) {
-	        $contentString .= "<h4>$fieldHeading</h4>\n";
+	        $contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">$fieldHeading</font></h5>\n";
 	        $contentString .= "<blockquote>\n";
 	        $contentString .= "<table border=\"1\"  width=\"90%\">\n";
 	        $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+		# Not updating this table into a definition list because
+		# this code path can never be called for valid C code.
 	        foreach my $element (@fields) {
 	            my $fName = $element->name();
 	            my $fDesc = $element->discussion();
@@ -572,9 +594,12 @@ sub _getVarDetailString {
 	        }
 	        $contentString .= "</table>\n</blockquote>\n";
 	    }
-	    if (length($updated)) {
-		$contentString .= "<b>Updated:</b> $updated\n";
-	    }
+	    # if (length($updated)) {
+		# $contentString .= "<b>Availability:</b> $availability\n";
+	    # }
+	    # if (length($updated)) {
+		# $contentString .= "<b>Updated:</b> $updated\n";
+	    # }
 	    # $contentString .= "<hr>\n";
     }
     return $contentString;
@@ -626,19 +651,31 @@ sub docNavigatorComment {
 sub objName { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-   return ($obj1->name() cmp $obj2->name());
+   if ($HeaderDoc::sort_entries) {
+        return ($obj1->name() cmp $obj2->name());
+   } else {
+        return (1 cmp 2);
+   }
 }
 
 sub byLinkage { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-   return ($obj1->linkageState() cmp $obj2->linkageState());
+   # if ($HeaderDoc::sort_entries) {
+        return ($obj1->linkageState() cmp $obj2->linkageState());
+   # } else {
+        # return (1 cmp 2);
+   # }
 }
 
 sub byAccessControl { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-   return ($obj1->accessControl() cmp $obj2->accessControl());
+   # if ($HeaderDoc::sort_entries) {
+        return ($obj1->accessControl() cmp $obj2->accessControl());
+   # } else {
+        # return (1 cmp 2);
+   # }
 }
 
 sub linkageAndObjName { # used for sorting
@@ -646,7 +683,11 @@ sub linkageAndObjName { # used for sorting
    my $obj2 = $b;
    my $linkAndName1 = $obj1->linkageState() . $obj1->name();
    my $linkAndName2 = $obj2->linkageState() . $obj2->name();
-   return ($linkAndName1 cmp $linkAndName2);
+   if ($HeaderDoc::sort_entries) {
+        return ($linkAndName1 cmp $linkAndName2);
+   } else {
+        return byLinkage($obj1, $obj2); # (1 cmp 2);
+   }
 }
 
 ##################### Debugging ####################################

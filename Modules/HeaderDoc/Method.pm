@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 #
 # Class name: Method
-# Synopsis: Holds method info parsed by headerDoc
+# Synopsis: Holds Objective C method info parsed by headerDoc (not used for C++)
 #
 # Author: SKoT McDonald  <skot@tomandandy.com> Aug 2001
 # Based on Function.pm, and modified, by Matt Morse <matt@apple.com>
@@ -143,6 +143,7 @@ sub processMethodComment {
 			};
 			($field =~ s/^abstract\s+//) && do {$self->abstract($field); last SWITCH;};
 			($field =~ s/^discussion\s+//) && do {$self->discussion($field); last SWITCH;};
+			($field =~ s/^availability\s+//) && do {$self->availability($field); last SWITCH;};
 			($field =~ s/^updated\s+//) && do {$self->updated($field); last SWITCH;};
 			($field =~ s/^param\s+//) && 
 			do {
@@ -158,7 +159,7 @@ sub processMethodComment {
 				last SWITCH;
 			};
 			($field =~ s/^result\s+//) && do {$self->result($field); last SWITCH;};
-			my $filename = $HeaderDoc::headerObject->name();
+			my $filename = $HeaderDoc::headerObject->filename();
 			print "$filename:0:Unknown field: $field\n";
 		}
 	}
@@ -236,7 +237,7 @@ sub setMethodDeclaration {
     } elsif ($newdec =~ /^-/) {
     	$self->setIsInstanceMethod("YES");
     } else {
-	my $filename = $HeaderDoc::headerObject->name();
+	my $filename = $HeaderDoc::headerObject->filename();
         print "$filename:0:Cannot determine whether method is class or instance method:\n";
         print "$filename:0:        $newdec\n";
     	$self->setIsInstanceMethod("UNKNOWN");
@@ -261,6 +262,7 @@ sub documentationBlock {
 	my $name = $self->name();
 	my $desc = $self->discussion();
 	my $abstract = $self->abstract();
+	my $availability = $self->availability();
 	my $updated = $self->updated();
 	my $declaration = $self->declarationInHTML();
 	my $declarationRaw = $self->declaration();
@@ -270,20 +272,22 @@ sub documentationBlock {
     my $owner = $self->owner();
     my $contentString;
     my $className= 'UNKNOWN_CLASSNAME';
-    	
+
     if ($owner->can("className")) {  # to get the class name from Category objects
     	$className = $owner->className();
     } else {
     	$className = $owner->name();
     }
     
-    my $filename = $HeaderDoc::headerObject->name();
+    my $filename = $HeaderDoc::headerObject->filename();
     print "#$filename:0:Warning: couldn't determine owning class/protocol for method: $name\n" if ($className eq 'UNKNOWN_CLASSNAME');
 
 	$contentString .= "<hr>";
 	# if ($declaration !~ /#define/) { # not sure how to handle apple_refs with macros yet
 		my $methodType = $self->getMethodType($declarationRaw);
-		$contentString .= "<a name=\"//$apiUIDPrefix/occ/$methodType/$className/$name\"></a>\n";
+		my $uid = "//$apiUIDPrefix/occ/$methodType/$className/$name";
+		HeaderDoc::APIOwner->register_uid($uid);
+		$contentString .= "<a name=\"$uid\"></a>\n";
 	# }
 	$contentString .= "<table border=\"0\"  cellpadding=\"2\" cellspacing=\"2\" width=\"300\">";
 	$contentString .= "<tr>";
@@ -294,12 +298,18 @@ sub documentationBlock {
 	$contentString .= "<hr>";
 	if (length($abstract)) {
 		# $contentString .= "<b>Abstract:</b> $abstract\n";
-		$contentString .= "$abstract\n";
+		$contentString .= "$abstract<br>\n";
+	}
+	if (length($availability)) {
+		$contentString .= "<b>Availability:</b> $availability<br>\n";
 	}
 	if (length($updated)) {
-		$contentString .= "<b>Updated:</b> $updated\n";
+		$contentString .= "<b>Updated:</b> $updated<br>\n";
 	}
 	$contentString .= "<blockquote><pre>$declaration</pre></blockquote>\n";
+
+        if (length($desc)) {$contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Discussion</font></h5><p>$desc</p>\n"; }
+
 	my $arrayLength = @params;
 	if ($arrayLength > 0) {
 		my $paramContentString;
@@ -307,23 +317,27 @@ sub documentationBlock {
 			my $pName = $element->name();
 			my $pDesc = $element->discussion();
 			if (length ($pName)) {
-				$paramContentString .= "<tr><td align=\"center\"><tt>$pName</tt></td><td>$pDesc</td></tr>\n";
+				# $paramContentString .= "<tr><td align=\"center\"><tt>$pName</tt></td><td>$pDesc</td></tr>\n";
+				$paramContentString .= "<dt><tt><em>$pName</em></tt></dt><dd>$pDesc</dd>\n";
 			}
 		}
 		if (length ($paramContentString)){
-			$contentString .= "<h4>Parameters</h4>\n";
+			$contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Parameter Descriptions</font></h5>\n";
 			$contentString .= "<blockquote>\n";
-			$contentString .= "<table border=\"1\"  width=\"90%\">\n";
-			$contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+			# $contentString .= "<table border=\"1\"  width=\"90%\">\n";
+			# $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+			$contentString .= "<dl>\n";
 				$contentString .= $paramContentString;
-			$contentString .= "</table>\n</blockquote>\n";
+			# $contentString .= "</table>\n</blockquote>\n";
+			$contentString .= "</dl>\n</blockquote>\n";
 		}
 	}
+	# if (length($desc)) {$contentString .= "<p>$desc</p>\n"; }
 	if (length($result)) {
-		$contentString .= "<b>Result:</b> $result\n";
+		$contentString .= "<i>method result:</i> $result\n";
 	}
-	if (length($desc)) {$contentString .= "<p>$desc</p>\n"; }
 	# $contentString .= "<hr>\n";
+	return $contentString;
 }
 
 sub XMLdocumentationBlock {
@@ -331,6 +345,7 @@ sub XMLdocumentationBlock {
 	my $name = $self->name();
 	my $desc = $self->discussion();
 	my $abstract = $self->abstract();
+	my $availability = $self->availability();
 	my $updated = $self->updated();
 	my $declaration = $self->declarationInHTML();
 	my $declarationRaw = $self->declaration();
@@ -347,15 +362,20 @@ sub XMLdocumentationBlock {
     	$className = $owner->name();
     }
     
-    my $filename = $HeaderDoc::headerObject->name();
+    my $filename = $HeaderDoc::headerObject->filename();
     print "$filename:0:Warning: couldn't determine owning class/protocol for method: $name\n" if ($className eq 'UNKNOWN_CLASSNAME');
 
 	my $methodType = $self->getMethodType($declarationRaw);
-	$contentString .= "<method id=\"//$apiUIDPrefix/occ/$methodType/$className/$name\">\n";
+	my $uid = "//$apiUIDPrefix/occ/$methodType/$className/$name";
+	HeaderDoc::APIOwner->register_uid($uid);
+	$contentString .= "<method id=\"$uid\">\n";
 
 	$contentString .= "<name>$name</name>\n";
 	if (length($abstract)) {
 		$contentString .= "<abstract>$abstract</abstract>\n";
+	}
+	if (length($availability)) {
+		$contentString .= "<availability>$availability</availability>\n";
 	}
 	if (length($updated)) {
 		$contentString .= "<updated>$updated</updated>\n";
@@ -382,6 +402,7 @@ sub XMLdocumentationBlock {
 		$contentString .= "<result>$result</result>\n";
 	}
 	$contentString .= "</method>\n";
+	return $contentString;
 }
 
 sub getMethodType {
@@ -396,7 +417,7 @@ sub getMethodType {
 	} elsif ($declaration =~ /#define/) {
 	    $methodType = "defn";
 	} else {
-		my $filename = $HeaderDoc::headerObject->name();
+		my $filename = $HeaderDoc::headerObject->filename();
 		print "$filename:0:Unable to determine whether declaration is for an instance or class method.\n";
 		print "$filename:0:     '$declaration'\n";
 	}
@@ -409,7 +430,7 @@ sub printObject {
     print "Method\n";
     $self->SUPER::printObject();
     print "Result: $self->{RESULT}\n";
-    print "Tagged Parameters:\n";
+    print "Tagged Parameter Descriptions:\n";
     my $taggedParamArrayRef = $self->{TAGGEDPARAMETERS};
     my $arrayLength = @{$taggedParamArrayRef};
     if ($arrayLength > 0) {

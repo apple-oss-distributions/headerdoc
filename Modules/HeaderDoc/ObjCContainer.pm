@@ -5,7 +5,7 @@
 #
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2003/05/31 00:02:49 $
+# Last Updated: $Date: 2003/07/15 18:55:08 $
 # 
 # Copyright (c) 1999-2001 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
@@ -94,6 +94,13 @@ sub _getCompositePageString {
     $contentString= $self->_getMethodDetailString();
     if (length($contentString)) {
 	    $compositePageString .= "<h2>Methods</h2>\n";
+		$contentString = $self->stripAppleRefs($contentString);
+	    $compositePageString .= $contentString;
+    }
+
+    $contentString= $self->_getVarDetailString();
+    if (length($contentString)) {
+	    $compositePageString .= "<h2>Variables</h2>\n";
 		$contentString = $self->stripAppleRefs($contentString);
 	    $compositePageString .= $contentString;
     }
@@ -199,6 +206,7 @@ sub tocString {
     $contentFrameName = $contentFrameName . ".html";
     my $header = $self->headerObject();
     my @meths = $self->methods();
+    my @vars = $self->vars();
 	my $compositePageName = HeaderDoc::APIOwner->compositePageName();
 	my $defaultFrameName = HeaderDoc::APIOwner->defaultFrameName();
     
@@ -237,6 +245,54 @@ sub tocString {
 	        }
 	    }
     }
+
+    if (@vars) {
+        my @publics;
+        my @protecteds;
+        my @privates;
+
+            if ($self->outputformat eq "hdxml") {
+                $tocString .= "XMLFIX<br><h4>Member Data</h4><hr>\n";
+            } elsif ($self->outputformat eq "html") {
+                $tocString .= "<br><h4>Member Data</h4><hr>\n";
+            } else {
+            }
+            foreach my $obj (sort byAccessControl @vars) {
+                my $access = $obj->accessControl();
+
+                if ($access =~ /public/){
+                    push (@publics, $obj);
+                } elsif ($access =~ /protected/){
+                    push (@protecteds, $obj);
+                } elsif ($access =~ /private/){
+                    push (@privates, $obj);
+                }
+            }
+            if (@publics) {
+                $tocString .= "<h5>Public</h5>\n";
+                    foreach my $obj (sort objName @publics) {
+                        my $name = $obj->name();
+                        $tocString .= "<nobr>&nbsp;<a href=\"Vars/Vars.html#$name\" target=\"doc\"
+>$name</a></nobr><br>\n";
+                }
+            }
+            if (@protecteds) {
+                $tocString .= "<h5>Protected</h5>\n";
+                    foreach my $obj (sort objName @protecteds) {
+                        my $name = $obj->name();
+                        $tocString .= "<nobr>&nbsp;<a href=\"Vars/Vars.html#$name\" target=\"doc\"
+>$name</a></nobr><br>\n";
+                }
+            }
+            if (@privates) {
+                $tocString .= "<h5>Private</h5>\n";
+                    foreach my $obj (sort objName @privates) {
+                        my $name = $obj->name();
+                        $tocString .= "<nobr>&nbsp;<a href=\"Vars/Vars.html#$name\" target=\"doc\"
+>$name</a></nobr><br>\n";
+                }
+            }
+        }
 	$tocString .= "<br><h4>Other Reference</h4><hr>\n";
 	$tocString .= "<nobr>&nbsp;<a href=\"../../$defaultFrameName\" target=\"_top\">Header</a></nobr><br>\n";
     $tocString .= "<br><hr><a href=\"$compositePageName\" target=\"_blank\">[Printable HTML Page]</a>\n";
@@ -274,12 +330,31 @@ sub objName { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
    return ($obj1->name() cmp $obj2->name());
+   if ($HeaderDoc::sort_entries) {
+        return ($obj1->name() cmp $obj2->name());
+   } else {
+        return (1 cmp 2);
+   }
 }
 
 sub byMethodType { # used for sorting
    my $obj1 = $a;
    my $obj2 = $b;
-   return ($obj1->isInstanceMethod() cmp $obj2->isInstanceMethod());
+   if ($HeaderDoc::sort_entries) {
+        return ($obj1->isInstanceMethod() cmp $obj2->isInstanceMethod());
+   } else {
+        return (1 cmp 2);
+   }
+}
+
+sub byAccessControl { # used for sorting
+   my $obj1 = $a;
+   my $obj2 = $b;
+   if ($HeaderDoc::sort_entries) {       
+        return ($obj1->accessControl() cmp $obj2->accessControl());
+   } else {
+        return (1 cmp 2);
+   }
 }
 
 ##################### Debugging ####################################

@@ -4,7 +4,7 @@
 # Synopsis: Holds function info parsed by headerDoc
 #
 # Author: Matt Morse (matt@apple.com)
-# Last Updated: $Date: 2003/05/31 00:02:49 $
+# Last Updated: $Date: 2003/08/12 00:57:03 $
 # 
 # Copyright (c) 1999 Apple Computer, Inc.  All Rights Reserved.
 # The contents of this file constitute Original Code as defined in and are
@@ -106,6 +106,14 @@ sub processFunctionComment {
 	foreach my $field (@fields) {
 		SWITCH: {
 			($field =~ /^\/\*\!/)&& do {last SWITCH;}; # ignore opening /*!
+			($field =~ s/^method\s+//) && 
+			do {
+				my ($name, $disc);
+				($name, $disc) = &getAPINameAndDisc($field); 
+				$self->name($name);
+				if (length($disc)) {$self->discussion($disc);};
+				last SWITCH;
+			};
 			($field =~ s/^function\s+//) && 
 			do {
 				my ($name, $disc);
@@ -117,8 +125,13 @@ sub processFunctionComment {
 			($field =~ s/^abstract\s+//) && do {$self->abstract($field); last SWITCH;};
 			($field =~ s/^throws\s+//) && do {$self->throws($field); last SWITCH;};
 			($field =~ s/^exception\s+//) && do {$self->throws($field); last SWITCH;};
+			($field =~ s/^availability\s+//) && do {$self->availability($field); last SWITCH;};
 			($field =~ s/^updated\s+//) && do {$self->updated($field); last SWITCH;};
 			($field =~ s/^discussion\s+//) && do {$self->discussion($field); last SWITCH;};
+			($field =~ s/^templatefield\s+//) && do {
+					$self->attributelist("Template Field", $field);
+                                        last SWITCH;
+			};
 			($field =~ s/^param\s+//) && 
 			do {
 				$field =~ s/^\s+|\s+$//g; # trim leading and trailing whitespace
@@ -134,7 +147,7 @@ sub processFunctionComment {
 				last SWITCH;
 			};
 			($field =~ s/^result\s+//) && do {$self->result($field); last SWITCH;};
-			my $filename = $HeaderDoc::headerObject->name();
+			my $filename = $HeaderDoc::headerObject->filename();
 			print "$filename:0:Unknown field: $field\n";
 		}
 	}
@@ -167,6 +180,7 @@ sub setFunctionDeclaration {
         print "returning #define macro with declaration |$dec|\n" if ($localDebug);
 	if ($self->outputformat() eq "html") {
             $dec =~ s/\\\n/\\<br>&nbsp;/g;
+    	    $self->declarationInHTML("<tt>$dec</tt><br>");
             return"<tt>$dec</tt><br>\n";
 	} elsif (self->outputformat() eq "hdxml") {
             return"$dec";
@@ -304,14 +318,19 @@ sub documentationBlock {
     my $desc = $self->discussion();
     my $throws = $self->throws();
     my $abstract = $self->abstract();
+    my $availability = $self->availability();
     my $updated = $self->updated();
     my $declaration = $self->declarationInHTML();
     my @params = $self->taggedParameters();
     my $result = $self->result();
     my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
+    my $list_attributes = $self->getAttributeLists();
 
     $contentString .= "<hr>";
-    $contentString .= "<a name=\"//$apiUIDPrefix/c/func/$name\"></a>\n"; # apple_ref marker
+    my $uid = "//$apiUIDPrefix/c/func/$name";
+	
+    HeaderDoc::APIOwner->register_uid($uid);
+    $contentString .= "<a name=\"$uid\"></a>\n"; # apple_ref marker
     $contentString .= "<table border=\"0\"  cellpadding=\"2\" cellspacing=\"2\" width=\"300\">";
     $contentString .= "<tr>";
     $contentString .= "<td valign=\"top\" height=\"12\" colspan=\"5\">";
@@ -326,9 +345,20 @@ sub documentationBlock {
         # $contentString .= "<b>Abstract:</b> $abstract\n";
         $contentString .= "$abstract\n";
     }
-    if (length($updated)) {
-        $contentString .= "<b>Updated:</b> $updated\n";
+    if (length($availability)) {
+        $contentString .= "<b>Availability:</b> $availability<br>\n";
     }
+    if (length($updated)) {
+        $contentString .= "<b>Updated:</b> $updated<br>\n";
+    }
+
+    if (length($list_attributes)) {
+	$contentString .= $list_attributes;
+    }
+    $contentString .= "<blockquote><pre>$declaration</pre></blockquote>\n";
+
+    if (length($desc)) {$contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Discussion</font></h5><p>$desc</p>\n"; }
+
     my $arrayLength = @params;
     if ($arrayLength > 0) {
         my $paramContentString;
@@ -336,23 +366,25 @@ sub documentationBlock {
             my $pName = $element->name();
             my $pDesc = $element->discussion();
             if (length ($pName)) {
-                $paramContentString .= "<tr><td align=\"center\"><tt>$pName</tt></td><td>$pDesc</td></tr>\n";
+                # $paramContentString .= "<tr><td align=\"center\"><tt>$pName</tt></td><td>$pDesc</td></tr>\n";
+                $paramContentString .= "<dt><tt><em>$pName</em></tt></dt><dd>$pDesc</dd>\n";
             }
         }
         if (length ($paramContentString)){
-            $contentString .= "<h4>Parameters</h4>\n";
+            $contentString .= "<h5><font face=\"Lucida Grande,Helvetica,Arial\">Parameter Descriptions</font></h5>\n";
             $contentString .= "<blockquote>\n";
-            $contentString .= "<table border=\"1\"  width=\"90%\">\n";
-            $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+            # $contentString .= "<table border=\"1\"  width=\"90%\">\n";
+            # $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+            $contentString .= "<dl>\n";
             $contentString .= $paramContentString;
-            $contentString .= "</table>\n</blockquote>\n";
+            # $contentString .= "</table>\n</blockquote>\n";
+            $contentString .= "</dl>\n</blockquote>\n";
         }
     }
+    # if (length($desc)) {$contentString .= "<p>$desc</p>\n"; }
     if (length($result)) {
-        $contentString .= "<b>Result:</b> $result\n";
+        $contentString .= "<dl><dt><i>function result</i></dt><dd>$result</dd></dl>\n";
     }
-    $contentString .= "<blockquote><pre>$declaration</pre></blockquote>\n";
-    if (length($desc)) {$contentString .= "<p>$desc</p>\n"; }
     # $contentString .= "<hr>\n";
     return $contentString;
 }
@@ -364,14 +396,21 @@ sub XMLdocumentationBlock {
     my $desc = $self->discussion();
     my $throws = $self->XMLthrows();
     my $abstract = $self->abstract();
+    my $availability = $self->availability();
     my $updated = $self->updated();
     my $declaration = $self->declarationInHTML();
     my @params = $self->taggedParameters();
     my $result = $self->result();
     my $apiUIDPrefix = HeaderDoc::APIOwner->apiUIDPrefix();
     
-    $contentString .= "<function id=\"//$apiUIDPrefix/c/func/$name\">\n"; # apple_ref marker
+    my $uid = "//$apiUIDPrefix/c/func/$name";
+
+    HeaderDoc::APIOwner->register_uid($uid);
+    $contentString .= "<function id=\"$uid\">\n"; # apple_ref marker
     $contentString .= "<name>$name</name>\n";
+    if (length($availability)) {
+        $contentString .= "<availability>$availability</availability>\n";
+    }
     if (length($updated)) {
         $contentString .= "<updated>$updated</updated>\n";
     }
@@ -412,7 +451,7 @@ sub printObject {
     print "Function\n";
     $self->SUPER::printObject();
     print "Result: $self->{RESULT}\n";
-    print "Tagged Parameters:\n";
+    print "Tagged Parameter Descriptions:\n";
     my $taggedParamArrayRef = $self->{TAGGEDPARAMETERS};
     my $arrayLength = @{$taggedParamArrayRef};
     if ($arrayLength > 0) {
