@@ -1,9 +1,9 @@
 
 DEBUG_CFLAGS=
-# DEBUG_CFLAGS="-g"
+# DEBUG_CFLAGS=-g
 
 # LOCALCFLAGS= -I/usr/local/include/libxml2 
-LOCALCFLAGS=
+LOCALCFLAGS=-Os
 # LOCALLDFLAGS= -L/usr/local/lib 
 LOCALLDFLAGS=
 
