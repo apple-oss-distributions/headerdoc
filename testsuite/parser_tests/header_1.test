@@ -47,7 +47,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 
 	For more information, reread this page.
  */
-$0|$4598|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$4705|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 1
 inClass: 0
 inInterface: 0
@@ -115,8 +115,10 @@ $parserState->{noInsert} => 0
 $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{onlyComments} => 1
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 0
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 1
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -252,7 +254,7 @@ LONG ATTRIBUTES:
 
 -=: HTML OUTPUT OF PARSE TREES :=-
 
-$4598|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$4705|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 1
 inClass: 0
 inInterface: 0
@@ -320,8 +322,10 @@ $parserState->{noInsert} => 0
 $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{onlyComments} => 1
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 0
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 1
 $parserState->{pplStack} => ARRAY(OBJID)

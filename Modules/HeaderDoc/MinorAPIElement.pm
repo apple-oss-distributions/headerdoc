@@ -3,7 +3,7 @@
 # Class name: MinorAPIElement
 # Synopsis: Class for parameters and members of structs, etc.
 #
-# Last Updated: $Date: 2011/04/29 19:46:01 $
+# Last Updated: $Date: 2011/05/26 14:13:20 $
 #
 # Copyright (c) 1999-2008 Apple Computer, Inc.  All rights reserved.
 #
@@ -79,7 +79,7 @@
 
 package HeaderDoc::MinorAPIElement;
 
-use HeaderDoc::Utilities qw(findRelativePath safeName printArray printHash);
+use HeaderDoc::Utilities qw(findRelativePath safeName printArray printHash registerUID);
 use HeaderDoc::HeaderElement;
 
 use Carp qw(cluck);
@@ -95,7 +95,7 @@ use vars qw($VERSION @ISA);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::MinorAPIElement::VERSION = '$Revision: 1304131561 $';
+$HeaderDoc::MinorAPIElement::VERSION = '$Revision: 1306444400 $';
 
 
 # /*!
@@ -373,10 +373,11 @@ sub group
 #     @param self
 #         This <code>MinorAPIElement</code> object.
 #     @discussion
-#         For special declarations (Perl instance variables),
+#         For special declarations (Perl instance variables,
+#         function-local variables, and so on),
 #         returns a synthesized declaration from
-#         {@link AUTODECLARATION}.  Otherwise, hands off the
-#         request to the superclass,
+#         {@link //apple_ref/perl/data/HeaderDoc::MinorAPIElement/AUTODECLARATION AUTODECLARATION}.
+#         Otherwise, hands off the request to the superclass,
 #         {@link //apple_ref/perl/cl/HeaderDoc::HeaderElement HeaderElement}.
 #  */
 sub declaration
@@ -392,10 +393,11 @@ sub declaration
 #     @param self
 #         This <code>MinorAPIElement</code> object.
 #     @discussion
-#         For special declarations (Perl instance variables),
+#         For special declarations (Perl instance variables,
+#         function-local variables, and so on),
 #         returns a synthesized declaration from
-#         {@link AUTODECLARATION}.  Otherwise, hands off the
-#         request to the superclass,
+#         {@link //apple_ref/perl/data/HeaderDoc::MinorAPIElement/AUTODECLARATION AUTODECLARATION}.
+#         Otherwise, hands off the request to the superclass,
 #         {@link //apple_ref/perl/cl/HeaderDoc::HeaderElement HeaderElement}.
 #  */
 sub declarationInHTML
@@ -407,17 +409,19 @@ sub declarationInHTML
 
 # /*!
 #     @abstract
-#         Gets/sets the {@link AUTODECLARATION} flag.
+#         Gets/sets the
+#         {@link //apple_ref/perl/data/HeaderDoc::MinorAPIElement/AUTODECLARATION AUTODECLARATION}
+#         value.
 #     @param self
 #         This <code>MinorAPIElement</code> object.
 #     @param AUTODECLARATION
 #         The new value to set.
 #     @discussion
-#         For special declarations (Perl instance variables),
-#         returns a synthesized declaration from
-#         {@link AUTODECLARATION}.  Otherwise, hands off the
-#         request to the superclass,
-#         {@link //apple_ref/perl/cl/HeaderDoc::HeaderElement HeaderElement}.
+#         For special declarations (Perl instance variables,
+#         function-local variables, and so on), declaration functions
+#         return a synthesized declaration based on the
+#         {@link //apple_ref/doc/functionparam/HeaderDoc::MinorAPIElement/autodeclaration/AUTODECLARATION AUTODECLARATION}
+#         parameter.  This function supports that.
 #  */
 sub autodeclaration
 {
@@ -487,10 +491,19 @@ sub apiuid
 		$fieldtype = "enumconstant";
 	} elsif ($apioclass eq "HeaderDoc::Function") {
 		$fieldtype = "functionparam";
+		if ($self->autodeclaration()) {
+			$fieldtype = "functionvar";
+		}
 	} elsif ($apioclass eq "HeaderDoc::Method") {
 		$fieldtype = "methodparam";
+		if ($self->autodeclaration()) {
+			$fieldtype = "methodvar";
+		}
 	} elsif ($apioclass eq "HeaderDoc::PDefine") {
 		$fieldtype = "defineparam";
+		if ($self->autodeclaration()) {
+			$fieldtype = "definevar";
+		}
 		$include_class = 0;
 	} elsif ($apioclass eq "HeaderDoc::Struct") {
 		$fieldtype = "structfield";
@@ -515,6 +528,8 @@ sub apiuid
 		# return "//$apiUIDPrefix/doc/$fieldtype/".$apio->apiuidname()."/".$self->name();
 
 		$self->{APIUID} = $uid;
+
+		registerUID($uid, $self->rawname(), $self);
 
 		return $uid;
 	}

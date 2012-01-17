@@ -63,7 +63,7 @@ $2424|/*! @typedef TypedefdStructWithCallbacksAndStructs
     
     @field lastField Description of the struct's last field.
 */
-$0|$67020|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$67119|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -138,8 +138,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 3
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  typedef struct
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -181,14 +183,13 @@ implementsClass:
 -=: LIST OF PARSED PARAMETERS :=-
 Parsed Param 0 => IUNKNOWN_C_GUTS
 Parsed Param 1 => short firstField
-Parsed Param 2 => struct 
-        TEST
+Parsed Param 2 => TEST
 Parsed Param 3 => int a
 Parsed Param 4 => char *b
 Parsed Param 5 => void *c
 Parsed Param 6 => IOReturn (*massagePointers)(void *cmd,
                             IOVirtualRange *sgList)
-Parsed Param 7 => nestedStruct
+Parsed Param 7 => struct  nestedStruct
 Parsed Param 8 => IOReturn (*setPointers)(void *cmd,
         IOVirtualRange *sgList)
 Parsed Param 9 => void (*getPointers)(void *cmd, IOVirtualRange **outSGList, int *outSGEntries, UInt32 *outTransferCount, Boolean *outIsWrite)
@@ -539,7 +540,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: TEST
-        TYPE: struct
+        TYPE: 
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -749,7 +750,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: nestedStruct
-        TYPE: 
+        TYPE: struct
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -1223,7 +1224,7 @@ or a read command (false)
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: TEST
-        TYPE: struct
+        TYPE: 
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -1433,7 +1434,7 @@ or a read command (false)
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: nestedStruct
-        TYPE: 
+        TYPE: struct
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -2159,7 +2160,7 @@ END OF OBJECT
 
 
 
-$67020|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$67119|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -2234,8 +2235,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 3
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  typedef struct
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -2277,14 +2280,13 @@ implementsClass:
 -=: LIST OF PARSED PARAMETERS :=-
 Parsed Param 0 => IUNKNOWN_C_GUTS
 Parsed Param 1 => short firstField
-Parsed Param 2 => struct 
-        TEST
+Parsed Param 2 => TEST
 Parsed Param 3 => int a
 Parsed Param 4 => char *b
 Parsed Param 5 => void *c
 Parsed Param 6 => IOReturn (*massagePointers)(void *cmd,
                             IOVirtualRange *sgList)
-Parsed Param 7 => nestedStruct
+Parsed Param 7 => struct  nestedStruct
 Parsed Param 8 => IOReturn (*setPointers)(void *cmd,
         IOVirtualRange *sgList)
 Parsed Param 9 => void (*getPointers)(void *cmd, IOVirtualRange **outSGList, int *outSGEntries, UInt32 *outTransferCount, Boolean *outIsWrite)
@@ -2635,7 +2637,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: TEST
-        TYPE: struct
+        TYPE: 
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -2845,7 +2847,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: nestedStruct
-        TYPE: 
+        TYPE: struct
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -3319,7 +3321,7 @@ or a read command (false)
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: TEST
-        TYPE: struct
+        TYPE: 
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -3529,7 +3531,7 @@ or a read command (false)
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: nestedStruct
-        TYPE: 
+        TYPE: struct
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -4255,4 +4257,4 @@ END OF OBJECT
 
 
 
-_$91|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/typedef_7.test$1|C$9|typedef 7$1|C$6|parser
+_$37|testsuite/parser_tests/typedef_7.test$1|C$9|typedef 7$1|C$6|parser

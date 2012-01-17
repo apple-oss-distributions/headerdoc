@@ -23,7 +23,7 @@ $203|/*! Last symbol before curly brace was disappearing in one mostly unimporta
     parse, causing some constant values to not get picked up correctly in
     code that really shouldn't care, but does.
  */
-$0|$11290|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$11397|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -96,8 +96,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 1
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  enum
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -433,7 +435,7 @@ END OF OBJECT
 
 
 
-$11290|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$11397|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -506,8 +508,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 1
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  enum
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)

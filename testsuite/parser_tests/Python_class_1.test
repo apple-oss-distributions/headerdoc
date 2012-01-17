@@ -25,7 +25,7 @@ def baz(bat):
     print bat
 
 $23|        Python_class_1
-$0|$21117|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$21224|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -100,8 +100,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{onlyComments} => 0
 $parserState->{parsedParam} => 
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 0
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{popAfter} => 0
 $parserState->{popAtEnd} => 1
 $parserState->{posstypes} => 

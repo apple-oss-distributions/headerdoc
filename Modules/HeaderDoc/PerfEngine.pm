@@ -3,7 +3,7 @@
 # Class name: PerfEngine
 # Synopsis: Performance Testing Engine
 #
-# Last Updated: $Date: 2011/02/18 19:02:59 $
+# Last Updated: $Date: 2011/07/07 15:15:10 $
 #
 # Copyright (c) 2005 Apple Computer, Inc.  All rights reserved.
 #
@@ -81,7 +81,6 @@ use HeaderDoc::PerfPoint;
 use File::Basename;
 use strict;
 use vars qw($VERSION @ISA);
-use POSIX qw(strftime);
 
 use Carp;
 
@@ -92,7 +91,7 @@ use Carp;
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::PerfEngine::VERSION = '$Revision: 1298084579 $';
+$HeaderDoc::PerfEngine::VERSION = '$Revision: 1310076910 $';
 
 my $perfDebug = 0;
 

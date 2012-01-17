@@ -4,7 +4,7 @@ $155|# /*! Instance variable test
 #     @var ivar_test_in_perl
 #          Description of ivar_test_in_perl goes here.
 #  */
-$0|$7870|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$7977|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -77,8 +77,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 3
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{perlClassName} => HeaderDoc::
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 1
@@ -283,7 +285,7 @@ END OF OBJECT
 
 
 
-$7870|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$7977|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -356,8 +358,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 3
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{perlClassName} => HeaderDoc::
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 1

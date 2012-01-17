@@ -3,7 +3,7 @@
 # Class name: Test
 # Synopsis: Test Harness
 #
-# Last Updated: $Date: 2011/05/19 13:01:25 $
+# Last Updated: $Date: 2011/11/11 18:19:29 $
 #
 # Copyright (c) 2008 Apple Computer, Inc.  All rights reserved.
 #
@@ -143,7 +143,6 @@ use File::Basename;
 use strict;
 use vars qw($VERSION @ISA);
 use Cwd;
-use POSIX qw(strftime mktime localtime);
 use Carp qw(cluck);
 use HeaderDoc::Utilities qw(processTopLevel);
 use HeaderDoc::BlockParse qw(blockParseOutside blockParse getAndClearCPPHash);
@@ -161,7 +160,7 @@ if ($HeaderDoc::FreezeThaw_available) {
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::Test::VERSION = '$Revision: 1305835285 $';
+$HeaderDoc::Test::VERSION = '$Revision: 1321064369 $';
 
 # /*!
 #     @abstract
@@ -335,7 +334,11 @@ sub runtest_sub {
     %HeaderDoc::availability_has_args = ();
 
     # warn "MP: ".$HeaderDoc::modulesPath."Availability.list\n";
-    getAvailabilityMacros($HeaderDoc::modulesPath."Availability.list", 1);
+    if ( -f $HeaderDoc::modulesPath."../../Availability.list") {
+	getAvailabilityMacros($HeaderDoc::modulesPath."../../Availability.list", 1);
+    } else {
+	getAvailabilityMacros($HeaderDoc::modulesPath."Availability.list", 1);
+    }
 
     my $basefilename = basename($self->{FILENAME});
     my $coretestfail = 0;
@@ -608,7 +611,7 @@ print STDERR "ITEM NOW $item\n" if ($localDebug);
 	$results .= "-=: BLOCKPARSE PARSER STATE KEYS :=-\n";
 	my @pskeys = sort keys %{$parserState};
 	foreach my $key (@pskeys) {
-		if ($key !~ /(pplStack|hollow|lastTreeNode|freezeStack|parsedParamList|braceStack|treeStack|endOfTripleQuoteToken|rollbackState|availabilityNodesArray)/) {
+		if ($key !~ /(pplStack|hollow|lastTreeNode|freezeStack|parsedParamList|braceStack|treeStack|endOfTripleQuoteToken|rollbackState|availabilityNodesArray|parsedParamAtBrace|parsedParamStateAtBrace)/) {
 			$results .= "\$parserState->{$key} => ".$parserState->{$key}."\n";
 		} else {
 			my $temp = $parserState->{$key};
@@ -897,6 +900,46 @@ sub writeToFile {
 
     print WRITEFILE $string;
     close(WRITEFILE);
+}
+
+# /*!
+#     @abstract
+#         Writes tests to a property list file.  Currently
+#         disabled.
+#  */
+sub writeToPlist {
+    my $self = shift;
+    my $filename = shift;
+
+	# print "SELF: $self\n";
+
+    eval {
+	require Data::Plist::XMLWriter;
+    };
+
+return; # for now.
+
+    if ($@) {
+	warn("Not writing property lists because you do not have Data::Plist.\nTo install it, type:\n    sudo cpan YAML\n    sudo cpan Data::Plist::XMLWriter\n");
+	return;
+    }
+
+    $filename =~ s/\.test$/\.plist/g;
+
+    # my $plist = Data::Plist->new($self);
+
+    my $writer = Data::Plist::XMLWriter->new;
+
+    my %selfhash = %{$self};
+    # foreach my $key (keys %selfhash) {
+	# print STDERR "DATA $key -> ".$selfhash{$key}."\n";
+    # }
+
+    my $str = $writer->write(\%selfhash);
+    open(WRITEFILE, ">$filename") or die("Could not write file \"$filename\"\n");
+    print WRITEFILE $str;
+    close(WRITEFILE);
+
 }
 
 # sub dbprint_expanded

@@ -1,5 +1,5 @@
 # Configuration file for HeaderDoc
-# $Revision: 1.7 $
+# $Revision: 1325886578 $
 ###########################################################
 
 # These options set various parameters used in content generation.
@@ -48,7 +48,7 @@ stripDotH => 1
 # The TOC template file list can contain multiple template files, separated by spaces, e.g.
 # TOCTemplateFile => toctemplate.html functions.tmpl constants.tmpl datatypes.tmpl mpindex.tmpl
 
-TOCTemplateFile => /Library/Preferences/com.apple.headerdoc.exampletocteplate.html
+TOCTemplateFile => com.apple.headerdoc.exampletocteplate.html
 
 # The date format is specified in the same format as strftime.  See the
 # man page for strftime for more info.

@@ -1,6 +1,6 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$88|int __osx_available_starting(int a) __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_0);
 $17|/*! test case */
-$0|$7911|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$8006|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -72,8 +72,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 2
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -106,7 +108,7 @@ value:
 returntype:  int
 pridec: 
 simpleTDcontents: 
-bpavail:  Available in Mac OS X v10.6. Available in iPhone OS v3.0.
+bpavail:  Available in Mac OS X v10.6. Available in iOS v3.0.
 blockOffset: 0
 conformsToList: 
 functionContents: 
@@ -202,7 +204,7 @@ LONG ATTRIBUTES:
     UPDATED: ""
     LINKAGESTATE: ""
     ACCESSCONTROL: ""
-    AVAILABILITY: " Available in Mac OS X v10.6. Available in iPhone OS v3.0."
+    AVAILABILITY: " Available in Mac OS X v10.6. Available in iOS v3.0."
     LINKUID: ""
     ORIGCLASS: ""
     ISDEFINE: ""
@@ -300,7 +302,7 @@ END OF OBJECT
 
 
 
-$7911|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$8006|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -372,8 +374,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 2
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -406,7 +410,7 @@ value:
 returntype:  int
 pridec: 
 simpleTDcontents: 
-bpavail:  Available in Mac OS X v10.6. Available in iPhone OS v3.0.
+bpavail:  Available in Mac OS X v10.6. Available in iOS v3.0.
 blockOffset: 0
 conformsToList: 
 functionContents: 
@@ -502,7 +506,7 @@ LONG ATTRIBUTES:
     UPDATED: ""
     LINKAGESTATE: ""
     ACCESSCONTROL: ""
-    AVAILABILITY: " Available in Mac OS X v10.6. Available in iPhone OS v3.0."
+    AVAILABILITY: " Available in Mac OS X v10.6. Available in iOS v3.0."
     LINKUID: ""
     ORIGCLASS: ""
     ISDEFINE: ""
@@ -600,4 +604,4 @@ END OF OBJECT
 
 
 
-_$115|/Volumes/Macintosh HD/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/avmacros_053.test$1|C$12|avmacros 053$1|C$6|parser
+_$94|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/avmacros_053.test$1|C$12|avmacros 053$1|C$6|parser

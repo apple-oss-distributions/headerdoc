@@ -3,7 +3,7 @@
  * Synopsis:   Creates links between HTML pages using specially
  *             formed anchors.
  *
- * Last Updated: $Date: 2011/03/14 22:56:12 $
+ * Last Updated: $Date: 2011/08/16 16:54:00 $
  *
  * Copyright (c) 2002-2011 Apple Computer, Inc.  All rights reserved.
  *
@@ -4095,6 +4095,11 @@ char *ts_basename(char *path)
     safe_asprintf(&junk, "%s", path); // freed later.
     if (!junk) { fprintf(stderr, "Out of memory.\n"); exit(1); }
     orig = basename(junk);
+
+    if (orig == NULL) {
+	while (pthread_mutex_unlock(&mylock));
+	return NULL;
+    }
 
     // copy = malloc((strlen(orig) + 1) * sizeof(char));
     // strcpy(copy, orig);

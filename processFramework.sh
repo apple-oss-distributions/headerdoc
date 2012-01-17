@@ -41,7 +41,7 @@ if [ "x$1" = "x-E" ] ; then
 fi
 
 ASK=0
-if [ "x$1" = "x-q" ] ; then
+if [ "x$1" = "x-q" -o "x$1" = "x-i" ] ; then
 	ASK=1
 	shift
 fi

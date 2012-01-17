@@ -52,7 +52,7 @@ $503|/*! This returns the image associated with a link file (e.g. foo.link).
     obtain the actual file), it uses it.  Otherwise, it returns
     the default link image ($icondir/biglink.png).
  */
-$0|$12499|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$12606|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -167,8 +167,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 2
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 0
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)

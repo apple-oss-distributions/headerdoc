@@ -3,7 +3,7 @@
 # Script name:  headerwalk.pl
 # Synopsis: 	Walks a header and creates some simple text content.
 #
-# Last Updated: $Date: 2011/02/16 13:42:00 $
+# Last Updated: $Date: 2011/12/16 16:49:30 $
 #
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -26,7 +26,7 @@
 #
 # @APPLE_LICENSE_HEADER_END@
 #
-# $Revision: 1297892520 $
+# $Revision: 1324082970 $
 ######################################################################
 
 # /*!
@@ -45,11 +45,6 @@
 #     @indexgroup HeaderDoc Tools
 #  */
 
-# Comment out all but one of these.
-my $language = "C";
-# my $language = "ooc";
-# my $language = "cpp";
-
 use lib "./Modules";
 use HeaderDoc::Utilities qw(linesFromFile);
 use HeaderDoc::BlockParse qw(blockParse);
@@ -64,7 +59,7 @@ use strict;
 %HeaderDoc::perHeaderIgnoreFuncMacros = ();
 
 my $lang = "C";
-my $sublang = $language;
+my $sublang = $lang;
 
 my $headerObj = HeaderDoc::APIOwner->new("lang" => $lang, "sublang" => $sublang);
 

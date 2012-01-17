@@ -8,7 +8,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 	};
 };
 $15|/*! Union 1 */
-$0|$12672|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$13773|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -81,8 +81,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 2
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  union
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -124,9 +126,9 @@ implementsClass:
 -=: LIST OF PARSED PARAMETERS :=-
 Parsed Param 0 => int a
 Parsed Param 1 => float b
-Parsed Param 2 => struct 
-                int c
+Parsed Param 2 => int c
 Parsed Param 3 => char *d
+Parsed Param 4 => struct
 -=: DUMP OF PARSE TREE :=-
 +---union
 +--- 
@@ -352,7 +354,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: c
-        TYPE: struct                   int
+        TYPE: int
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -395,6 +397,48 @@ LONG ATTRIBUTES:
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: d
         TYPE: char *
+        APIUID: 
+        ABSTRACT: ""
+        DISCUSSION: "<p></p>"
+        UPDATED: ""
+        COPYRIGHT: ""
+        HTMLMETA: ""
+        PRIVATEDECLARATION: ""
+        GROUP: ""
+        INDEXGROUP: ""
+        THROWS: ""
+        XMLTHROWS: ""
+        UPDATED: ""
+        LINKAGESTATE: ""
+        ACCESSCONTROL: ""
+        AVAILABILITY: ""
+        LINKUID: ""
+        ORIGCLASS: ""
+        ISDEFINE: ""
+        ISTEMPLATE: ""
+        VALUE: "UNKNOWN"
+        RETURNTYPE: ""
+        LINENUM: ""
+        CLASS: "HeaderDoc::MinorAPIElement"
+        MASTERENUM: ""
+        APIREFSETUPDONE: "1"
+        TPCDONE: ""
+        NOREGISTERUID: ""
+        SUPPRESSCHILDREN: ""
+        NAMELINE_DISCUSSION: ""
+        HIDEDOC: ""
+        HIDESINGLETONS: ""
+        HIDECONTENTS: ""
+        MAINOBJECT: ""
+        LIST ATTRIBUTES: 
+        SHORT ATTRIBUTES: 
+        LONG ATTRIBUTES: 
+        TREE COUNT: 0
+        INDEX GROUP: 
+        IS BLOCK: 
+        OBJECT TYPE: HeaderDoc::MinorAPIElement
+        NAME: struct
+        TYPE: 
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -495,7 +539,7 @@ END OF OBJECT
 
 
 
-$12672|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$13773|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -568,8 +612,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 2
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  union
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -611,9 +657,9 @@ implementsClass:
 -=: LIST OF PARSED PARAMETERS :=-
 Parsed Param 0 => int a
 Parsed Param 1 => float b
-Parsed Param 2 => struct 
-                int c
+Parsed Param 2 => int c
 Parsed Param 3 => char *d
+Parsed Param 4 => struct
 -=: DUMP OF PARSE TREE :=-
 +---union
 +--- 
@@ -839,7 +885,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: c
-        TYPE: struct                   int
+        TYPE: int
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -882,6 +928,48 @@ LONG ATTRIBUTES:
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: d
         TYPE: char *
+        APIUID: 
+        ABSTRACT: ""
+        DISCUSSION: "<p></p>"
+        UPDATED: ""
+        COPYRIGHT: ""
+        HTMLMETA: ""
+        PRIVATEDECLARATION: ""
+        GROUP: ""
+        INDEXGROUP: ""
+        THROWS: ""
+        XMLTHROWS: ""
+        UPDATED: ""
+        LINKAGESTATE: ""
+        ACCESSCONTROL: ""
+        AVAILABILITY: ""
+        LINKUID: ""
+        ORIGCLASS: ""
+        ISDEFINE: ""
+        ISTEMPLATE: ""
+        VALUE: "UNKNOWN"
+        RETURNTYPE: ""
+        LINENUM: ""
+        CLASS: "HeaderDoc::MinorAPIElement"
+        MASTERENUM: ""
+        APIREFSETUPDONE: "1"
+        TPCDONE: ""
+        NOREGISTERUID: ""
+        SUPPRESSCHILDREN: ""
+        NAMELINE_DISCUSSION: ""
+        HIDEDOC: ""
+        HIDESINGLETONS: ""
+        HIDECONTENTS: ""
+        MAINOBJECT: ""
+        LIST ATTRIBUTES: 
+        SHORT ATTRIBUTES: 
+        LONG ATTRIBUTES: 
+        TREE COUNT: 0
+        INDEX GROUP: 
+        IS BLOCK: 
+        OBJECT TYPE: HeaderDoc::MinorAPIElement
+        NAME: struct
+        TYPE: 
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"

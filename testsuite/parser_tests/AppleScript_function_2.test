@@ -5,7 +5,7 @@ on ShouldNotBeParsed()
     display dialog myNumber
 end ReportMyNumber
 $19|(*! Function 3. *)
-$0|$12020|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$12196|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -71,6 +71,7 @@ $parserState->{inString} => 0
 $parserState->{inTemplate} => 0
 $parserState->{initbsCount} => 0
 $parserState->{inputCounter} => 3
+$parserState->{inrbraceargument} => 0
 $parserState->{kr_c_function} => 0
 $parserState->{kr_c_name} => 
 $parserState->{lang} => applescript
@@ -82,10 +83,12 @@ $parserState->{namePending} => 0
 $parserState->{noInsert} => 0
 $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
-$parserState->{occparmlabelfound} => 19
+$parserState->{occparmlabelfound} => 18
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 0
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -95,7 +98,7 @@ $parserState->{prekeywordsodname} =>
 $parserState->{prekeywordsodtype} => 
 $parserState->{pushedfuncbrace} => 2
 $parserState->{returntype} =>  on Multi Word Function 2 of foo from bar given baz: bat,
-bag:ban 
+bag:ban
 $parserState->{seenBraces} => 1
 $parserState->{seenMacroPart} => 0
 $parserState->{seenTilde} => 0
@@ -107,6 +110,7 @@ $parserState->{sodtype} =>  Multi Word Function
 $parserState->{stackFrozen} => 1
 $parserState->{startOfDec} => 0
 $parserState->{sublang} => applescript
+$parserState->{treePopTwo} => 0
 $parserState->{typestring} => function
 $parserState->{value} => 
 $parserState->{valuepending} => 0
@@ -465,4 +469,4 @@ END OF OBJECT
 
 
 
-__$104|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/AppleScript_function_2.test$11|applescript$22|AppleScript function 2$11|applescript$6|parser
+__$50|testsuite/parser_tests/AppleScript_function_2.test$11|applescript$22|AppleScript function 2$11|applescript$6|parser

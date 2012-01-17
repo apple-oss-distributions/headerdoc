@@ -2,7 +2,7 @@
 #
 # Class name: 	ParseTree
 # Synopsis: 	Used by headerdoc2html to hold parse trees
-# Last Updated: $Date: 2011/05/03 14:50:47 $
+# Last Updated: $Date: 2012/01/06 17:37:19 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -121,6 +121,22 @@
 #     @var ISAVAILABILITYMACRO
 #         Indicates that this node is an availability macro.  This
 #         is used for wrapping content in both HTML and XML.
+#     @var RE_STATE
+#         Indicates that this node is part of a regular expression.
+#         This value contains one of the following values:
+#
+#         <code>RE_PREFIX</code> (the optional "command" letters before
+#         the expression)
+#
+#         <code>RE_START</code> (the opening slash or other delimiter)
+#
+#         <code>RE_PARTSEP</code> (the intermediate delimiter or delimiters)
+#
+#         <code>RE_END</code> (the trailing slash or other delimiter).
+#
+#         Note that the trailing flags are not tagged in any special way
+#         because you can trivially distinguish the parse tree node that
+#         contains them by inspecting the node after <code>RE_END</code>.
 #
 #  @vargroup Caches
 #
@@ -153,13 +169,15 @@ use Carp qw(cluck);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::ParseTree::VERSION = '$Revision: 1304459447 $';
+$HeaderDoc::ParseTree::VERSION = '$Revision: 1325900239 $';
 ################ General Constants ###################################
 my $debugging = 0;
 
 my $apioDebug = 0;
 
+# 0 = normal; 1 = debug; 2 = debug + backtraces
 my $treeDebug = 0;
+
 my %defaults = (
 	# TOKEN => undef,
 	# NEXT => undef,
@@ -324,6 +342,7 @@ sub addSibling
 
 # print STDERR "addSibling $self\n";
     print STDERR "addSibling $self \"$name\" HIDDEN: $hide\n" if ($treeDebug || $localDebug);
+    if ($treeDebug == 2) { cluck("backtrace"); }
 
     # Always hide siblings of descendants of elements that the parser
     # tells us to hide.  Also spaces if they are the immediate successor
@@ -389,6 +408,7 @@ sub addChild
 
 # print STDERR "addChild\n";
     print STDERR "addChild to $self \"$name\"\n" if ($treeDebug);
+    if ($treeDebug == 2) { cluck("backtrace"); }
 
     # If the parser wants a node hidden, any children of such a node
     # should be hidden, as should any siblings of those children or their
@@ -907,7 +927,9 @@ sub slowprev()
     my $self = shift;
 
     my $parent = $self->parent;
+    if (!$parent) { return undef; }
     my $fc = $parent->firstchild;
+    if ($self == $fc) { return undef; }
     while ($fc && $fc->next && ($fc->next != $self)) { $fc = $fc->next; }
     return $fc;
 }
@@ -1711,13 +1733,14 @@ print STDERR "LAST DECLARATION: $lastDeclaration\n" if ($localDebug);
 	      }
 	      if ($string =~ /^\s*\!/o) {
 		      $string =~ s/^\s*\!//so;
-		      my $tagstring =~ s/^\s*\@//so;
+		      my $tagstring = $string;
+		      $tagstring =~ s/^\s*\@//so;
 
 		      print STDERR "EOD $eoDeclaration NT $ntoken STR $string\n" if ($localDebug);;
 
 		      if ((($eoDeclaration && $lastDeclaration =~ /[a-zA-Z]/) || !$ntoken ||
 			   $ntoken =~ /[)}]/o || casecmp($ntoken, $parseTokens{rbrace}, $case_sensitive)) &&
-			  ($string !~ /^\s*\@/o || !validTag($tagstring, 1))) {
+			  ($string !~ /^\s*\@/o || !validTag($tagstring, 0))) {
 
 			if (!$inBlockDefine) {
 				$string =~ s/\@abstract/ /sg;
@@ -1778,8 +1801,11 @@ print STDERR "LAST DECLARATION: $lastDeclaration\n" if ($localDebug);
 				}
 		      }
 		      $string =~ s/^\s*//so;
-		      my $tagstring =~ s/^\s*\@//so;
-		      if ($string =~ /^\s*\@/o && validTag($tagstring, 1)) { # $string =~ /^\s*\@/o
+		      my $tagstring = $string;
+		      $tagstring =~ s/^\s*\@//so;
+		      # warn("STR: $string TAGSTR: $tagstring\n");
+		      # warn(validTag("", 0)." != ".validTag($tagstring, 0));
+		      if ($string =~ /^\s*\@/o && validTag($tagstring, 0)) { # $string =~ /^\s*\@/o
 			print STDERR "COMMENTSTRING: $string\n" if ($localDebug);
 	
 			my $fieldref = stringToFields($string, $fullpath, $linenum, $xmlmode, $apio->lang(), $apio->sublang());
@@ -2963,12 +2989,25 @@ sub colorTreeSub
     my $self = shift;
     my $ctstateref = shift;
 
+    my $localDebug = 0;
+    my $psDebug = 0;
+    my $treeDebug = 0;
+    my $dropDebug = 0;
+    my $tokenDebug = 0;
+    my $codePathDebug = 0;
+    my $rubyDebug = 0;
+
+    print STDERR "***** TOKEN: ".$self->{TOKEN}." *****\n" if ($codePathDebug || $localDebug);
+
 # print STDERR "IN COLORTREESUB\n";
 
     my $continue = 1;
     my %ctstate = %{$ctstateref};
 
-    if ($self == $ctstate{lastTreeNode}) { $continue = 0; }
+    if ($self == $ctstate{lastTreeNode}) {
+	print STDERR "Node is last node in tree.  Ending after this node.\n" if ($localDebug || $codePathDebug);
+	$continue = 0;
+    }
 
     my %parseTokens = %{$ctstate{parseTokensRef}};
     my %macroList = %{$parseTokens{macronames}};
@@ -2985,13 +3024,6 @@ sub colorTreeSub
 
     # This cache slows things down now that it works....
     # if ($self->{CTSUB}) { return (\$self->{CTSTRING}, $self->{CTSUB}); }
-    my $localDebug = 0;
-    my $psDebug = 0;
-    my $treeDebug = 0;
-    my $dropDebug = 0;
-    my $tokenDebug = 0;
-    my $codePathDebug = 0;
-    my $rubyDebug = 0;
 
     my $keep_all_newlines = 0;
 
@@ -3725,7 +3757,7 @@ print STDERR "TESTTYPE: $tokenType\n" if ($localDebug);
 	print STDERR "PASREC VAR\n" if ($localDebug);
 	$tokenType = "var";
     }
-    else { print STDERR "TYPE: ".$ctstate{type}." TT: ".$ctstate{tokenType}."\n" if ($localDebug); }
+    else { print STDERR "TYPE: ".$ctstate{type}." TT: ".$tokenType."\n" if ($localDebug); }
     print STDERR "IM: ".$ctstate{inMacro}."\n" if ($localDebug);
 
     if (!$ctstate{inComment} && $token =~ /^\s/o && !$tokennl && ($mustbreak || !$ctstate{newlen}) && (!$ctstate{keep_whitespace})) {
@@ -4064,11 +4096,13 @@ sub dbprintrec
       }
       my $HYPHEN = "-";
       my $psString = "";
+      my $reStateString = "";
+      if ($self->{RE_STATE}) { $reStateString = " ".$self->{RE_STATE}; }
       if ($self->parserState()) {
 	$HYPHEN = "*";
-	$psString = " (TOKENID: ".$self.", PSID: ".$self->parserState().")";
+	$psString = " (TOKENID: ".$self.", PSID: ".$self->parserState().$reStateString.")";
       } else {
-	$psString = " (TOKENID: ".$self.")";
+	$psString = " (TOKENID: ".$self.$reStateString.")";
       }
       if ($depth) {
 	print STDERR "+-$HYPHEN-";
@@ -4654,4 +4688,486 @@ sub isAvailabilityMacro
     return 0;
 }
 
+# /*!
+#     @abstract
+#         Partially translates Perl code into C
+#  */
+sub translateTree {
+    my $self = shift;
+    my %state = ();
+
+    $self->translateTreeRec(\%state);
+}
+
+# /*!
+#     @abstract
+#         Returns the parse tree node containing the
+#         next non-space token at the current level.
+#     @param self
+#         The initial parse tree node.
+#  */
+sub nextNSToken
+{
+    my $self = shift;
+    my $next = $self->{NEXT};
+    while ($next && $next->{TOKEN} !~ /\S/s) {
+	$next = $next->{NEXT};
+    }
+    return $next;
+}
+
+# /*! @abstract
+#         Does the real work of translating a Perl script (partially)
+#         to C.
+#     @param self
+#         The tree to translate.
+#     @param self
+#         A translation state object (initially empty).
+#  */
+sub translateTreeRec {
+    my $self = shift;
+    my $stateref = shift;
+    my %state = %{$stateref};
+    my $localDebug = 0;
+
+    my $enteringComment = 0;
+    my $enteringString = 0;
+    my $enteringSingle = 0;
+    my $leavingHDComment = 0;
+
+    print STDERR "TOK: ".$self->{TOKEN}."\n" if ($localDebug);
+
+    if ((!$state{seenCode}) && $self->{TOKEN} && $self->{TOKEN} =~ /\S/s && $self->{TOKEN} ne "if" && $self->{TOKEN} ne "#" && $self->{TOKEN} ne "{" && $self->{TOKEN} ne "}") {
+	print STDERR "SEENCODE -> 1\n" if ($localDebug);
+	$state{seenCode} = 1;
+	$state{insertIfBeforeNode} = $self;
+    }
+    print STDERR "CHECK: INSTRING: ".$state{inString}." INCOMMENT: ".$state{inComment}." INREGEXP: ".$state{inRegExp}." INSINGLE: ".$state{inSingle}."\n" if ($localDebug);
+    if (!($state{inString} || $state{inComment} || $state{inRegExp} || $state{inSingle})) {
+	# Don't mess with the guts of these things, for the most part.
+	print STDERR "FIXUP OKAY\n" if ($localDebug);
+
+	if ($self->{TOKEN} eq "\"") {
+		$state{inString} = 1;
+		$enteringString = 1;
+	} elsif ($self->{TOKEN} eq "'") {
+		$state{inSingle} = 1;
+		$enteringSingle = 1;
+	} elsif ($self->{TOKEN} eq "#") {
+		print STDERR "ILC\n" if ($localDebug);
+		$state{inComment} = 1;
+		$enteringComment = 1;
+		$state{socNode} = $self;
+		if ($state{inHDComment}) {
+			$self->{TOKEN} = " ";
+		} else {
+			$self->{TOKEN} = "//";
+		}
+		if ($self->{FIRSTCHILD}->textTree() =~ /\*\//) {
+			$leavingHDComment = 1;
+		}
+	} elsif ($self->{TOKEN} eq "\$") { # Merge with next token.
+		my $next = $self->{NEXT};
+		if ($next) {
+			$self->{TOKEN} = "";
+			$self->{NEXT}->{TOKEN} = "\$".$self->{NEXT}->{TOKEN};
+		}
+	} elsif ($self->{TOKEN} eq ":") {
+		if ($self->{NEXT} && $self->{NEXT}->{TOKEN} eq ":") {
+			$self->{TOKEN} = "_";
+			$self->{NEXT}->{TOKEN} = "_";
+		}
+	} elsif ($self->{TOKEN} eq "elsif") {
+		$self->{TOKEN} = "else if";
+	} elsif ($self->{TOKEN} eq "STDERR") {
+		$self->{TOKEN} = "stderr";
+	} elsif ($self->{TOKEN} eq "STDOUT") {
+		$self->{TOKEN} = "stdout";
+	} elsif ($self->{TOKEN} eq "STDIN") {
+		$self->{TOKEN} = "stdin";
+	} elsif ($self->{TOKEN} eq "<" && $self->{FIRSTCHILD} &&
+		$self->{FIRSTCHILD}->{NEXT} &&
+		$self->{FIRSTCHILD}->{NEXT}->{TOKEN} =~ /^[a-zA-Z]+$/ &&
+		$self->{FIRSTCHILD}->{NEXT}->{NEXT} &&
+		$self->{FIRSTCHILD}->{NEXT}->{NEXT}->{TOKEN} eq ">") {
+			# print STDERR "FC: ".$self->{FIRSTCHILD}->{TOKEN}." NC ".$self->{FIRSTCHILD}->{NEXT}->{TOKEN}."\n";
+			print STDERR "Read from file.\n" if ($localDebug);
+			$self->{TOKEN} = "stringFromFP(";
+			$self->{FIRSTCHILD}->{NEXT}->{NEXT}->{TOKEN} = ")";
+	} elsif ($self->{TOKEN} eq "print" || $self->{TOKEN} eq "warn") {
+		my $nextnstoken = $self->nextNSToken();
+		if ($self->{TOKEN} eq "print") {
+			my $ns = $self->nextNSToken();
+			if ($ns && ($ns->{TOKEN} eq "\"" || $ns->{TOKEN} eq "\$")) {
+				$self->{TOKEN} = "printf";
+			} else {
+				$self->{TOKEN} = "fprintf";
+				if ($ns->{TOKEN} eq "STDERR") {
+					$ns->{TOKEN} = "stderr";
+				} elsif ($ns->{TOKEN} eq "STDOUT") {
+					$ns->{TOKEN} = "stdout";
+				}
+				$ns->{TOKEN} .= ",";
+			}
+		}
+		if ($nextnstoken->{TOKEN} ne "(") {
+			$self->{TOKEN} .= "(";
+			$state{addParenAtSemi} = 1;
+			$self->{NEXT} = $nextnstoken;
+		}
+	} elsif ($self->{TOKEN} eq "split") {
+		$self->{TOKEN} = "regexpSplit";
+		$state{inSplit} = 1;
+		print STDERR "inSplit -> 1\n" if ($localDebug);
+	} elsif ($self->{TOKEN} eq "(" && $state{inSplit}) {
+		$state{inSplit} = 2;
+		print STDERR "inSplit -> 1\n" if ($localDebug);
+	} elsif ($self->{TOKEN} eq "->") {
+		print STDERR "->" if ($localDebug);
+		my $pos = $self->{NEXT};
+		while ($pos && $pos->{TOKEN} !~ /\S/s) {
+			$pos = $pos->{NEXT};
+		}
+		if ($pos && $pos->{TOKEN} eq "{") {
+			my $posb = $pos->{FIRSTCHILD};
+			while ($posb && $posb->{TOKEN} ne "}") {
+				$posb = $posb->{NEXT};
+			}
+			if ($pos && $posb) {
+				$pos->{TOKEN} = "";
+				$posb->{TOKEN} = "";
+			}
+		}
+	} elsif ($self->{TOKEN} eq "eq" || $self->{TOKEN} eq "ne") {
+		my $prev = $self->slowprev();
+		while ($prev && ($prev->token !~ /\S/s)) {
+			$prev = $prev->slowprev();
+		}
+		while ($prev && $prev->{TOKEN} !~ /\&/ && $prev->{TOKEN} !~/\|/) {
+			print STDERR "PREV: $prev\n" if ($localDebug);
+			print STDERR "TOK: ".$prev->{TOKEN}."\n" if ($localDebug);
+			$prev = $prev->slowprev();
+		}
+		# })
+
+		# If we run off the beginning of the chain, we hit an open parenthesis,
+		# so we know we can always insert after the first (always-empty)
+		# child.
+
+		my $addspace = "";
+		if (!$prev) {
+			$prev = $self->parent()->firstchild();
+		} else {
+			# Add a space after || or &&
+			$addspace = " ";
+		}
+
+		my $next = $self->{NEXT};
+		while ($next && ($next->token !~ /\S/s)) {
+			$next = $next->{NEXT};
+		}
+		print STDERR "NEXT IS \"".$next->{TOKEN}."\"\n" if ($localDebug);
+		while ($next && $next->{NEXT} && $next->{NEXT}->{TOKEN} !~ /\&/ && $next->{NEXT}->{TOKEN} !~ /\|/ &&
+				$next->{NEXT}->{TOKEN} !~ /\)/) {
+			$next = $next->{NEXT};
+			print STDERR "INLOOP NEXT IS ".$next->{TOKEN}."\n" if ($localDebug);
+		}
+		if ($prev && $next) {
+			my $newnode = HeaderDoc::ParseTree->new();
+			if ($self->{TOKEN} eq "eq") {
+				$newnode->{TOKEN} = $addspace."!strcmp(";
+			} else {
+				$newnode->{TOKEN} = $addspace."strcmp(";
+			}
+			$newnode->{NEXT} = $prev->{NEXT};
+			$prev->{NEXT} = $newnode;
+
+			if ($next->{TOKEN} eq "\$") {
+				$next->{TOKEN} = "";
+				$next->{NEXT}->{TOKEN} = "\$".$next->{NEXT}->{TOKEN};
+				$next = $next->{NEXT};
+			}
+
+			$newnode = HeaderDoc::ParseTree->new();
+			$newnode->{TOKEN} = ")";
+			$newnode->{NEXT} = $next->{NEXT};
+			$next->{NEXT} = $newnode;
+
+			$self->{TOKEN} = ",";
+			$prev = $self->slowprev();
+			while ($prev && ($prev->{TOKEN} =~ /\s/s)) {
+				$prev->{TOKEN} = "";
+				$prev = $prev->slowprev();
+			}
+		} else {
+			warn("Could not fix \"eq\" because previous/next token not found (PREV: $prev NEXT: $next).\n");
+		}
+	} elsif ($state{seenCode} && ($self->{TOKEN} eq ";" || $self->{TOKEN} eq "{")) {
+		$state{seenCode} = 0;
+		if ($state{addParenAtSemi}) {
+			$state{addParenAtSemi} = 0;
+			$self->{TOKEN} = ")".$self->{TOKEN};
+		}
+		print STDERR "SEENCODE -> 0\n" if ($localDebug);
+		if ($state{captureIf}) {
+			my $lastcapture = $self->slowprev();
+
+			my $beforenode = $state{insertIfBeforeNode};
+			my $prev = $beforenode->slowprev();
+			if (!$prev) {
+				my $newnode = HeaderDoc::ParseTree->new();
+				$newnode->{TOKEN} = $beforenode->{TOKEN};
+				$newnode->{NEXT} = $beforenode->{NEXT};
+				$beforenode->{NEXT} = $newnode;
+				$beforenode->{TOKEN} = "";
+				$prev = $beforenode;
+				$beforenode = $newnode;
+			}
+
+			my $trailingspace = $self->slowprev();
+			if (!$trailingspace) {
+				$trailingspace = $self->parent();
+			}
+			while ($trailingspace &&
+				((!$trailingspace->{TOKEN}) ||
+				 ($trailingspace->{TOKEN} =~ /\s/s))) {
+
+				# print STDERR "TS: $trailingspace\n" if ($localDebug);
+				# print STDERR "PARENT: ".$trailingspace->parent()."\n" if ($localDebug);
+
+				$trailingspace->{TOKEN} = "";
+				my $temp = $trailingspace->slowprev();
+				if ($temp) { $trailingspace = $temp; }
+				else { $trailingspace = $trailingspace->parent(); }
+			}
+
+			my $copiedDataNode = HeaderDoc::ParseTree->new();
+			$copiedDataNode->{NEXT} = $prev->{NEXT};
+			$prev->{NEXT} = $copiedDataNode;
+
+			$copiedDataNode->{TOKEN} = $state{capturedText}." ";
+			print STDERR "ACCUM: ".$state{capturedText}."\n" if ($localDebug);
+
+			$state{captureIf} = 0;
+			print STDERR "captureIf -> 0\n" if ($localDebug);
+		}
+	} elsif ($self->{TOKEN} eq "if" && $state{seenCode}) {
+		$state{capturedText} = "";
+		$state{captureIf} = 1;
+		print STDERR "captureIf -> 1\n" if ($localDebug);
+	}
+    } elsif ($state{inComment} == 1 && ($self->{TOKEN} eq "/*!" || $self->{TOKEN} eq "/**")) {
+	$state{socNode}->{TOKEN} = " ";
+	$state{inHDComment} = 1;
+    } elsif ($state{inComment} && $self->{TOKEN} =~ /\S/) {
+	$state{inComment} = 2;
+    }
+
+    print STDERR "RE_STATE: ".$self->{RE_STATE}."\n" if ($localDebug);
+    if ($self->{RE_STATE} eq "RE_PREFIX") {
+	print STDERR "Regexp prefix found.\n" if ($localDebug);
+	if ($self->{TOKEN} eq "s") {
+		$state{inRegExp} = 3;
+		$state{rePrefix} = $self->{TOKEN};
+		$self->{TOKEN} = "";
+	} elsif ($self->{TOKEN} eq "tr") {
+		$state{inRegExp} = 4;
+		$state{rePrefix} = $self->{TOKEN};
+		$self->{TOKEN} = "";
+	} elsif ($self->{TOKEN} eq "m") {
+		$self->{TOKEN} = "";
+		print STDERR "Dropping prefix because 'm' is equivalent to no prefix.\n" if ($localDebug);
+	} else {
+		print STDERR "Unsupported prefix.  Ignoring this expression.\n" if ($localDebug);
+		$state{inRegExp} = -1; # No 'tr' support yet.
+	}
+    } elsif ($self->{RE_STATE} eq "RE_PARTSEP") {
+	if ($self->{NEXT}->{RE_STATE} eq "RE_PARTSEP") {
+		$self->{NEXT}->{TOKEN} = "";
+		$self->{NEXT}->{RE_STATE} = "";
+	}
+	$self->{TOKEN} = "\", \"";
+    } elsif ($self->{RE_STATE} eq "RE_START" && ((!$state{inRegExp}) || $state{inRegExp} == 3 || $state{inRegExp} == 4)) {
+	print STDERR "Regexp start found.  INSPLIT: ".$state{inSplit}."\n" if ($localDebug);
+	$state{regexpName} = $state{prevTokenNode}->{TOKEN};
+
+	print STDERR "PTN: ".$state{prevTokenNode}." (".$state{prevTokenNode}->{TOKEN}.") REGEXPNAME: ".$state{regexpName}."\n" if ($localDebug);
+
+	if ($state{inSplit}) {
+		$self->{TOKEN} = "\"";
+		$state{inRegExp} = 2;
+	} elsif ($state{regexpName} =~ /^\$[0-9A-Za-z_]+$/) {
+		if (!$state{inRegExp}) {
+			$state{inRegExp} = 1;
+			$state{prevTokenNode}->{TOKEN} = "regexpMatch(".$state{regexpName}.", ";
+		} elsif ($state{inRegExp} == 3) {
+			$state{prevTokenNode}->{TOKEN} = "regexpReplace(".$state{regexpName}.", \@\@\@DEST\@\@\@, ";
+		} elsif ($state{inRegExp} == 4) {
+			$state{prevTokenNode}->{TOKEN} = "regexptr(".$state{regexpName}.", \@\@\@DEST\@\@\@, ";
+		}
+		my $pos = $state{prevTokenNode}->{NEXT};
+		print STDERR "Deleting the =~ .\n" if ($localDebug);
+		while ($pos && !$pos->{RE_STATE}) {
+			print STDERR "Deleting \"".$pos->{TOKEN}."\" ($pos)\n" if ($localDebug);
+			# Nuke the "=~"
+			if ($pos->{TOKEN} eq "!") {
+				$state{prevTokenNode}->{TOKEN} = "!".$state{prevTokenNode}->{TOKEN};
+			}
+			$pos->{TOKEN} = "";
+			$pos = $pos->{NEXT}
+		}
+		if ($state{rePrefix} eq "s") {
+			$self->{TOKEN} = "\"";
+		# } elsif ($state{rePrefix} eq "tr") {
+			# $self->{TOKEN} = "\"[";
+		} else {
+			$self->{TOKEN} = "\"";
+		}
+	} else {
+		$state{inRegExp} = -1;
+	}
+    } elsif ($self->{RE_STATE} eq "RE_END") {
+	print STDERR "End of regexp found.\n" if ($localDebug);
+
+	# Defaults.
+	my $multiline = 0;
+	my $insensitive = 0;
+	my $global = 0;
+	my $complement = 0;
+	my $delete = 0;
+	my $nondestructive = 0;
+	my $squash = 0;
+
+	my $next = $self->{NEXT};
+	if ($next && $next->{TOKEN} =~ /^[siogmcdr]*$/) {
+		my $re_trailer = $next->{TOKEN};
+		if ($re_trailer =~ /s/) {
+			$multiline = 0;  # for 's'
+			$squash = 1;     # for 'tr'
+		} elsif ($re_trailer =~ /m/) {
+			$multiline = 1;
+		}
+		if ($re_trailer =~ /g/) {
+			$global = 1;
+		}
+		if ($re_trailer =~ /i/) {
+			$insensitive = 1;
+		}
+		if ($re_trailer =~ /c/) {
+			$complement = 1;
+		}
+		if ($re_trailer =~ /d/) {
+			$delete = 1;
+		}
+		if ($re_trailer =~ /r/) {
+			$nondestructive = 1;
+		}
+		$next->{TOKEN} = "";
+	}
+	if ($state{inRegExp} == 1) {
+		$self->{TOKEN} = "\", $multiline, $insensitive, NULL)";
+	} elsif ($state{inRegExp} == 2) {
+		# Leave parentheses open.
+		$self->{TOKEN} = "\"";
+
+		my $next = $self->nextNSToken();
+		print STDERR "THISNEXT: ".$next->{TOKEN}."\n" if ($localDebug);
+		if (!$next) {
+			die("Malformed split\n");
+		}
+		# $next should be the comma after the regular expression.
+
+		$next = $next->nextNSToken();
+		if ($next->{TOKEN} eq "\$") {
+			$next->{TOKEN} = "";
+			$next->{NEXT}->{TOKEN} = "\$".$next->{NEXT}->{TOKEN};
+			$next = $next->{NEXT};
+		}
+		# $next should be the data to split.
+
+		my $argNode = HeaderDoc::ParseTree->new();
+		$argNode->{NEXT} = $next->{NEXT};
+		$next->{NEXT} = $argNode;
+		$argNode->{TOKEN} = ", $multiline, $insensitive";
+
+		my $afternext = $argNode->nextNSToken();
+		print STDERR "AN: ".$afternext->{TOKEN}."\n" if ($localDebug);
+		if (!$afternext || ($afternext->{TOKEN} ne ",")) {
+			$argNode->{TOKEN} .= ", 0";
+		}
+	} elsif ($state{inRegExp} == 3) {
+		if ($state{rePrefix} eq "s") {
+			$self->{TOKEN} = "\", $multiline, $insensitive, $global)";
+		# } elsif ($state{rePrefix} eq "tr") {
+			# $self->{TOKEN} = "]\"";
+		} else {
+			die("Unknown RE prefix \"".$state{rePrefix}."\" [1]\n");
+		}
+	} elsif ($state{inRegExp} == 4) {
+		if ($state{rePrefix} eq "tr") {
+			# Allowed: "s", but not "m", not "i", not "g"
+			$self->{TOKEN} = "\", $squash, $complement, $delete)";
+
+			if ($nondestructive) {
+				$state{prevTokenNode}->{TOKEN} = "regexptr(".$state{regexpName}.", NULL, ";
+			}
+		} else {
+			die("Unknown RE prefix \"".$state{rePrefix}."\" [2]\n");
+		}
+	}
+	$state{inRegExp} = 0;
+	$state{rePrefix} = "";
+    } elsif ($state{inRegExp}) {
+	$self->{TOKEN} =~ s/\\/\\\\/g;
+    }
+
+    if ($state{inComment} && $self->{TOKEN} =~ /[\n\r]/) {
+	print STDERR "Leaving comment.\n" if ($localDebug);
+	$state{inComment} = 0;
+    }
+
+    print STDERR "Checking token.\n" if ($localDebug);
+    if ($self->{TOKEN} =~ /^\$[a-zA-Z0-9_]+$/) {
+	print STDERR "setting PTN\n" if ($localDebug);
+	$state{prevTokenNode} = $self;
+    }
+
+    if ($state{captureIf}) {
+	print STDERR "APPEND ".$self->{TOKEN}."\n" if ($localDebug);
+	$state{capturedText} .= $self->{TOKEN};
+	$self->{TOKEN} = "";
+    }
+
+    my $resetSplit = 0;
+    if ($state{inSplit} == 2) {
+	$resetSplit = 1;
+	$state{inSplit} = 3;
+    }
+
+    if ($self->{FIRSTCHILD}) {
+	print STDERR "Processing children.\n" if ($localDebug);
+	my $tempstateref = $self->{FIRSTCHILD}->translateTreeRec(\%state);
+	my %tempstate = %{$tempstateref};
+	if ($state{inComment} && $tempstate{inHDComment}) {
+		$state{inHDComment} = 1;
+	}
+	if ($state{captureIf}) {
+		$state{capturedText} = $tempstate{capturedText};
+	}
+	$state{seenCode} = $tempstate{seenCode};
+	$state{prevTokenNode} = $tempstate{prevtoken};
+    }
+    if ($resetSplit) { $state{inSplit} = 0; print STDERR "inSplit -> 0\n" if ($localDebug) };
+    if ($enteringComment) { $state{inComment} = 0; $state{seenCode} = 0; }
+    if ($enteringString) { $state{inString} = 0; }
+    if ($enteringSingle) { $state{inSingle} = 0; }
+    if ($leavingHDComment) { $state{inHDComment} = 0; $state{seenCode} = 0; }
+    if ($self->{NEXT}) {
+	print STDERR "Processing next.\n" if ($localDebug);
+	$stateref = $self->{NEXT}->translateTreeRec(\%state);
+	%state = %{$stateref};
+    }
+    print STDERR "Returning.\n" if ($localDebug);
+    return \%state;
+}
 1;

@@ -3,7 +3,7 @@
 # Class name: APIOwner
 # Synopsis: Abstract superclass for Header and OO structures
 #
-# Last Updated: $Date: 2011/05/18 12:09:34 $
+# Last Updated: $Date: 2011/09/29 11:25:23 $
 # 
 # Method additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -74,6 +74,11 @@
 #         Contains an array of names of functions to "also include" in
 #         the documentation for this class/pseudoclass.  Mainly intended
 #         for applying class-like behavior to procedural languages.
+#     @var APPLEREFUSED
+#         A reference to a hash containing API references that have been
+#         emitted already in the context of this API owner.  This is
+#         needed so that it can be reset if a class is re-emitted (after
+#         category folding, for example).
 #     @var CATEGORIES
 #         An array of
 #         {@link //apple_ref/perl/cl/HeaderDoc::ObjCCategory ObjCCategory}
@@ -225,7 +230,7 @@ use vars qw(@ISA);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::APIOwner::VERSION = '$Revision: 1305745774 $';
+$HeaderDoc::APIOwner::VERSION = '$Revision: 1317320723 $';
 
 my $addToDebug = 0;
 
@@ -3484,8 +3489,10 @@ sub createTOCFile {
 #     @abstract
 #         Generates the content HTML file (right-side frame).
 #     @discussion
-#         In "class as composite" mode, this function writes
-#         all of the right-side frames into a single file.
+#         In "class as composite" mode, this function does not
+#         get called.  Instead, {@link writeHeaderElementsToCompositePage}
+#         is used.
+#
 #         Otherwise, this function just writes the introduction
 #         for the header or class itself, and the other
 #         right-side content is written later by a call to
@@ -3823,7 +3830,7 @@ sub writeFunctionListToStdOut {
 #         Writes the right-side content.
 #     @discussion
 #         In "class as composite" mode, this function's
-#         purpose is handled by {@link createContentFile},
+#         purpose is handled by {@link writeHeaderElementsToCompositePage},
 #         so it does not get called.
 #
 #         Otherwise, this function writes all of the
@@ -4203,8 +4210,8 @@ sub writeHeaderElementsToXMLPage { # All API in a single XML page
 #     @abstract
 #         Writes output to the composite page.
 #     @discussion
-#         In "class as composite" mode, this function is not called.
-#         The function {@link createContentFile} handles this instead.
+#         In "class as composite" mode, this function supersedes
+#         the function {@link createContentFile}.
 #     @param self
 #         The <code>APIOwner</code> object.
 #  */
@@ -4218,10 +4225,18 @@ sub writeHeaderElementsToCompositePage { # All API in a single HTML page -- for 
     # $compositePageString = $self->stripAppleRefs($compositePageString);
     my $outputFile = $rootOutputDir.$pathSeparator.$compositePageName;
 
+# print STDERR "OUTFILE: $outputFile\n";
+
 	if (! -e $rootOutputDir) {
 		unless (mkdir ("$rootOutputDir", 0777)) {die ("Can't create output folder $rootOutputDir. $!");};
     }
+
+# print STDERR "PRE: $compositePageString\n";
+
     my $processed_string = html_fixup_links($self, $compositePageString);
+
+# print STDERR "DUMP: $processed_string\n";
+
     $self->_createHTMLOutputFile($outputFile, $processed_string, "$name", 1);
 }
 
@@ -7577,6 +7592,56 @@ sub fixupTypeRequests
     }
 
     $self->{PDEFINES} = \@newobjs;
+}
+
+
+# /*!
+#     @abstract
+#         Marks an API reference ID as having been emitted already.
+#     @param self
+#         The API owner object.
+#     @param uid
+#         The user ID to query or set.
+#     @param used
+#         Normally, you would pass 1 when setting.  If you just
+#         want to query the value, do not pass this argument.
+#  */
+sub appleRefUsed
+{
+    my $self = shift;
+    my $uid = shift;
+
+    my %map = ();
+
+    if ($self->{APPLEREFUSED}) {
+	%map = %{$self->{APPLEREFUSED}};
+    }
+
+    my $retval = $map{$uid};
+
+    if (@_) {
+	# print STDERR "SETTING USED FOR $uid ON $self\n";
+	$map{$uid} = 1;
+	$self->{APPLEREFUSED} = \%map;
+    }
+
+    return $retval;
+}
+
+# /*!
+#     @abstract
+#         Clears the API reference hash used by {@link appleRefUsed}.
+#     @discussion
+#         This is called when an API owner object needs to be
+#         emitted again (e.g. when a category's methods are folded
+#         into a class in another header).
+#  */
+sub resetAppleRefUsed
+{
+    my $self = shift;
+
+    # print STDERR "RESETTING USED ON $self\n";
+    delete $self->{APPLEREFUSED};
 }
 
 1;

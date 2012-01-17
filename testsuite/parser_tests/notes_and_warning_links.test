@@ -25,7 +25,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 
     This is out of the note again.
  */
-$0|$4578|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$4693|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 1
 inClass: 0
 inInterface: 0
@@ -93,8 +93,10 @@ $parserState->{noInsert} => 0
 $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{onlyComments} => 1
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 0
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 1
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -149,20 +151,20 @@ APIUID: //test_ref/doc/header/notes_and_warning_links.test
 ABSTRACT: ""
 DISCUSSION: "<p>This is a test of the warning and important tags.
 </p>
-<p><b>WARNING:</b><br /></p><div class='warning_indent'><p>This doesn't work that well.
-No, really it doesn't.</p></div>
-<p>This is a normal paragraph.
-</p>
-<p><b>Important:</b><br /></p><div class='important_indent'><p>This is sort of important.
-Maybe.</p></div>
-<p>This is also a normal paragraph.
-</p>
-<p><b>Test note:</b><br /></p><div class='note_indent'><p>This is a test of <code><hd_link posstarget="//apple_ref/c/func/foo"> foo</hd_link></code> notes with 
-custom titles and links.</p></div>
-<p>This is out of the note.
-</p>
-<p><b>Note:</b><br /></p><div class='note_indent'><p>This is a straight note with no title.</p></div>
-<p>This is out of the note again.
+<hd_warning_internal><note_title></note_title><p>This doesn't work that well.
+No, really it doesn't.</p></hd_warning_internal>
+This is a normal paragraph.
+
+<hd_important_internal><note_title></note_title><p>This is sort of important.
+Maybe.</p></hd_important_internal>
+This is also a normal paragraph.
+
+<hd_note_internal><note_title>Test note</note_title><p>This is a test of <code><hd_link posstarget="//apple_ref/c/func/foo"> foo</hd_link></code> notes with 
+custom titles and links.</p></hd_note_internal>
+This is out of the note.
+
+<hd_note_internal><note_title>Note</note_title><p>This is a straight note with no title.</p></hd_note_internal>
+This is out of the note again.
 "
 UPDATED: ""
 COPYRIGHT: ""
@@ -201,7 +203,7 @@ LONG ATTRIBUTES:
 
 -=: HTML OUTPUT OF PARSE TREES :=-
 
-$4578|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$4693|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 1
 inClass: 0
 inInterface: 0
@@ -269,8 +271,10 @@ $parserState->{noInsert} => 0
 $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{onlyComments} => 1
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 0
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 1
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -325,20 +329,20 @@ APIUID: //test_ref/doc/header/notes_and_warning_links.test
 ABSTRACT: ""
 DISCUSSION: "<p>This is a test of the warning and important tags.
 </p>
-<p><b>WARNING:</b><br /></p><div class='warning_indent'><p>This doesn't work that well.
-No, really it doesn't.</p></div>
-<p>This is a normal paragraph.
-</p>
-<p><b>Important:</b><br /></p><div class='important_indent'><p>This is sort of important.
-Maybe.</p></div>
-<p>This is also a normal paragraph.
-</p>
-<p><b>Test note:</b><br /></p><div class='note_indent'><p>This is a test of <code><hd_link posstarget="//apple_ref/c/func/foo"> foo</hd_link></code> notes with 
-custom titles and links.</p></div>
-<p>This is out of the note.
-</p>
-<p><b>Note:</b><br /></p><div class='note_indent'><p>This is a straight note with no title.</p></div>
-<p>This is out of the note again.
+<hd_warning_internal><note_title></note_title><p>This doesn't work that well.
+No, really it doesn't.</p></hd_warning_internal>
+This is a normal paragraph.
+
+<hd_important_internal><note_title></note_title><p>This is sort of important.
+Maybe.</p></hd_important_internal>
+This is also a normal paragraph.
+
+<hd_note_internal><note_title>Test note</note_title><p>This is a test of <code><hd_link posstarget="//apple_ref/c/func/foo"> foo</hd_link></code> notes with 
+custom titles and links.</p></hd_note_internal>
+This is out of the note.
+
+<hd_note_internal><note_title>Note</note_title><p>This is a straight note with no title.</p></hd_note_internal>
+This is out of the note again.
 "
 UPDATED: ""
 COPYRIGHT: ""

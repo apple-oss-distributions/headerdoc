@@ -8,7 +8,7 @@ $46|/*!
  @typedef Wrapper2
  @abstract A struct
 */
-$0|$10914|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$10986|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -82,8 +82,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 3
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  typedef struct
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -124,9 +126,8 @@ extendsClass:
 implementsClass: 
 -=: LIST OF PARSED PARAMETERS :=-
 Parsed Param 0 => struct myStruct2 *data
-Parsed Param 1 => struct 
-                int value
-Parsed Param 2 => container
+Parsed Param 1 => int value
+Parsed Param 2 => struct  container
 -=: DUMP OF PARSE TREE :=-
 +---typedef
 +--- 
@@ -305,7 +306,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: value
-        TYPE: struct                   int
+        TYPE: int
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -347,7 +348,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: container
-        TYPE: 
+        TYPE: struct
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -440,7 +441,7 @@ END OF OBJECT
 
 
 
-$10914|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$10986|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -514,8 +515,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 3
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  typedef struct
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -556,9 +559,8 @@ extendsClass:
 implementsClass: 
 -=: LIST OF PARSED PARAMETERS :=-
 Parsed Param 0 => struct myStruct2 *data
-Parsed Param 1 => struct 
-                int value
-Parsed Param 2 => container
+Parsed Param 1 => int value
+Parsed Param 2 => struct  container
 -=: DUMP OF PARSE TREE :=-
 +---typedef
 +--- 
@@ -737,7 +739,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: value
-        TYPE: struct                   int
+        TYPE: int
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -779,7 +781,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::MinorAPIElement
         NAME: container
-        TYPE: 
+        TYPE: struct
         APIUID: 
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
@@ -877,4 +879,4 @@ objects---the legitimate one for the outer typedef and a
 bogus second one for struct myData2.  This has been fixed.
 In the unlikely even tthat this fix regresses, this test
 should detect it.
-$91|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/typedef_9.test$1|C$9|typedef 9$1|C$6|parser
+$37|testsuite/parser_tests/typedef_9.test$1|C$9|typedef 9$1|C$6|parser

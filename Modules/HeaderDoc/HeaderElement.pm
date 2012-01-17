@@ -3,7 +3,7 @@
 # Class name: HeaderElement
 # Synopsis: Root class for Function, Typedef, Constant, etc. -- used by HeaderDoc.
 #
-# Last Updated: $Date: 2011/05/18 14:09:25 $
+# Last Updated: $Date: 2011/12/07 08:49:40 $
 #
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -255,7 +255,7 @@
 #         destroying this object to allow those references to be destroyed.
 #     @var NAMESPACE
 #         Contains a text string representing the namespace for this class.
-#         See {@link namespace}.
+#         See {@link //apple_ref/perl/instm/HeaderDoc::HeaderElement/namespace//() namespace}.
 #     @var NOREGISTERUID
 #         Set to 1 when an object's UID has been unregistered to prevent it from being
 #         registered again.  See {@link noRegisterUID}.
@@ -328,7 +328,8 @@
 #     @var USESTDOUT
 #         Set to 1 if the <code>-P</code> (pipe) flag is passed to HeaderDoc, else 0.
 #     @var VALUE
-#         The value of a constant/variable.  See {@link value}.
+#         The value of a constant/variable.
+#         See {@link //apple_ref/perl/instm/HeaderDoc::HeaderElement/value//() value}.
 #     @var VARIABLES
 #         An array of variables enclosed in a normal (usually function) object.  These are
 #         {@link //apple_ref/perl/cl/HeaderDoc::MinorAPIElement MinorAPIElement} objects.
@@ -360,7 +361,7 @@ use Devel::Peek;
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::HeaderElement::VERSION = '$Revision: 1305752965 $';
+$HeaderDoc::HeaderElement::VERSION = '$Revision: 1323276580 $';
 
 # /*!
 #     @abstract
@@ -1596,6 +1597,8 @@ sub getAttributes
         foreach my $key (sort strcasecmp keys %attlist) {
 	    my $value = $attlist{$key};
 	    if ($xml) {
+		$key = $self->htmlToXML($key);
+		$value = $self->htmlToXML($value);
 		$retval .= "<longattribute><name>$key</name><value>$value</value></longattribute>\n";
 	    } else {
 		$maybe = 0;
@@ -2504,7 +2507,7 @@ sub throws {
 #     @param self
 #         The current object.
 #     @discussion
-#         The value is set with {@link throws}.
+#         The value is set with {@link //apple_ref/perl/instm/HeaderDoc::HeaderElement/throws//() throws}.
 #  */
 sub XMLthrows {
     my $self = shift;
@@ -3894,7 +3897,7 @@ sub keywords
 	"try" => 1,
 	"volatile"  => 1,
 	"while"  => 1);
-    my %tclKeywords = ( ); # @@@ FIXME DAG @@@
+    my %tclKeywords = ( "method" => 1, "constructor" => 1, "proc" => 1, "attribute" => 1 ); # Consider adding "regexp" command? # @@@ ADD "class" and fix bugs.
     my %perlKeywords = ( "sub"  => 1, "my" => 8, "next" => 1, "last" => 1,
 	"package" => 1 );
     my %shellKeywords = ( "sub"  => 1, "alias" => 1,
@@ -5519,9 +5522,9 @@ sub documentationBlock
             my $uid = $element->apiuid(); # "econst");
             # $contentString .= "<tr><td align=\"center\"><a name=\"$uid\"><code>$cName</code></a></td><td>$cDesc</td></tr>\n";
 
-	    if (!$HeaderDoc::appleRefUsed{$uid} && !$HeaderDoc::ignore_apiuid_errors) {
+	    if (!$apio->appleRefUsed($uid) && !$HeaderDoc::ignore_apiuid_errors) {
 		# print STDERR "MARKING APIREF $uid used\n";
-		$HeaderDoc::appleRefUsed{$uid} = 1;
+		$apio->appleRefUsed($uid, 1);
                 $contentString .= "<dt><a name=\"$uid\"><code>$cName</code></a></dt><dd>$cDesc</dd>\n";
 	    } else {
                 $contentString .= "<dt><code>$cName</code></dt><dd>$cDesc</dd>\n";
@@ -5671,11 +5674,12 @@ sub documentationBlock
 
 			# $contentString .= "<tr><td align=\"center\"><a name=\"$uid\"><code>$cName</code></a></td><td>$cDesc</td></tr>\n";
 
-			if (!$HeaderDoc::appleRefUsed{$uid} && !$HeaderDoc::ignore_apiuid_errors) {
-				# print STDERR "MARKING APIREF $uid used\n";
-				$HeaderDoc::appleRefUsed{$uid} = 1;
+			if (!$apio->appleRefUsed($uid) && !$HeaderDoc::ignore_apiuid_errors) {
+				# cluck("MARKING APIREF $uid used\n");
+				$apio->appleRefUsed($uid, 1);
 				$contentString .= "<dt><a name=\"$uid\"><code>$cName</code></a></dt><dd>$cDesc</dd>\n";
 			} else {
+				# cluck("Reused Apple Ref $uid\n");
 				$contentString .= "<dt><code>$cName</code></dt><dd>$cDesc</dd>\n";
 			}
 		    }
@@ -6424,6 +6428,7 @@ sub XMLdocumentationBlock {
 		# my $methodType = $self->getMethodType($declarationRaw);
 		my $methodType = $self->getMethodType();
 		$uid = $self->apiuid($methodType);
+		$extra = " type=\"$methodType\"";
 		$isAPIOwner = 0;
 		last SWITCH;
 	    };
@@ -6494,7 +6499,11 @@ sub XMLdocumentationBlock {
 		} else {
 			$definetype = "value";
 		}
-		$defineinfo = " definetype=\"$definetype\" ";
+		$defineinfo = "definetype=\"$definetype\" ";
+
+		if ($self->parseOnly()) {
+			$defineinfo .= "parseOnly=\"true\" ";
+		}
 		$isAPIOwner = 0;
 		last SWITCH;
 	    };
@@ -6587,6 +6596,9 @@ sub XMLdocumentationBlock {
 	$value = $self->value();
 
 	if (length($value) && ($value ne "UNKNOWN")) {
+		# Always XML in this function, so do this every time.
+		$value = $self->textToXML($value);
+
         	$compositePageString .= "<value>$value</value>\n";
 	}
     }
@@ -6720,9 +6732,9 @@ sub XMLdocumentationBlock {
 			if (length($fielduidtag)) {
 				my $fielduid = $field->apiuid($fielduidtag);
 				$fielduidstring = " id=\"$fielduid\"";
-				if (!$HeaderDoc::appleRefUsed{$uid} && !$HeaderDoc::ignore_apiuid_errors) {
+				if (!$apio->appleRefUsed($uid) && !$HeaderDoc::ignore_apiuid_errors) {
 					# print STDERR "MARKING APIREF $uid used\n";
-					$HeaderDoc::appleRefUsed{$uid} = 1;
+					$apio->appleRefUsed($uid, 1);
 				} else {
 					# already used or a "junk" run to obtain
 					# uids for another purpose.  Drop the
@@ -6768,9 +6780,9 @@ sub XMLdocumentationBlock {
 			if (length($fielduidtag)) {
 				my $fielduid = $field->apiuid($fielduidtag);
 				$fielduidstring = " id=\"$fielduid\"";
-				if (!$HeaderDoc::appleRefUsed{$uid} && !$HeaderDoc::ignore_apiuid_errors) {
+				if (!$apio->appleRefUsed($uid) && !$HeaderDoc::ignore_apiuid_errors) {
 					# print STDERR "MARKING APIREF $uid used\n";
-					$HeaderDoc::appleRefUsed{$uid} = 1;
+					$apio->appleRefUsed($uid, 1);
 				} else {
 					# already used or a "junk" run to obtain
 					# uids for another purpose.  Drop the
@@ -7828,7 +7840,7 @@ field);
 		};
 
 	    ($class =~ /HeaderDoc\:\:PDefine/ && $self->isBlock() && $field =~ s/^hidesingletons(\s+)/$1/sio) && do {$self->{HIDESINGLETONS} = 1; last SWITCH;};
-	    ($class =~ /HeaderDoc\:\:PDefine/ && $field =~ s/^hidecontents(\s+)/$1/sio) && do {$self->hideContents(1); last SWITCH;};
+	    (($class =~ /HeaderDoc\:\:PDefine/ || $class =~ /HeaderDoc\:\:Function/ || $class =~ /HeaderDoc\:\:Method/) && $field =~ s/^hidecontents(\s+)/$1/sio) && do {$self->hideContents(1); last SWITCH;};
 	    (($class =~ /HeaderDoc\:\:Function/ || $class =~ /HeaderDoc\:\:Method/) && $field =~ s/^(function|method)group\s+//sio) &&
 		do {$self->group($field); last SWITCH;};
 

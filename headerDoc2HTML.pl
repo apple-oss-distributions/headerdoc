@@ -4,7 +4,7 @@
 # Synopsis: Scans a file for headerDoc comments and generates an HTML
 #           file from the comments it finds.
 #
-# Last Updated: $Date: 2011/05/06 20:29:05 $
+# Last Updated: $Date: 2012/01/11 09:43:51 $
 #
 # ObjC additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -29,7 +29,7 @@
 #
 # @APPLE_LICENSE_HEADER_END@
 #
-# $Revision: 1304738945 $
+# $Revision: 1326303831 $
 #####################################################################
 
 
@@ -52,7 +52,7 @@
 #     @abstract
 #         The version number of the HeaderDoc suite.
 #  */
-my $HeaderDoc_Version = "8.8";
+my $HeaderDoc_Version = "8.9";
 
 # /*!
 #     @abstract
@@ -61,7 +61,7 @@ my $HeaderDoc_Version = "8.8";
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-my $VERSION = '$Revision: 1304738945 $';
+my $VERSION = '$Revision: 1326303831 $';
 
 # /*!
 #     @abstract
@@ -503,6 +503,7 @@ $| = 1;
 # Check options in BEGIN block to avoid overhead of loading supporting 
 # modules in error cases.
 my $uninstalledModulesPath;
+my $devtoolsModulesPath;
 BEGIN {
     use FindBin qw ($Bin);
     use Cwd;
@@ -987,9 +988,10 @@ BEGIN {
 		$pathSeparator = "/";
 		$isMacOS = 0;
     }
-	$uninstalledModulesPath = "$FindBin::Bin"."$pathSeparator"."Modules";
+    $uninstalledModulesPath = "$FindBin::Bin"."$pathSeparator"."Modules";
+    $devtoolsModulesPath = "$FindBin::Bin"."$pathSeparator".".."."$pathSeparator"."share"."$pathSeparator"."headerdoc"."$pathSeparator"."Modules";
 	
-	foreach (qw(Mac::Files)) {
+    foreach (qw(Mac::Files)) {
 	    $MOD_AVAIL{$_} = eval "use $_; 1";
     }
 
@@ -1036,6 +1038,8 @@ BEGIN {
 }
 
     use lib $uninstalledModulesPath;
+    use lib $devtoolsModulesPath;
+
     use HeaderDoc::Utilities qw(linesFromFile getLangAndSubLangFromFilename dumpCaches stripLeading);
     use HeaderDoc::Utilities qw(processTopLevel);
     use locale;
@@ -1729,11 +1733,12 @@ if ($^O =~ /MacOS/io) {
 	$systemPreferencesPath = "/Library/Preferences";
 	$systemAppSupportPath = "/Library/Application Support/Apple/HeaderDoc";
 }
+my $devtoolsPreferencesPath = "$FindBin::Bin"."$pathSeparator".".."."$pathSeparator"."share"."$pathSeparator"."headerdoc"."$pathSeparator"."conf";
 
 # The order of files in this array determines the order that the config files will be read
 # If there are multiple config files that declare a value for the same key, the last one read wins
 my $CWD = cwd();
-my @configFiles = ($systemPreferencesPath.$pathSeparator.$preferencesConfigFileName, $usersPreferencesPath.$pathSeparator.$preferencesConfigFileName, $Bin.$pathSeparator.$localConfigFileName, $CWD.$pathSeparator.$localConfigFileName);
+my @configFiles = ($devtoolsPreferencesPath.$pathSeparator.$preferencesConfigFileName, $systemPreferencesPath.$pathSeparator.$preferencesConfigFileName, $usersPreferencesPath.$pathSeparator.$preferencesConfigFileName, $Bin.$pathSeparator.$localConfigFileName, $CWD.$pathSeparator.$localConfigFileName);
 
 if (length($HeaderDoc::specified_config_file)) {
 	@configFiles = ();
@@ -1784,7 +1789,11 @@ my %config = (
 %config = &updateHashFromConfigFiles(\%config,\@configFiles);
 
 # Read the static availability macro text from the modules folder.
-getAvailabilityMacros($HeaderDoc::modulesPath."Availability.list", $quietLevel);
+if ( -f $HeaderDoc::modulesPath."../../Availability.list") {
+	getAvailabilityMacros($HeaderDoc::modulesPath."../../Availability.list", 1);
+} else {
+	getAvailabilityMacros($HeaderDoc::modulesPath."Availability.list", $quietLevel);
+}
 
 if ($config{"ignorePrefixes"}) {
     my $localDebug = 0;
@@ -1869,7 +1878,7 @@ if ($config{"styleSheetExtrasFile"} ne "") {
     my $oldRS = $/;
     $/ = undef;
     # my @extrasFiles = ($Bin.$pathSeparator.$basename, $usersPreferencesPath.$pathSeparator.$basename, $basename);
-    my @extrasFiles = ($systemPreferencesPath.$pathSeparator.$basename, $usersPreferencesPath.$pathSeparator.$basename, $Bin.$pathSeparator.$basename, $CWD.$pathSeparator.$basename, $usersAppSupportPath.$pathSeparator.$basename, $systemAppSupportPath.$pathSeparator.$basename);
+    my @extrasFiles = ($devtoolsPreferencesPath.$pathSeparator.$basename, $systemPreferencesPath.$pathSeparator.$basename, $usersPreferencesPath.$pathSeparator.$basename, $Bin.$pathSeparator.$basename, $CWD.$pathSeparator.$basename, $usersAppSupportPath.$pathSeparator.$basename, $systemAppSupportPath.$pathSeparator.$basename);
     foreach my $filename (@extrasFiles) {
 	if (open(READFILE, "<$filename")) {
 		$HeaderDoc::styleSheetExtras = <READFILE>;
@@ -3062,6 +3071,7 @@ print STDERR "REDO" if ($debugging);
                     		print STDERR "$fullpath:$linenum: warning: Couldn't find Header object that owns the category with name $categoryName.\n";
 			}
 			my $assocapio = $associatedClass->APIOwner();
+			$assocapio->resetAppleRefUsed();
 			if ($man_output) {
 				$assocapio->writeHeaderElementsToManPage();
 			} elsif ($function_list_output) {
@@ -4404,7 +4414,8 @@ sub newtest
 		exit(-1);
 	}
     }
-    $test->writeToFile("$filename");
+    $test->writeToFile($filename);
+    $test->writeToPlist($filename);
     print "Wrote test data to \"$filename\"\n";
     $test->dbprint();
 }
@@ -4448,7 +4459,7 @@ sub runtests
     my $preferencesConfigFileName = "com.apple.headerDoc2HTML.config";
 
     my $CWD = cwd();
-    my @configFiles = ($systemPreferencesPath.$pathSeparator.$preferencesConfigFileName, $usersPreferencesPath.$pathSeparator.$preferencesConfigFileName, $Bin.$pathSeparator.$localConfigFileName, $CWD.$pathSeparator.$localConfigFileName);
+    my @configFiles = ($devtoolsPreferencesPath.$pathSeparator.$preferencesConfigFileName, $systemPreferencesPath.$pathSeparator.$preferencesConfigFileName, $usersPreferencesPath.$pathSeparator.$preferencesConfigFileName, $Bin.$pathSeparator.$localConfigFileName, $CWD.$pathSeparator.$localConfigFileName);
 
     %config = &updateHashFromConfigFiles(\%config,\@configFiles);
 
@@ -4563,6 +4574,12 @@ sub runtestlist
 		}
 		my $test = HeaderDoc::Test->new();
 		$test->readFromFile($filename);
+
+		my $plist = $filename;
+		$plist =~ s/\.test$/\.plist/g;
+		if (! -f $plist) {
+			$test->writeToPlist($filename);
+		}
 		print "Test \"".$test->{NAME}."\": ";
 
 		my $coretestfail = $test->runTest(\@ignore_re);
@@ -4583,6 +4600,7 @@ sub runtestlist
 			$test->{EXPECTED_RESULT} = $test->{RESULT};
 			$test->{EXPECTED_RESULT_ALLDECS} = $test->{RESULT_ALLDECS};
 			$test->writeToFile($filename);
+			$test->writeToPlist($filename);
 			$ok_count++;
 		} elsif (($test->{FILTERED_RESULT} eq $test->{EXPECTED_FILTERED_RESULT}) &&
 		    ($test->{FILTERED_RESULT_ALLDECS} eq $test->{EXPECTED_FILTERED_RESULT_ALLDECS})) {
@@ -4595,6 +4613,7 @@ sub runtestlist
 
 			if ($force) {
 				$test->writeToFile($filename);
+				$test->writeToPlist($filename);
 			}
 
 			# $test->showresults();
@@ -4651,6 +4670,7 @@ sub runtestlist
 						$test->{EXPECTED_RESULT} = $test->{RESULT};
 						$test->{EXPECTED_RESULT_ALLDECS} = $test->{RESULT_ALLDECS};
 						$test->writeToFile($filename);
+						$test->writeToPlist($filename);
 						$ok_count++; $continue_update = 0;
 					} elsif ($temp =~ /^\s*skip\s*$/) {
 						$fail_count++; $continue_update = 0;
@@ -4669,6 +4689,7 @@ sub runtestlist
 							$test->{EXPECTED_RESULT} = $test->{RESULT};
 							$test->{EXPECTED_RESULT_ALLDECS} = $test->{RESULT_ALLDECS};
 							$test->writeToFile($filename);
+							$test->writeToPlist($filename);
 							$ok_count++; $continue_update = 0;
 						} else {
 							print STDERR "Still failed.  (At some point, re-running a test will work, but not yet.)\n";

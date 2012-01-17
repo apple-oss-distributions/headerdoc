@@ -3,7 +3,7 @@
 # Class name: Header
 # Synopsis: Holds header-wide comments parsed by headerDoc
 #
-# Last Updated: $Date: 2011/02/18 19:02:58 $
+# Last Updated: $Date: 2011/05/26 15:50:22 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -84,7 +84,7 @@ use vars qw($VERSION @ISA);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::Header::VERSION = '$Revision: 1298084578 $';
+$HeaderDoc::Header::VERSION = '$Revision: 1306450222 $';
 
 # Inheritance
 @ISA = qw( HeaderDoc::APIOwner );
@@ -480,6 +480,8 @@ sub writeHeaderElementsToCompositePage {
     my @categoryObjs = $self->categories();
 
     $self->SUPER::writeHeaderElementsToCompositePage();
+    return;
+
     if ($self->classes()) {
 	    foreach my $obj (@classObjs) {
 		    $obj->writeHeaderElementsToCompositePage(); 

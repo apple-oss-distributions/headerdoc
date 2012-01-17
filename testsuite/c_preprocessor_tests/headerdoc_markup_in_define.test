@@ -7,7 +7,7 @@ $0|$56|#define GUTS \
 	int bar; \
 	/*! @var foo */ \
 	int foo;
-$3639|-=: CPP MACROS PARSED :=-
+$3746|-=: CPP MACROS PARSED :=-
 PARSED: GUTS
 
 -=: BLOCKPARSE PARSER STATE KEYS :=-
@@ -56,8 +56,10 @@ $parserState->{noInsert} => 0
 $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  typedef struct
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -148,7 +150,7 @@ $CPP_HASH{GUTS} =>
         int bar; 
 /*! @var foo */ 
         int foo;
-$3639|-=: CPP MACROS PARSED :=-
+$3746|-=: CPP MACROS PARSED :=-
 PARSED: GUTS
 
 -=: BLOCKPARSE PARSER STATE KEYS :=-
@@ -197,8 +199,10 @@ $parserState->{noInsert} => 0
 $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  typedef struct
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)

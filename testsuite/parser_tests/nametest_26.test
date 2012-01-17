@@ -17,7 +17,7 @@ $589|/*!
         @constant       kDRBlockSizeMode2Form2Data      Mode 2 Form 2 data.
         @constant       kDRBlockSizeDVDData                     DVD data.
 */
-$0|$15775|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$15882|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -89,8 +89,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 1
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  enum
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -616,7 +618,7 @@ END OF OBJECT
 
 
 
-$15775|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$15882|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -688,8 +690,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 1
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  enum
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)

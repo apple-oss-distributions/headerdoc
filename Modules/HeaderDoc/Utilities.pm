@@ -2,7 +2,7 @@
 # Utilities.pm
 # 
 # Common subroutines
-# Last Updated: $Date: 2011/05/17 14:51:53 $
+# Last Updated: $Date: 2011/09/29 11:25:23 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -50,6 +50,8 @@ package HeaderDoc::Utilities;
 use strict;
 use vars qw(@ISA @EXPORT $VERSION);
 use Carp qw(cluck);
+use IPC::Open2;
+use IO::Handle;
 # use HeaderDoc::MacroFilter qw(filterFileString);
 
 use Cwd;
@@ -73,7 +75,7 @@ my $depth = 0;
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::Utilities::VERSION = '$Revision: 1305669113 $';
+$HeaderDoc::Utilities::VERSION = '$Revision: 1317320723 $';
 @ISA = qw(Exporter);
 @EXPORT = qw(findRelativePath safeName safeNameNoCollide linesFromFile makeAbsolutePath
              printHash printArray fileNameFromPath folderPathForFile 
@@ -755,6 +757,11 @@ sub linesFromFile {
 #     @param arrayref
 #         A reference to an array containing the candidate API references
 #         to check.
+#     @result
+#         Returns the array <code>($value, $bogus)</code> containing the
+#         best value and a flag to indicate whether the conflict is
+#         solely caused by a function parameter or local variable
+#         that is local to a different function.
 #  */
 sub chooseBestAPIRef
 {
@@ -764,12 +771,15 @@ sub chooseBestAPIRef
 
 	my $localDebug = 0;
 
+	my $bogus = 0;
+
 	if ($fromObj) {
 		my $headerName = "";
 		my $className = "";
 		my $targetLang = $fromObj->lang();
 		my $targetSubLang = $fromObj->sublang();
 		my $apiOwner = $fromObj->apiOwner();
+		my $name = $fromObj->apiuidname();
 
 		if ($fromObj->isAPIOwner()) {
 			my $class = ref($fromObj) || $fromObj;
@@ -798,7 +808,62 @@ sub chooseBestAPIRef
 		$headerName =~ s/\s//sgo;
 		$headerName =~ s/<.*?>//sgo;
 
-		# First, look for the one in the current class.
+		my @newarr = ();
+		# First, look for the one in the current function or declaration.
+		foreach my $ref (@arr) {
+			if ($ref =~ /^\/\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)(\/|$)/) {
+				my $apple_ref_part = $1;
+				my $language_part = $2;
+				my $reftype_part = $3;
+				my $class_part = $4;
+				my $owning_symbol_part = $5;
+				my $symbol_part = $6;
+
+				print STDERR "POINT A: REF: $ref reftype_part: $reftype_part\n" if ($localDebug);
+
+				if ($reftype_part =~ /(functionparam|methodparam|defineparam|enumconstant|functionvar|methodvar|definevar|structfield|typedeffield)/) {
+					if (($class_part eq $className) && ($owning_symbol_part eq $name)) {
+						print STDERR "CLASSMATCH OWNERMATCH (($class_part eq $className) && ($owning_symbol_part eq $name))\n" if ($localDebug);
+
+						return ($ref, $bogus);
+					}
+				} else {
+					push(@newarr, $ref);
+				}
+			} elsif ($ref =~ /^\/\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)(\/|$)/) {
+				my $apple_ref_part = $1;
+				my $language_part = $2;
+				my $reftype_part = $3;
+				my $owning_symbol_part = $4;
+				my $symbol_part = $5;
+
+				print STDERR "POINT B: REF: $ref reftype_part: $reftype_part\n" if ($localDebug);
+
+				if ($reftype_part =~ /(functionparam|methodparam|defineparam|enumconstant|functionvar|methodvar|definevar|structfield|typedeffield)/) {
+					if (($owning_symbol_part eq $name) && ($className eq "")) {
+						print STDERR "OWNERMATCH ($owning_symbol_part eq $name)\n" if ($localDebug);
+						return ($ref, $bogus);
+					}
+				} else {
+					push(@newarr, $ref);
+				}
+			} else {
+				push(@newarr, $ref);
+			}
+		}
+
+		@arr = @newarr;
+
+		if ($localDebug) {
+			print STDERR "BOGOSITY CHECK: scalar(\@newarr) is ".scalar(@newarr)."\n";
+			foreach my $item (@newarr) {
+				print STDERR "BOGOSITY CHECK: $item\n";
+			}
+		}
+
+		if (scalar(@newarr) == 1) { $bogus = 1; }
+
+		# Next, look for the one in the current class.
 		foreach my $ref (@arr) {
 			print STDERR "PASS 1.  CHECKING REF: $ref\n" if ($localDebug);
 			if ($ref =~ /^\/\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)(\/|$)/) {
@@ -812,7 +877,7 @@ sub chooseBestAPIRef
 				print STDERR "CLASS PART: $class_part TARGET: $className\n" if ($localDebug);
 
 				if ($language_part eq $targetLang || $language_part eq $targetSubLang) {
-					if ($class_part eq $className) { return $ref; }
+					if ($class_part eq $className) { return ($ref, $bogus); }
 				}
 			}
 		}
@@ -831,7 +896,7 @@ sub chooseBestAPIRef
 				print STDERR "HEADER PART: $class_part TARGET: $headerName\n" if ($localDebug);
 
 				if ($language_part eq $targetLang || $language_part eq $targetSubLang) {
-					if ($class_part eq $headerName) { return $ref; }
+					if ($class_part eq $headerName) { return ($ref, $bogus); }
 				}
 			}
 		}
@@ -857,7 +922,7 @@ sub chooseBestAPIRef
 
 				if ($toObj->filename() eq $fromObj->filename()) {
 
-					return $ref;
+					return ($ref, $bogus);
 				}
 			} elsif (!$toObj) {
 				warn("No object found for UID $ref\n");
@@ -865,7 +930,7 @@ sub chooseBestAPIRef
 		}
 	}
 
-	return $arr[0];
+	return ($arr[0], $bogus);
 }
 
 # /*!
@@ -905,10 +970,14 @@ sub resolveLink
 	    $ret = $uid;
 	    if ($uid_conflict{$symbol}) {
 		my @candidates = @{$uid_candidates{$symbol}};
-		$uid = chooseBestAPIRef($fromObj, $uid_candidates{$symbol});
+		my $conflict_is_bogus;
+		($uid, $conflict_is_bogus) = chooseBestAPIRef($fromObj, $uid_candidates{$symbol});
 		$ret = $uid;
 		# foreach my $x (@candidates) { print STDERR "CANDIDATE $x\n"; }
-		warn "$fullpath:0: warning: multiple matches found for symbol \"$symbol\"!!! Only the nearest matching symbol will be $linkedword. Replace the symbol with a specific api ref tag (e.g. apple_ref) in header file to fix this conflict.\n\nCandidates are:\n\t".join("\n\t", @candidates)."\n\nDefault is:\n\t$uid\n";
+
+		if (!$conflict_is_bogus) {
+			warn "$fullpath:0: warning: multiple matches found for symbol \"$symbol\"!!! Only the nearest matching symbol will be $linkedword. Replace the symbol with a specific api ref tag (e.g. apple_ref) in header file to fix this conflict.\n\nCandidates are:\n\t".join("\n\t", @candidates)."\n\nDefault is:\n\t$uid\n";
+		}
 	    }
 	}
     if ($ret eq "") {
@@ -1330,6 +1399,45 @@ sub printHash {
 #         <code>#define</code> macros to be parsed from the code.  This is
 #         only used for code parsing, NOT for interpreting
 #         the actual <code>#define</code> macros themselves!
+#     @var regexpfirstcharpattern
+#         A regular expression that matches any symbol that is a
+#         legal start token for a regular expression.  In Perl,
+#         there are a lot of these.  In Ruby and JavaScript, only
+#         slash (/) is allowed.  In Tcl, only a left curly brace
+#         is allowed (because other regular expressions are just
+#         strings).
+#     @var regexpcharpattern
+#         A regular expression containing a list of tokens that
+#         are special in regular expressions.  In general, only
+#         start tokens are listed, with the exception of the close
+#         curly brace.  This should probably be the same for every
+#         language that supports regular expressions.
+#     @var regexppattern
+#         A list of special Perl commands that are immediately
+#         followed by a regular expression (e.g. tr).
+#     @var singleregexppattern
+#         A list of special Perl commands that are immediately
+#         followed by a one-part regular expression (e.g. qq).
+#         This is a strict subset of {@link regexppattern}.
+#     @var regexpAllowedAfter
+#         A list of symbols that a regular expression can
+#         follow.  This prevents other uses of certain common
+#         symbol (e.g. /) from incorrectly triggering the start
+#         of regular expression parsing.
+#     @var regexpAllowedAtStartOfLine
+#         Set to 1 in languages where regular expressions are
+#         first-class objects (Ruby) and thus can legally appear
+#         as the first symbol on a line in addition to places that
+#         can be detected based on the previous symbol.
+#     @var TCLregexpcommand
+#         Set to "regexp" in Tcl.  This is a regular expression
+#         that matches a list of commands in scripting languages
+#         that can take an unquoted (non-string) regular expression.
+#     @var rbracetakesargument
+#         Normally zero.  Set to 1 if a right brace marker
+#         (e.g. <code>end</code>) is followed by another token
+#         (e.g. <code>tell</code>) that tells what type of block
+#         it closes.
 #  */
 sub parseTokens
 {
@@ -1429,7 +1537,7 @@ sub parseTokens
 		# curly braces in TCL.
 		$parseTokens{parmswithcurlybraces} = 1;
 		$parseTokens{superclasseswithcurlybraces} = 1;
-		$parseTokens{classregexp} = "^(Class)\$";
+		$parseTokens{classregexp} = "^(class)\$";
 		$parseTokens{varname} = "attribute";
 	}
 	if ($lang eq "shell" && $sublang eq "csh") {
@@ -1440,6 +1548,30 @@ sub parseTokens
 	}
 	$parseTokens{constname} = "";
 	$parseTokens{structisbrace} = 0;
+
+	if ($lang eq "perl") {
+		$parseTokens{regexpAllowedAfter} = '(\~|\(|\=|\,)';
+
+		$parseTokens{regexpcharpattern} = "[[|{}#(/'\"<`]";
+		# "}" vi bug workaround for previous line
+
+		# If it appears not after a ~, tr, etc., only allow slash.
+		$parseTokens{regexpfirstcharpattern} = "[/]";
+		# "}" vi bug workaround for previous line
+
+		$parseTokens{regexppattern} = "qq|qr|qx|qw|q|m|s|tr|y";
+		$parseTokens{singleregexppattern} = "qq|qr|qx|qw|q|m";
+
+	} elsif ($lang eq "tcl") {
+		# Syntax: regexp [-foo [-bar ..]] {expression goes here} ...
+		$parseTokens{TCLregexpcommand} = "regexp";
+
+		$parseTokens{regexpfirstcharpattern} = "[{]";
+		# "}" vi bug workaround for previous line
+
+		$parseTokens{regexpcharpattern} = "[[|{}#(/'\"<`]";
+		# "}" vi bug workaround for previous line
+	}
     } elsif ($lang eq "pascal") {
 	print STDERR "Language is Pascal.\n" if ($langDebug);
 	$parseTokens{sotemplate} = "";
@@ -1508,6 +1640,15 @@ sub parseTokens
 	$parseTokens{structisbrace} = 0;
 	$parseTokens{functionisbrace} = 1;
 	$parseTokens{classisbrace} = 1;
+
+	$parseTokens{regexpAllowedAfter} = '(\~|\(|\=|\,|if|elsif|while|unless|until|when)';
+	$parseTokens{regexpAllowedAtStartOfLine} = 1;
+
+	$parseTokens{regexpfirstcharpattern} = "[/]";
+	# "}" vi bug workaround for previous line
+	$parseTokens{regexpcharpattern} = "[[|{}#(/'\"<`]";
+	# "}" vi bug workaround for previous line
+
     } elsif ($lang eq "applescript") {
 	# Applescript
 	$parseTokens{classregexp} = "^(script)\$";
@@ -1524,13 +1665,14 @@ sub parseTokens
 	# $parseTokens{lbrace} = "{";
 	$parseTokens{lbraceunconditionalre} = "^(tell)";
 	$parseTokens{rbrace} = "end";
+	$parseTokens{rbracetakesargument} = 1;
 	$parseTokens{varname} = "property";
 	# $parseTokens{constname} = "const";
 	$parseTokens{structisbrace} = 0;
 	$parseTokens{functionisbrace} = 1;
 	$parseTokens{classisbrace} = 1;
 	$parseTokens{assignmentwithcolon} = 1;
-	$parseTokens{labelregexp} = "^(about|above|against|apart from|around|aside from|at|below|beneath|beside|between|by|for|from|instead of|into|on|onto|out of|over|since|thru|through|under)";
+	$parseTokens{labelregexp} = "^(about|above|against|apart from|around|aside from|at|below|beneath|beside|between|by|for|from|instead of|into|on|onto|out of|over|since|thru|through|under)\$";
 
 
 	$parseTokens{sofunction} = "on";
@@ -1587,6 +1729,15 @@ sub parseTokens
 	} elsif ($sublang eq "php") {
 		$parseTokens{accessregexp} = "^(public|private|protected)\$";
 		$parseTokens{ilc_b} = "#";
+	}
+	if ($lang eq "java" && $sublang eq "javascript") {
+		$parseTokens{regexpAllowedAfter} = '(\(|\=|\,)';
+
+		$parseTokens{regexpcharpattern} = "[[|{}#(/'\"<`]";
+		# "}" vi bug workaround for previous line
+		$parseTokens{regexpfirstcharpattern} = '[/]';
+		# "}" vi bug workaround for previous line
+
 	}
 
 	$parseTokens{soc} = "/*";
@@ -1695,9 +1846,9 @@ sub isKeyword
 }
 
 
-use FileHandle;
-use IPC::Open2;
-use Fcntl;
+# use FileHandle;
+# use IPC::Open2;
+# use Fcntl;
 
 # /*! @group XML Helpers
 #     @abstract
@@ -2133,6 +2284,8 @@ sub replaceTag($$$)
 	my $iter = shift;
 	my $xml_mode = shift;
 
+	my $localDebug = 0;
+
 	my @fields = @{$fieldsref};
 
 	my $tag = $fields[$iter];
@@ -2146,29 +2299,25 @@ sub replaceTag($$$)
 	}
 
 	my $xmlkey = "";
-	my $htmlkey = "";
-	my $cssindentclass = "";
 	my $title = "";
 	my $body = "";
 
 	my $text;
 	my $rest;
-	my $done;
+	my $more_after; # If true, there's more content after this.
 
 	if ($tag =~ s/^warning(\s|$)//si) {
 		$tag =~ s/^\s*//sg;
-		($text, $rest, $done) = splitOnPara($tag);
+		($text, $rest, $more_after) = splitOnPara($tag);
 
-		$xmlkey = "hd_warning";
-		$htmlkey = "WARNING:";
-		$cssindentclass = "warning_indent";
+		$xmlkey = "hd_warning_internal";
+		$body = $text;
 	} elsif ($tag =~ s/^important(\s|$)//si) {
 		$tag =~ s/^\s*//sg;
-		($text, $rest, $done) = splitOnPara($tag);
+		($text, $rest, $more_after) = splitOnPara($tag);
 
-		$xmlkey = "hd_important";
-		$htmlkey = "Important:";
-		$cssindentclass = "important_indent";
+		$xmlkey = "hd_important_internal";
+		$body = $text;
 	} elsif ($tag =~ s/^note(\s|$)//si) {
 		my $notitle = 0;
 		if ($1 =~ /[\n\r]/ || $tag =~ /^\s*[\n\r]+/) {
@@ -2176,7 +2325,7 @@ sub replaceTag($$$)
 		}
 
 		$tag =~ s/^\s*//sg;
-		($text, $rest, $done) = splitOnPara($tag);
+		($text, $rest, $more_after) = splitOnPara($tag);
 
 		if ($notitle) {
 			$body = $text;
@@ -2188,9 +2337,7 @@ sub replaceTag($$$)
 		if ($title !~ /\S/) {
 			$title = "Note";
 		}
-		$xmlkey = "hd_note";
-		$htmlkey = "Note:";
-		$cssindentclass = "note_indent";
+		$xmlkey = "hd_note_internal";
 	} else {
 		warn "Could not replace unknown tag \"$tag\"\n";
 		return ($fieldsref, 0, "");
@@ -2199,42 +2346,42 @@ sub replaceTag($$$)
 	# Now that we have this in $tag, wipe it from the array.
 	$fields[$iter] = "";
 
-	# print STDERR "XMLKEY: $xmlkey\n";
-	# print STDERR "HTMLKEY: $htmlkey\n";
-	# print STDERR "CSSINDENTCLASS: $cssindentclass\n";
-	# print STDERR "TEXT: $text\n";
-	# print STDERR "TITLE: $title\n";
-	# print STDERR "BODY: $body\n";
-
 	my $append = "";
 	my $tail = "";
-	if ($title) {
-		if ($xml_mode) {
-			$append = "<$xmlkey><title>$title</title><p>".$body;
-			$tail = "</p></$xmlkey>\n$rest";
-		} else {
-			$append = "<p><b>$title:</b><br /></p><div class='$cssindentclass'><p>".$body;
-			$tail = "</p></div>\n$rest";
-		}
-	} else {
-		if ($xml_mode) {
-			$append = "<$xmlkey><p>".$text;
-			$tail = "</p></$xmlkey>\n$rest";
-		} else {
-			$append = "<p><b>$htmlkey</b><br /></p><div class='$cssindentclass'><p>".$text;
-			$tail = "</p></div>\n$rest";
-		}
+
+	$append = "<$xmlkey><note_title>$title</note_title><p>".$body;
+	$tail = "</p></$xmlkey>\n$rest";
+
+	if ($localDebug) {
+		print STDERR "CONVERSION:\n";
+		print STDERR "    XMLKEY: $xmlkey\n";
+		# print STDERR "    HTMLKEY: $htmlkey\n";
+		# print STDERR "    CSSINDENTCLASS: $cssindentclass\n";
+		print STDERR "    TEXT: $text\n";
+		print STDERR "    TITLE: $title\n";
+		print STDERR "    BODY: $body\n";
+
+		print STDERR "APPEND: $append\n";
+		print STDERR "TAIL: $tail\n";
+		print STDERR "ITER: $iter\n";
 	}
 
-	if ($done) {
+	if ($more_after) {
 		# We got a paragraph break.  Append the closing bits immediately.
+
+		print STDERR "DONE.  ADDING $tail TO APPEND\n" if ($localDebug);
+
 		$append .= $tail;
 	} else {
 		# No paragraph break.  Figure out where to append the closing tags.
 		if ($iter == $#fields) {
 			# This is the last part.  Append it immediately.
 			$append .= $tail;
+
+			print STDERR "LASTFIELD.  ADDING $tail TO APPEND\n" if ($localDebug);
 		} else {
+			my $origiter = $iter;
+
 			$iter++;
 			while (1) {
 				my $nextfield = $fields[$iter];
@@ -2253,17 +2400,26 @@ sub replaceTag($$$)
 				if ($iter > $#fields) { last; } # Break at the one after the last field.
 			}
 
-			# print STDERR "Adding $tail before node ".$fields[$iter]."\n";
+			print STDERR "Adding $tail before node ".$fields[$iter]."\n" if ($localDebug);
 
 			$iter--;
 
-			# print STDERR "IN NODE: ".$fields[$iter]."\n"; 
+			if ($iter == $origiter) {
+				# Immediately encountered a tag that can't be part of the
+				# note/important/warning box.  Append the close tag immediately.
+				$append .= $tail;
+			} else {
+				print STDERR "IN NODE $iter: ".$fields[$iter]."\n" if ($localDebug);
 
-			($text, $rest, $done) = splitOnPara($fields[$iter]);
+				($text, $rest, $more_after) = splitOnPara($fields[$iter]);
 
-			# print STDERR "TEXT: $text\nREST: $rest\nDONE: $done\n";
+				print STDERR "TEXT: $text\nREST: $rest\nDONE: $more_after\n" if ($localDebug);
 
-			$fields[$iter] = $text.$tail.$rest;
+				$fields[$iter] = $text.$tail.$rest;
+
+				print STDERR "MODIFYING FIELD WITH $tail\n" if ($localDebug);
+				print STDERR "NOW: ".$fields[$iter]."\n" if ($localDebug);
+			}
 		}
 	}
 
@@ -2849,6 +3005,7 @@ sub classTypeFromFieldAndBPinfo
 		($classBPtype =~ /typedef/) && do { return "C"; };
 		($classBPtype =~ /struct/) && do { return "C"; };
 		($classBPtype =~ /class/) && do { return $sublang; };
+		($classBPtype =~ /script/) && do { return $sublang; };
 		($classBPtype =~ /interface/) && do { return $sublang; };
 		($classBPtype =~ /implementation/) && do { return $sublang; };
 		($classBPtype =~ /module/) && do { return $sublang; };
@@ -2980,11 +3137,12 @@ sub complexAvailabilityTokenToOSAndVersion($)
 
     my $os = "";
     if ($string =~ s/^__IPHONE_//) {
-	$os = "iPhone OS";
+	$os = "iOS";
     } elsif ($string =~ s/^__MAC_//) {
 	$os = "Mac OS X";
     } else {
 	warn "Unknown OS in availability string \"$string\".  Giving up.\n";
+	# cluck("bt\n");
 	return "";
     }
 
@@ -3383,9 +3541,9 @@ sub filterHeaderDocTagContents
 	"ul" => 1,
 	"var" => 1,
 
-	"hd_warning" => 1,   # Used for @warning.
-	"hd_important" => 1, # Used for @important
-	"hd_note" => 1       # Used for @note
+	"hd_warning_internal" => 1,   # Used for @warning.
+	"hd_important_internal" => 1, # Used for @important
+	"hd_note_internal" => 1       # Used for @note
     );
 
     my %discouraged_tags = (
@@ -3498,6 +3656,9 @@ sub filterHeaderDocTagContents
 
 			$tagcontents .= $close.$htmltag;
 		} elsif ($tagname eq "!--") {
+			# Likewise.
+			$tagcontents .= $close.$htmltag;
+		} elsif ($tagname eq "note_title") {
 			# Likewise.
 			$tagcontents .= $close.$htmltag;
 		} elsif ($recommended_tags{lc($tagname)} || $custom_tags{lc($tagname)}) {
@@ -5438,15 +5599,43 @@ sub fixup_links
     my $element = "";
     my $movespace = "";
     my $in_link = 0;
+
+    my $in_warning_et_al = "";
+
     foreach my $nextelt (@elements) {
 	if ($first) { $first = 0; $element = $nextelt; next; }
+
 	# print "ELEMENT: $element\n";
 	# print "NEXTELT: $nextelt\n";
+
 	if ($nextelt =~ /^\/hd_link>/s) {
 		$element =~ s/(\s*)$//s;
 		$movespace = $1;
 	}
-	if ($element =~ /^hd_link posstarget=\"(.*?)\">/o) {
+	if ($element =~ /^hd_warning_internal>/o) {
+		$in_warning_et_al .= "<".$element;
+
+	} elsif ($element =~ s/^\/hd_warning_internal>//o) {
+		$ret .= warningFixup($self, "WARNING:", "warning_indent", $mode, $in_warning_et_al);
+		$in_warning_et_al = "";
+
+	} elsif ($element =~ /^hd_important_internal>/o) {
+		$in_warning_et_al .= "<".$element;
+
+	} elsif ($element =~ s/^\/hd_important_internal>//o) {
+		$ret .= warningFixup($self, "Important:", "important_indent", $mode, $in_warning_et_al);
+		$in_warning_et_al = "";
+
+	} elsif ($element =~ /^hd_note_internal>/o) {
+		$in_warning_et_al .= "<".$element;
+
+	} elsif ($element =~ s/^\/hd_note_internal>//o) {
+		$ret .= warningFixup($self, "Note:", "note_indent", $mode, $in_warning_et_al);
+		$in_warning_et_al = "";
+
+	} elsif ($in_warning_et_al) {
+	    $in_warning_et_al .= "<".$element;
+	} elsif ($element =~ /^hd_link posstarget=\"(.*?)\">/o) {
 	    $in_link = 1;
 	    # print STDERR "found.\n";
 	    my $oldtarget = $1;
@@ -5486,8 +5675,7 @@ sub fixup_links
 		    # $ret .= "</a>\n";
 		# }
 	    }
-	} else {
-	    if ($element =~ s/^\/hd_link>//o) {
+	} elsif ($element =~ s/^\/hd_link>//o) {
 		$in_link = 0;
 		# print "LEAVING LINK\n";
 		if ($nextelt =~ /^\s*[.,?!]/) {
@@ -5499,15 +5687,80 @@ sub fixup_links
 		    $ret .= "<!-- /a -->$movespace";
 		}
 		$ret .= $element;
-	    } else {
+	} else {
 		$ret .= "<$element";
-	    }
 	}
 	$element = $nextelt;
     }
     $ret =~ s/^<//o;
 
+    if ($in_warning_et_al) {
+	warn("Error: unterminated warning, important, or note box.  Please file a bug.\n");
+	$ret .= $in_warning_et_al;
+    }
+
     return $ret;
+}
+
+# /*!
+#     @abstract
+#         Converts the internal form for \@note, \@warning,
+#         and \@important tags into final form (HTML or XML).
+#  */
+sub warningFixup
+{
+    my $self = shift;
+    my $htmlkey = shift;
+    my $cssindentclass = shift;
+    my $xml_mode = shift;
+    my $contents = shift;
+
+    my $localDebug = 0;
+
+    print STDERR "INITIAL CONTENTS: $contents\n" if ($localDebug);
+
+    $contents =~ s/^\s*<\s*(.*?)\s*>//s;
+
+    my $xmlkey = $1;
+
+    $xmlkey =~ s/_internal$//s;
+
+    $contents =~ s/^\s*<note_title>(.*?)<\/note_title>//s;
+
+    my $title = $1;
+    my $append = "";
+    my $tail = "";
+
+    print STDERR "    HTMLKEY:  $htmlkey\n" if ($localDebug);
+    print STDERR "    CSSCLASS: $cssindentclass\n" if ($localDebug);
+    print STDERR "    XMLKEY:   $xmlkey\n" if ($localDebug);
+    print STDERR "    TITLE:    $title\n" if ($localDebug);
+    print STDERR "    CONTENTS: $contents\n" if ($localDebug);
+
+    if ($title) {
+	if ($xml_mode) {
+		$append = "<$xmlkey><title>$title</title>";
+		$tail = "</$xmlkey>\n";
+	} else {
+		$append = "<p><b>$title:</b><br /></p><div class='$cssindentclass'>";
+		$tail = "</div>\n";
+	}
+    } else {
+	if ($xml_mode) {
+		$append = "<$xmlkey>";
+		$tail = "</$xmlkey>\n";
+	} else {
+		$append = "<p><b>$htmlkey</b><br /></p><div class='$cssindentclass'>";
+		$tail = "</div>\n";
+	}
+    }
+
+    my $updatedcontents = fixup_links($self, $contents, $xml_mode);
+
+    print STDERR "CONTENTS: $contents\n" if ($localDebug);
+    print STDERR "UPDATED CONTENTS: $updatedcontents\n" if ($localDebug);
+
+    return $append.$updatedcontents.$tail;
 }
 
 # /*!

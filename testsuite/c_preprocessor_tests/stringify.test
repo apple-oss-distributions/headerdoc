@@ -1,6 +1,6 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$51|TEST_MACRO_342347862387_FOO(char *mytype,myvalue);
 $0|$48|#define TEST_MACRO_342347862387_FOO(a,b) a = #b
-$3129|-=: CPP MACROS PARSED :=-
+$3236|-=: CPP MACROS PARSED :=-
 PARSED: TEST_MACRO_342347862387_FOO
 
 -=: BLOCKPARSE PARSER STATE KEYS :=-
@@ -47,8 +47,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 2
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 1
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -108,7 +110,7 @@ VALUE: 0
 -=: CPP CHANGES :=-
 $CPP_HASH{TEST_MACRO_342347862387_FOO} => a = #b
 $CPP_ARG_HASH{TEST_MACRO_342347862387_FOO} => a,b
-$3129|-=: CPP MACROS PARSED :=-
+$3236|-=: CPP MACROS PARSED :=-
 PARSED: TEST_MACRO_342347862387_FOO
 
 -=: BLOCKPARSE PARSER STATE KEYS :=-
@@ -155,8 +157,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 2
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 1
 $parserState->{pplStack} => ARRAY(OBJID)

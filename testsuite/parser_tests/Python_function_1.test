@@ -13,7 +13,7 @@ def baz(x)
         qux(x)
         foo(x - 1)
 $9|Pyfunc_1
-$0|$10699|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$10806|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -89,8 +89,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{onlyComments} => 0
 $parserState->{parsedParam} => 
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 0
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{popAfter} => 0
 $parserState->{popAtEnd} => 1
 $parserState->{posstypes} => 

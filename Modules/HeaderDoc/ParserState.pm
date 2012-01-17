@@ -2,7 +2,7 @@
 #
 # Class name: 	ParserState
 # Synopsis: 	Used by headerDoc2HTML.pl to hold parser state
-# Last Updated: $Date: 2011/05/10 17:36:18 $
+# Last Updated: $Date: 2011/12/03 10:08:35 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -661,6 +661,25 @@
 #             do not precede the function body with any other
 #             opening brace.
 #
+#         @var afterNL
+#             A nondestructive variant of {@link firstpastnl} that is available to
+#             any programming language (and currently used in TCL).
+#             Set to 2 after a newline, 1 during the first non-space
+#             token, 0 after.
+#
+#         @var inrbraceargument
+#             Some languages take an additional argument for their equivalent of
+#             a right brace.  For example, in AppleScript, a <code>tell</code>
+#             block ends with <code>end tell</code>.  In effect, <code>end</code>
+#             terminates the block, but the next token does not start the next
+#             block.
+#
+#             If {@link //apple_ref/doc/functionvar/HeaderDoc::Utilities/parseTokens/rbracetakesargument rbracetakesargument}
+#             is set in the object returned by a call to
+#             {@link //apple_ref/perl/instm/HeaderDoc::Utilities/parseTokens//() parseTokens},
+#             then that trailing <code>tell</code> is included in the
+#             trailer for the block.
+#
 #    @vargroup Parameter, attribute, asm, and availability parsing
 #
 #         @var parsedParamParse
@@ -726,6 +745,12 @@
 #                     is popped up a level, and attribute parsing
 #                     is complete.</li>
 #             </ul>
+#
+#         @var parsedParamAtBrace
+#             Any in-progress parsed parameters when we enter a brace.
+#
+#         @var parsedParamStateAtBrace
+#             The state of parameter parsing when we enter a brace.
 #
 #    @vargroup Token variables
 #
@@ -801,6 +826,7 @@
 #
 #         @var lastTreeNode
 #             The last node in the parse tree rooted at this node.
+#             This node is marked with EODEC in parse tree dumps.
 #
 #             For example, the <code>lastTreeNode</code> value for
 #             a class declaration would point to the closing brace
@@ -1144,6 +1170,15 @@
 #             Reset to 0 after the first non-space token.  Used in case/esac
 #             parsing.
 #
+#    @vargroup TCL-specific variables
+#
+#         @var inTCLRegExpCommand
+#             In TCL, set to 1 when a command is encountered that takes an
+#             unquoted (non-string) regular expression as an argument.
+#
+#             Set to 0 upon entering the regular expression or when a
+#             newline or carriage return is encountered.
+#
 #    @vargroup Legacy junk variables
 # 
 #         @var simpleTDcontents
@@ -1169,7 +1204,7 @@ use Carp qw(cluck);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::ParserState::VERSION = '$Revision: 1305074178 $';
+$HeaderDoc::ParserState::VERSION = '$Revision: 1322935715 $';
 ################ General Constants ###################################
 my $debugging = 0;
 
@@ -1368,11 +1403,15 @@ sub _initialize {
     my @arr1 = ();
     my @arr2 = ();
     my @arr3 = ();
+    my @arr4 = ();
+    my @arr5 = ();
 
     $self->{parsedParamList} = \@arr1; # currently active parsed parameter list.
     $self->{pplStack} = \@arr2; # stack of parsed parameter lists.  Used to handle
                        # fields and parameters in nested callbacks/structs.
     $self->{freezeStack} = \@arr3; # copy of pplStack when frozen.
+    $self->{parsedParamAtBrace} = \@arr4; # Any in-progress parsed parameters when we enter a brace.
+    $self->{parsedParamStateAtBrace} = \@arr5; # The state of parameter parsing when we enter a brace.
 
     my %orighash = %{$self};
 
@@ -1800,7 +1839,7 @@ sub isLeftBrace
 
 	if ($lang eq "perl" && $self->{inTemplate}) { return 0; }
 
-	if (($lang eq "ruby" || $lang eq "python") && (($curBraceCount - $self->{initbsCount}) > 1)) {
+	if ($classisbrace && (($curBraceCount - $self->{initbsCount}) > 1)) {
 		# print STDERR "CBC: $curBraceCount INIT: ".$self->{initbsCount}."\n";
 		return 0;
 	}

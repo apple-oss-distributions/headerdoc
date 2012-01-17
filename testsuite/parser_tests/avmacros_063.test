@@ -1,6 +1,6 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$62|int cf_deprecated(int a) CF_DEPRECATED(10_6, 10_7, 3_0, 3_1);
 $17|/*! test case */
-$0|$7955|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$8038|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -72,8 +72,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 2
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -106,7 +108,7 @@ value:
 returntype:  int
 pridec: 
 simpleTDcontents: 
-bpavail:  Introduced in Mac OS X v10.6, but later deprecated in Mac OS X v10.7. Introduced in iPhone OS v3.0, but later deprecated in iPhone OS v3.1.
+bpavail:  Introduced in Mac OS X v10.6, but later deprecated in Mac OS X v10.7. Introduced in iOS v3.0, but later deprecated in iOS v3.1.
 blockOffset: 0
 conformsToList: 
 functionContents: 
@@ -208,7 +210,7 @@ LONG ATTRIBUTES:
     UPDATED: ""
     LINKAGESTATE: ""
     ACCESSCONTROL: ""
-    AVAILABILITY: " Introduced in Mac OS X v10.6, but later deprecated in Mac OS X v10.7. Introduced in iPhone OS v3.0, but later deprecated in iPhone OS v3.1."
+    AVAILABILITY: " Introduced in Mac OS X v10.6, but later deprecated in Mac OS X v10.7. Introduced in iOS v3.0, but later deprecated in iOS v3.1."
     LINKUID: ""
     ORIGCLASS: ""
     ISDEFINE: ""
@@ -312,7 +314,7 @@ END OF OBJECT
 
 
 
-$7955|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$8038|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -384,8 +386,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 2
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -418,7 +422,7 @@ value:
 returntype:  int
 pridec: 
 simpleTDcontents: 
-bpavail:  Introduced in Mac OS X v10.6, but later deprecated in Mac OS X v10.7. Introduced in iPhone OS v3.0, but later deprecated in iPhone OS v3.1.
+bpavail:  Introduced in Mac OS X v10.6, but later deprecated in Mac OS X v10.7. Introduced in iOS v3.0, but later deprecated in iOS v3.1.
 blockOffset: 0
 conformsToList: 
 functionContents: 
@@ -520,7 +524,7 @@ LONG ATTRIBUTES:
     UPDATED: ""
     LINKAGESTATE: ""
     ACCESSCONTROL: ""
-    AVAILABILITY: " Introduced in Mac OS X v10.6, but later deprecated in Mac OS X v10.7. Introduced in iPhone OS v3.0, but later deprecated in iPhone OS v3.1."
+    AVAILABILITY: " Introduced in Mac OS X v10.6, but later deprecated in Mac OS X v10.7. Introduced in iOS v3.0, but later deprecated in iOS v3.1."
     LINKUID: ""
     ORIGCLASS: ""
     ISDEFINE: ""
@@ -624,4 +628,4 @@ END OF OBJECT
 
 
 
-_$115|/Volumes/Macintosh HD/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/avmacros_063.test$1|C$12|avmacros 063$1|C$6|parser
+_$94|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/avmacros_063.test$1|C$12|avmacros 063$1|C$6|parser

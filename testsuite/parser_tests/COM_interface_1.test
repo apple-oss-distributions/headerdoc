@@ -930,7 +930,7 @@ $1723|/*!	@interface IOFireWireDeviceInterface
 	</ul>
 
 */
-$0|$1967065|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$1967172|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 1
@@ -1005,8 +1005,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 3
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  typedef struct
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -46721,7 +46723,7 @@ END OF OBJECT
 
 
 
-$1967065|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$1967172|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 1
@@ -46796,8 +46798,10 @@ $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
 $parserState->{occparmlabelfound} => 3
 $parserState->{onlyComments} => 0
+$parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
 $parserState->{parsedParamParse} => 1
+$parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} =>  typedef struct
 $parserState->{posstypesPending} => 0
 $parserState->{pplStack} => ARRAY(OBJID)
@@ -92512,4 +92516,4 @@ END OF OBJECT
 
 
 
-_$43|testsuite/parser_tests/COM_interface_1.test$1|C$15|COM interface 1$1|C$6|parser
+_$97|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/COM_interface_1.test$1|C$15|COM interface 1$1|C$6|parser

@@ -4,7 +4,7 @@
 # Synopsis: 	Finds all HeaderDoc generated docs in an input
 #		folder and creates a top-level HTML page to them
 #
-# Last Updated: $Date: 2011/03/18 14:20:22 $
+# Last Updated: $Date: 2012/01/06 14:16:45 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -27,7 +27,7 @@
 #
 # @APPLE_LICENSE_HEADER_END@
 #
-# $Revision: 1300483222 $
+# $Revision: 1325888205 $
 ######################################################################
 
 # /*!
@@ -55,6 +55,10 @@ my $isMacOS;
 #         Path to the Perl modules in the source directory.
 #  */
 my $uninstalledModulesPath;
+# /*! @abstract
+#         Path to the Perl modules in the developer tools package.
+#  */
+my $devtoolsModulesPath;
 # /*! @abstract
 #         Indicates that an internal link resolution tool was found.
 #  */
@@ -91,6 +95,7 @@ BEGIN {
 		$isMacOS = 0;
     }
     $uninstalledModulesPath = "$FindBin::Bin"."$pathSeparator"."Modules";
+    $devtoolsModulesPath = "$FindBin::Bin"."$pathSeparator".".."."$pathSeparator"."share"."$pathSeparator"."headerdoc"."$pathSeparator"."Modules";
 
     $HeaderDoc::use_styles = 0;
 }
@@ -102,6 +107,7 @@ use File::Find;
 use File::Copy;
 # use Carp qw(cluck);
 use lib $uninstalledModulesPath;
+use lib $devtoolsModulesPath;
 use POSIX;
 
 # /*! @abstract
@@ -266,9 +272,10 @@ if ($^O =~ /MacOS/i) {
 	$usersPreferencesPath = $homeDir.$pathSeparator."Library".$pathSeparator."Preferences";
 	$systemPreferencesPath = "/Library/Preferences";
 }
+my $devtoolsPreferencesPath = "$FindBin::Bin"."$pathSeparator".".."."$pathSeparator"."share"."$pathSeparator"."headerdoc"."$pathSeparator"."conf";
 
 my $CWD = getcwd();
-my @configFiles = ($systemPreferencesPath.$pathSeparator.$preferencesConfigFileName, $usersPreferencesPath.$pathSeparator.$preferencesConfigFileName, $Bin.$pathSeparator.$localConfigFileName, $CWD.$pathSeparator.$localConfigFileName);
+my @configFiles = ($devtoolsPreferencesPath.$pathSeparator.$preferencesConfigFileName, $systemPreferencesPath.$pathSeparator.$preferencesConfigFileName, $usersPreferencesPath.$pathSeparator.$preferencesConfigFileName, $Bin.$pathSeparator.$localConfigFileName, $CWD.$pathSeparator.$localConfigFileName);
 
 # ($Bin.$pathSeparator.$localConfigFileName, $usersPreferencesPath.$pathSeparator.$preferencesConfigFileName);
 
@@ -455,21 +462,37 @@ if (defined $config{"masterTOCName"} && $masterTOCFileName eq "") {
 if (defined $config{"stripDotH"}) {
 	$stripDotH = $config{"stripDotH"};
 } 
+
+
+# /*!
+#     @abstract
+#         The background color for the built-in (default) template.
+#  */
+$GHD::bgcolor = "#ffffff";
+
+my $TOCTemplateFile = "HEADERDOC_DEFAULT_INTERNAL_TEMPLATE";
 if (defined $config{"TOCTemplateFile"}) {
-	my $TOCTemplateFile = $config{"TOCTemplateFile"};
+	$TOCTemplateFile = $config{"TOCTemplateFile"};
+}
 
-	my $oldRecSep = $/;
-	undef $/; # read in files as strings
+my $oldRecSep = $/;
+undef $/; # read in files as strings
 
-	my @filelist = split(/\s/, $TOCTemplateFile);
-	foreach my $file (@filelist) {
-		my %used = ();
+my @filelist = split(/\s/, $TOCTemplateFile);
+foreach my $file (@filelist) {
+	my %used = ();
 
+	my $TOCTemplate = "";
+	my $found = 0;
+	my $foundpath = "";
+
+	if ($file eq "HEADERDOC_DEFAULT_INTERNAL_TEMPLATE") {
+		$found = 1;
+		$foundpath = "n/a";
+		$TOCTemplate = default_template();
+	} else {
 		print STDERR "Searching for $file\n";
-		my @templateFiles = ($systemPreferencesPath.$pathSeparator.$file, $usersPreferencesPath.$pathSeparator.$file, $Bin.$pathSeparator.$file, $file);
-		my $TOCTemplate = "";
-		my $found = 0;
-		my $foundpath = "";
+		my @templateFiles = ($devtoolsPreferencesPath.$pathSeparator.$file, $systemPreferencesPath.$pathSeparator.$file, $usersPreferencesPath.$pathSeparator.$file, $Bin.$pathSeparator.$file, $file);
 
 		foreach my $filename (@templateFiles) {
 			if (open(TOCFILE, "<$filename")) {
@@ -484,52 +507,52 @@ if (defined $config{"TOCTemplateFile"}) {
 		} else {
 			print STDERR "Found at $foundpath\n";
 		}
-		push(@TOCTemplateList, $TOCTemplate);
-		push(@TOCNames, basename($file));
-
-		if ($TOCTemplate =~ /\$\$\s*typelist/) {
-			$gather_types = 1;
-			$used{type} = 1;
-		}
-		if ($TOCTemplate =~ /\$\$\s*proplist/) {
-			$gather_properties = 1;
-			$used{prop} = 1;
-		}
-		if ($TOCTemplate =~ /\$\$\s*datalist/) {
-			$gather_globals_and_constants = 1;
-			$used{data} = 1;
-		}
-		if ($TOCTemplate =~ /\$\$\s*functionlist/) {
-			$gather_functions = 1;
-			$used{function} = 1;
-		}
-		if ($TOCTemplate =~ /\$\$\s*manpagelist/) {
-			$gather_man_pages = 1;
-			$used{manpage} = 1;
-		}
-
-		if ($TOCTemplate =~ /\$\$\s*headerlist/) {
-			$used{header} = 1;
-		}
-		if ($TOCTemplate =~ /\$\$\s*macrolist/) {
-			$used{macro} = 1;
-		}
-		if ($TOCTemplate =~ /\$\$\s*protocollist/) {
-			$used{protocol} = 1;
-		}
-		if ($TOCTemplate =~ /\$\$\s*categorylist/) {
-			$used{category} = 1;
-		}
-		if ($TOCTemplate =~ /\$\$\s*classlist/) {
-			$used{class} = 1;
-		}
-		if ($TOCTemplate =~ /\$\$\s*comintlist/) {
-			$used{comint} = 1;
-		}
-		$usedInTemplate{$TOCTemplate} = \%used;
 	}
-	$/ = $oldRecSep;
+	push(@TOCTemplateList, $TOCTemplate);
+	push(@TOCNames, basename($file));
+
+	if ($TOCTemplate =~ /\$\$\s*typelist/) {
+		$gather_types = 1;
+		$used{type} = 1;
+	}
+	if ($TOCTemplate =~ /\$\$\s*proplist/) {
+		$gather_properties = 1;
+		$used{prop} = 1;
+	}
+	if ($TOCTemplate =~ /\$\$\s*datalist/) {
+		$gather_globals_and_constants = 1;
+		$used{data} = 1;
+	}
+	if ($TOCTemplate =~ /\$\$\s*functionlist/) {
+		$gather_functions = 1;
+		$used{function} = 1;
+	}
+	if ($TOCTemplate =~ /\$\$\s*manpagelist/) {
+		$gather_man_pages = 1;
+		$used{manpage} = 1;
+	}
+
+	if ($TOCTemplate =~ /\$\$\s*headerlist/) {
+		$used{header} = 1;
+	}
+	if ($TOCTemplate =~ /\$\$\s*macrolist/) {
+		$used{macro} = 1;
+	}
+	if ($TOCTemplate =~ /\$\$\s*protocollist/) {
+		$used{protocol} = 1;
+	}
+	if ($TOCTemplate =~ /\$\$\s*categorylist/) {
+		$used{category} = 1;
+	}
+	if ($TOCTemplate =~ /\$\$\s*classlist/) {
+		$used{class} = 1;
+	}
+	if ($TOCTemplate =~ /\$\$\s*comintlist/) {
+		$used{comint} = 1;
+	}
+	$usedInTemplate{$TOCTemplate} = \%used;
 }
+$/ = $oldRecSep;
 
 my $useBreadcrumbs = 0;
 
@@ -574,18 +597,6 @@ if ($options{t}) {
 	}
 unless (@inputFiles) { print STDERR "No valid input files specified. \n\n"; exit(-1)};
 
-
-# /*!
-#     @abstract
-#         The background color for the built-in (default) template.
-#  */
-$GHD::bgcolor = "#ffffff";
-
-if (!scalar(@TOCTemplateList)) {
-	my $TOCTemplate = default_template();
-	push(@TOCTemplateList, $TOCTemplate);
-	push(@TOCNames, "masterTOC.html")
-}
 
 # print STDERR "GatherFunc: $gather_functions\n";
 # print STDERR "TT: $TOCTemplate\n";
@@ -671,7 +682,7 @@ my @functionRefs;
 my $frameworkabstract = "";
 my $frameworkdiscussion = "";
 
-my $oldRecSep = $/;
+$oldRecSep = $/;
 undef $/; # read in files as strings
 
 my $localDebug = 0;
@@ -1290,7 +1301,11 @@ sub printMasterTOC {
     my $templatefilename = $TOCNames[$template_number];
     my $templatename = $templatefilename;
 
-    print STDERR "Writing output file for template \"$templatename\"\n";
+    if ($templatename eq "HEADERDOC_DEFAULT_INTERNAL_TEMPLATE") {
+	print STDERR "Writing output file using default internal template.\n";
+    } else {
+	print STDERR "Writing output file for template \"$templatename\"\n";
+    }
     if ($localDebug) {
 	print STDERR "Contains header list:        ".($used{header} ? 1 : 0)."\n";
 	print STDERR "Contains type list:          ".($used{type} ? 1 : 0)."\n";
