@@ -10,7 +10,7 @@ foo_t operator &(foo_t &a);
 
 };
 $36|/*! class should be called foo_t */
-$0|$17466|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$17507|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -236,7 +236,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: foo_t
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/foo_t
     ABSTRACT: ""
     DISCUSSION: "<p>class should be called foo_t "
     UPDATED: ""
@@ -291,7 +291,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -418,7 +418,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -634,7 +634,7 @@ END OF OBJECT
 
 
 
-$17466|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$17507|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -860,7 +860,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: foo_t
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/foo_t
     ABSTRACT: ""
     DISCUSSION: "<p>class should be called foo_t "
     UPDATED: ""
@@ -915,7 +915,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1042,7 +1042,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

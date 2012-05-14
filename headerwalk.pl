@@ -3,7 +3,7 @@
 # Script name:  headerwalk.pl
 # Synopsis: 	Walks a header and creates some simple text content.
 #
-# Last Updated: $Date: 2011/12/16 16:49:30 $
+# Last Updated: $Date: 2012/02/08 15:21:23 $
 #
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -26,7 +26,7 @@
 #
 # @APPLE_LICENSE_HEADER_END@
 #
-# $Revision: 1324082970 $
+# $Revision: 1328743283 $
 ######################################################################
 
 # /*!

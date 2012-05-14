@@ -7,7 +7,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $255|/*! @class foo
     @discussion For more information, see <A HREF="{@docroot}/index.html">the index</A>, <A HREF="@docroot/index.html">the index</A>, or { @link foo The foo documentation }, or else maybe { @linkplain foo The plain foo docs }.  Thanks.
  */
-$0|$6170|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$6192|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -187,7 +187,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: foo
-    APIUID: 
+    APIUID: //test_ref/java/cl/foo
     ABSTRACT: ""
     DISCUSSION: "<p>For more information, see <A HREF="@@docroot/index.html" target="_top">the index</A>, <A HREF="@@docroot/index.html" target="_top">the index</A>, or <code><hd_link posstarget="foo"> The foo documentation </hd_link></code>, or else maybe <hd_link posstarget="foo"> The plain foo docs </hd_link>.  Thanks.
 "
@@ -249,7 +249,7 @@ END OF OBJECT
 
 
 
-$6170|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$6192|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -429,7 +429,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: foo
-    APIUID: 
+    APIUID: //test_ref/java/cl/foo
     ABSTRACT: ""
     DISCUSSION: "<p>For more information, see <A HREF="@@docroot/index.html" target="_top">the index</A>, <A HREF="@@docroot/index.html" target="_top">the index</A>, or <code><hd_link posstarget="foo"> The foo documentation </hd_link></code>, or else maybe <hd_link posstarget="foo"> The plain foo docs </hd_link>.  Thanks.
 "

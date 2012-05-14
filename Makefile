@@ -27,7 +27,7 @@ all: all_internal test apidoc
 
 # Override the default compiler to GCC 4.0 if building for Snow Leopard internally.
 all_internal:
-	cd xmlman ; make all CC=`if [ "$$DEVELOPER_BIN_DIR" != "" -a "$(building_ppc)" != "0" ] ; then echo "gcc-4.0" ; else echo "cc"; fi` ARCH=`uname` VERS=`sw_vers -productVersion | sed 's/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\..*/\1.\2/'` ; cd ..
+	cd xmlman ; make all CC=`if [ "$$DEVELOPER_BIN_DIR" != "" -a "$(building_ppc)" != "0" ] ; then echo "gcc-4.0" ; else echo "cc"; fi` ARCH=`uname` VERS=`{ echo "10.6"; sw_vers -productVersion | sed 's/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\..*/\1.\2/'; } | sort | head -n 1` ; cd ..
 
 clean:
 	cd xmlman ; make clean ; cd ..
@@ -42,12 +42,17 @@ installhdrs:
 build:
 
 test:
+	rm -f /tmp/xref_out
+	rm -rf /tmp/hdtest_perm
+	rm -rf /tmp/hdtest_out
+
 	./headerDoc2HTML.pl -T run; \
 	if [ "$$?" -ne 0 ] ; then \
 		echo "Test suite failed."; \
 		exit 1; \
 	fi
 
+	rm -f /tmp/xref_out
 	rm -rf /tmp/hdtest_perm
 	rm -rf /tmp/hdtest_out
 	mkdir /tmp/hdtest_perm
@@ -83,9 +88,12 @@ install: all_internal
 	echo "          $$DSTROOT" ; \
 	echo "" ; \
 	echo "This is primarily intended for building packages." ; \
-	echo "If you want to actually install over your" ; \
-	echo "existing installation, cancel this make and run" ; \
-	echo "\"sudo make realinstall\" instead." ; \
+	echo "If you want to actually install over an existing" ; \
+	echo "installation in /usr, cancel this make and run" ; \
+	echo "\"sudo make realinstall\" instead, or to update" ; \
+	echo "an installed copy of Xcode, set the DEVELOPER_DIR" ; \
+	echo "environment variable to, for example," ; \
+	echo "/Applications/Xcode.app/Contents/Developer/" ; \
  \
 	sleep 5 ; \
 	make installsub

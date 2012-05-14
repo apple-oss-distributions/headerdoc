@@ -11,7 +11,7 @@ $303|/*!
         @discussion Methods declared in the Performance category of the Trains class are typicall
 y used during development--to analyze and improve performance.
 */
-$0|$9904|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$9949|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -211,7 +211,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCCategory
     NAME: Trains(Performance)
-    APIUID: 
+    APIUID: //test_ref/occ/cat/Trains(Performance)
     ABSTRACT: "<p>The Performance category instruments the Train class for performance analysis.
 "
     DISCUSSION: "<p>Methods declared in the Performance category of the Trains class are typicall
@@ -273,7 +273,7 @@ y used during development--to analyze and improve performance.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -367,7 +367,7 @@ END OF OBJECT
 
 
 
-$9904|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$9949|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -567,7 +567,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCCategory
     NAME: Trains(Performance)
-    APIUID: 
+    APIUID: //test_ref/occ/cat/Trains(Performance)
     ABSTRACT: "<p>The Performance category instruments the Train class for performance analysis.
 "
     DISCUSSION: "<p>Methods declared in the Performance category of the Trains class are typicall
@@ -629,7 +629,7 @@ y used during development--to analyze and improve performance.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

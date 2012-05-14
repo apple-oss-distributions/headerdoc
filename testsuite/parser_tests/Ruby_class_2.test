@@ -27,7 +27,7 @@ def myfunc(name)
   @name = name.capitalize
 end
 $21|    This is a class.
-$0|$14204|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$14235|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -245,7 +245,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: ruby_class_2
-    APIUID: 
+    APIUID: //test_ref/ruby/cl/ruby_class_2
     ABSTRACT: ""
     DISCUSSION: "<p>This is a class.
 "

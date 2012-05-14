@@ -3,7 +3,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
      void foo() {...}
 } 
 $28|/** Java class example 1 */
-$0|$10401|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$10447|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -207,7 +207,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: Java_Class_1
-    APIUID: 
+    APIUID: //test_ref/java/cl/Java_Class_1
     ABSTRACT: ""
     DISCUSSION: "<p>Java class example 1 "
     UPDATED: ""
@@ -265,7 +265,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "package-private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -348,7 +348,7 @@ END OF OBJECT
 
 
 
-$10401|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$10447|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -552,7 +552,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: Java_Class_1
-    APIUID: 
+    APIUID: //test_ref/java/cl/Java_Class_1
     ABSTRACT: ""
     DISCUSSION: "<p>Java class example 1 "
     UPDATED: ""
@@ -610,7 +610,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "package-private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

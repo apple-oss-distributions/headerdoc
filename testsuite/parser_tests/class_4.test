@@ -220,7 +220,7 @@ private:
     virtual void _RESERVEDOSMetaClassBase7();
 };
 $23|/*! OSMetaClassBase */
-$0|$409620|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$409653|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -1405,7 +1405,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: OSMetaClassBase
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/OSMetaClassBase
     ABSTRACT: ""
     DISCUSSION: "<p>OSMetaClassBase "
     UPDATED: ""
@@ -16682,7 +16682,7 @@ END OF OBJECT
 
 
 
-$501663|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$501696|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -17867,7 +17867,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: OSMetaClassBase
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/OSMetaClassBase
     ABSTRACT: ""
     DISCUSSION: "<p>OSMetaClassBase "
     UPDATED: ""

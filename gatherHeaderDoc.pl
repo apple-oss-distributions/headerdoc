@@ -4,7 +4,7 @@
 # Synopsis: 	Finds all HeaderDoc generated docs in an input
 #		folder and creates a top-level HTML page to them
 #
-# Last Updated: $Date: 2012/01/06 14:16:45 $
+# Last Updated: $Date: 2012/05/14 11:32:11 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -27,7 +27,7 @@
 #
 # @APPLE_LICENSE_HEADER_END@
 #
-# $Revision: 1325888205 $
+# $Revision: 1337020331 $
 ######################################################################
 
 # /*!
@@ -272,6 +272,7 @@ if ($^O =~ /MacOS/i) {
 	$usersPreferencesPath = $homeDir.$pathSeparator."Library".$pathSeparator."Preferences";
 	$systemPreferencesPath = "/Library/Preferences";
 }
+my $usrPreferencesPath = "/usr/share/headerdoc/conf";
 my $devtoolsPreferencesPath = "$FindBin::Bin"."$pathSeparator".".."."$pathSeparator"."share"."$pathSeparator"."headerdoc"."$pathSeparator"."conf";
 
 my $CWD = getcwd();
@@ -492,7 +493,7 @@ foreach my $file (@filelist) {
 		$TOCTemplate = default_template();
 	} else {
 		print STDERR "Searching for $file\n";
-		my @templateFiles = ($devtoolsPreferencesPath.$pathSeparator.$file, $systemPreferencesPath.$pathSeparator.$file, $usersPreferencesPath.$pathSeparator.$file, $Bin.$pathSeparator.$file, $file);
+		my @templateFiles = ($devtoolsPreferencesPath.$pathSeparator.$file, $usrPreferencesPath, $systemPreferencesPath.$pathSeparator.$file, $usersPreferencesPath.$pathSeparator.$file, $Bin.$pathSeparator.$file, $file);
 
 		foreach my $filename (@templateFiles) {
 			if (open(TOCFILE, "<$filename")) {

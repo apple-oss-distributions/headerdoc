@@ -2,7 +2,7 @@
 #
 # Class name: 	ParseTree
 # Synopsis: 	Used by headerdoc2html to hold parse trees
-# Last Updated: $Date: 2012/01/06 17:37:19 $
+# Last Updated: $Date: 2012/04/05 16:29:36 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -169,7 +169,7 @@ use Carp qw(cluck);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::ParseTree::VERSION = '$Revision: 1325900239 $';
+$HeaderDoc::ParseTree::VERSION = '$Revision: 1333668576 $';
 ################ General Constants ###################################
 my $debugging = 0;
 
@@ -2095,6 +2095,10 @@ sub printTree {
 #  */
 sub textTree {
     my $self = shift;
+    my $nohidden = 0;
+    if (@_) {
+	$nohidden = shift;
+    }
     my $parserState = $self->parserState();
     my $lastnode = undef;
 
@@ -2107,7 +2111,7 @@ sub textTree {
     print STDERR "TEXTTREE: LASTNODE: $lastnode\n" if ($localDebug);
     if ($lastnode && $localDebug) { print STDERR "LASTNODE TEXT: \"".$lastnode->token()."\"\n"; }
 
-    my ($string, $continue) = $self->textTreeSub(0, "", "", "", $lastnode);
+    my ($string, $continue) = $self->textTreeSub(0, $nohidden, "", "", "", $lastnode);
     return $string;
 }
 
@@ -2134,9 +2138,14 @@ sub textTreeNC {
 	# $requiredregexp, $propname, $objcdynamicname, $objcsynthesizename, $moduleregexp, $definename,
 	# $functionisbrace, $classisbrace, $parseTokens{lbraceconditionalre}, $parseTokens{lbraceunconditionalre}, $assignmentwithcolon,
 	# $labelregexp, $parmswithcurlybraces, $superclasseswithcurlybraces, $parseTokens{soc}) = parseTokens($lang, $sublang);
+
+    my $nohidden = 0;
+    if (@_) {
+	$nohidden = shift;
+    }
     my %parseTokens = %{parseTokens($lang, $sublang)};
 
-    my ($string, $continue) = $self->textTreeSub(1, $parseTokens{soc}, $parseTokens{ilc}, $parseTokens{ilc_b});
+    my ($string, $continue) = $self->textTreeSub(1, $nohidden, $parseTokens{soc}, $parseTokens{ilc}, $parseTokens{ilc_b});
     return $string;
 }
 
@@ -2148,6 +2157,8 @@ sub textTreeNC {
 #         The top of the tree/subtree to dump.
 #     @param nc
 #         Set to 1 if comments should be dropped, else 0.
+#     @param nh
+#         Set to 1 if hidden tokens should be dropped, else 0.
 #     @param soc
 #         The start-of-comment token for the current programming language.
 #         Obtained by a call to
@@ -2168,6 +2179,7 @@ sub textTreeSub
 {
     my $self = shift;
     my $nc = shift;
+    my $nh = shift;
     my $soc = shift;
     my $ilc = shift;
     my $ilc_b = shift;
@@ -2198,6 +2210,11 @@ sub textTreeSub
 		$skip = 1;
 	}
     }
+    if ($nh) {
+	if ($self->hidden()) {
+		$skip = 1;
+	}
+    }
 
     if (!$skip) {
 	$string .= $token;
@@ -2207,7 +2224,7 @@ sub textTreeSub
 	if ($self->{FIRSTCHILD}) {
 		my $node = $self->{FIRSTCHILD};
 		bless($node, "HeaderDoc::ParseTree");
-		my ($newstring, $newcontinue) = $node->textTreeSub($nc, $soc, $ilc, $ilc_b, $lastnode);
+		my ($newstring, $newcontinue) = $node->textTreeSub($nc, $nh, $soc, $ilc, $ilc_b, $lastnode);
 		if ($continue) { $continue = $newcontinue; }
 		$string .= $newstring;
 	}
@@ -2218,7 +2235,7 @@ sub textTreeSub
     if ($self->{NEXT}) {
 	my $node = $self->{NEXT};
 	bless($node, "HeaderDoc::ParseTree");
-	my ($newstring, $newcontinue) = $node->textTreeSub($nc, $soc, $ilc, $ilc_b, $lastnode);
+	my ($newstring, $newcontinue) = $node->textTreeSub($nc, $nh, $soc, $ilc, $ilc_b, $lastnode);
 	$continue = $newcontinue;
 	$string .= $newstring;
     }

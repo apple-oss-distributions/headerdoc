@@ -3,7 +3,7 @@
 # Class name: HeaderElement
 # Synopsis: Root class for Function, Typedef, Constant, etc. -- used by HeaderDoc.
 #
-# Last Updated: $Date: 2011/12/07 08:49:40 $
+# Last Updated: $Date: 2012/04/06 15:46:10 $
 #
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -361,7 +361,7 @@ use Devel::Peek;
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::HeaderElement::VERSION = '$Revision: 1323276580 $';
+$HeaderDoc::HeaderElement::VERSION = '$Revision: 1333752370 $';
 
 # /*!
 #     @abstract
@@ -5344,6 +5344,10 @@ sub documentationBlock
     if ($self->can("accessControl")) {
 	$accessControl = $self->accessControl();
     }
+    my $optionalOrRequired = "";
+    if ($self->parserState && ($apioclass =~ /HeaderDoc::ObjCProtocol/)) {
+	$optionalOrRequired = $self->parserState->{optionalOrRequired};
+    }
     my $includeAccess = 0;
     if ($accessControl ne "") { $includeAccess = 1; }
     if ($self->can("isProperty") && $self->isProperty()) { $includeAccess = 0; }
@@ -5357,6 +5361,8 @@ sub documentationBlock
 	my $declend = $self->headerDocMark("declaration", "end");
 	if ($includeAccess) {
 		$contentString .= "<pre><tt>$accessControl</tt>\n<br>$declaration</pre>\n";
+	} elsif (length $optionalOrRequired) {
+		$contentString .= "<pre><tt>$optionalOrRequired</tt>\n<br>$declaration</pre>\n";
 	} else {
 		$contentString .= "<pre>$declstart$declaration$declend</pre>\n";
 	}
@@ -6292,6 +6298,24 @@ sub XMLdocumentationBlock {
     my $fielduidtag = "";
     my $extra = "";
 
+    my $accessControl = "";
+    if ($self->can("accessControl")) {
+        $accessControl = $self->accessControl();
+    }
+    if ($accessControl =~ /\S/) {
+	$accessControl = " accessControl=\"$accessControl\"";
+    } else {
+	$accessControl = "";
+    }
+
+    my $optionalOrRequired = "";
+    if ($self->parserState && ($apioclass =~ /HeaderDoc::ObjCProtocol/)) {
+	$optionalOrRequired = $self->parserState->{optionalOrRequired};
+	if (length $optionalOrRequired) {
+		$optionalOrRequired = " optionalOrRequired=\"$optionalOrRequired\"";
+	}
+    }
+
     $langstring = $self->apiRefLanguage($sublang);
 
     # if ($sublang eq "cpp") {
@@ -6573,7 +6597,7 @@ sub XMLdocumentationBlock {
     }
 
     my $throws = $self->XMLthrows();
-    $compositePageString .= "<$type id=\"$uid\" $defineinfo"."lang=\"$langstring\"$extra>"; # e.g. "<class type=\"C++\">";
+    $compositePageString .= "<$type id=\"$uid\" $defineinfo"."lang=\"$langstring\"$extra$accessControl$optionalOrRequired>"; # e.g. "<class type=\"C++\">";
 
     if (length($name)) {
 	$compositePageString .= "<name>$name</name>\n";

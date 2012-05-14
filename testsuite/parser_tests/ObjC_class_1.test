@@ -53,7 +53,7 @@ $239|/*!
         @discussion An NSBox object is a simple NSView that can do two things:
         It can draw a border around itself, and it can title itself.
 */
-$0|$40336|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$40362|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -398,7 +398,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: Trains_2
-    APIUID: 
+    APIUID: //test_ref/occ/cl/Trains_2
     ABSTRACT: "<p>NSBox provides a visual grouping element.
 "
     DISCUSSION: "<p>An NSBox object is a simple NSView that can do two things:
@@ -1343,7 +1343,7 @@ END OF OBJECT
 
 
 
-$52326|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$52352|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -1688,7 +1688,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: Trains_2
-    APIUID: 
+    APIUID: //test_ref/occ/cl/Trains_2
     ABSTRACT: "<p>NSBox provides a visual grouping element.
 "
     DISCUSSION: "<p>An NSBox object is a simple NSView that can do two things:

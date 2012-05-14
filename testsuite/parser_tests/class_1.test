@@ -6,7 +6,7 @@ int k;
 
 };
 $43|/*! @class class_example_1 : public bat */
-$0|$9762|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$9798|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -212,7 +212,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: class_example_1
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/class_example_1
     ABSTRACT: ""
     DISCUSSION: "<p></p>"
     UPDATED: ""
@@ -271,7 +271,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -358,7 +358,7 @@ END OF OBJECT
 
 
 
-$9762|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$9798|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -564,7 +564,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: class_example_1
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/class_example_1
     ABSTRACT: ""
     DISCUSSION: "<p></p>"
     UPDATED: ""
@@ -623,7 +623,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

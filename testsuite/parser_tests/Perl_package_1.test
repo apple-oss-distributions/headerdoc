@@ -1,6 +1,6 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$36|package HeaderDoc::LineRange::test;
 $18|/*! test class */
-$0|$7225|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$7270|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -182,7 +182,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: HeaderDoc::LineRange::test
-    APIUID: 
+    APIUID: //test_ref/perl/cl/HeaderDoc::LineRange::test
     ABSTRACT: ""
     DISCUSSION: "<p>test class "
     UPDATED: ""
@@ -242,7 +242,7 @@ END OF OBJECT
 
 
 
-$7225|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$7270|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -424,7 +424,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: HeaderDoc::LineRange::test
-    APIUID: 
+    APIUID: //test_ref/perl/cl/HeaderDoc::LineRange::test
     ABSTRACT: ""
     DISCUSSION: "<p>test class "
     UPDATED: ""

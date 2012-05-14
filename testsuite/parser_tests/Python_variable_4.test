@@ -3,7 +3,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
     """
 python_var_junk = 4
 $29|        python_var_4 comment
-$0|$6276|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$6312|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -45,7 +45,7 @@ $parserState->{categoryClass} =>
 $parserState->{classtype} => 
 $parserState->{endOfTripleQuote} => 0
 $parserState->{endOfTripleQuoteToken} => HeaderDoc::ParseTree=HASH(OBJID)
-$parserState->{endgame} => 1
+$parserState->{endgame} => 3
 $parserState->{freezeStack} => ARRAY(OBJID)
 $parserState->{freezereturn} => 0
 $parserState->{frozensodname} => 
@@ -68,7 +68,8 @@ $parserState->{justLeftStringToken} => 0
 $parserState->{kr_c_function} => 0
 $parserState->{kr_c_name} => 
 $parserState->{lang} => python
-$parserState->{lastpart} => "
+$parserState->{lastNLWasQuoted} => 0
+$parserState->{lastpart} => 
 $parserState->{leadspace} => 0
 $parserState->{macroNoTrunc} => 1
 $parserState->{name} => 
@@ -94,7 +95,7 @@ $parserState->{seenBraces} => 0
 $parserState->{seenLeading} => 0
 $parserState->{seenMacroPart} => 0
 $parserState->{seenTilde} => 0
-$parserState->{seenToken} => 0
+$parserState->{seenToken} => 1
 $parserState->{setHollowAfter} => 0
 $parserState->{setleading} => 0
 $parserState->{simpleTDcontents} => 
@@ -112,7 +113,7 @@ $parserState->{value} =>  """
 
 $parserState->{valuepending} => 2
 -=: BLOCKPARSE RETURN VALUES :=-
-newcount: 2
+newcount: 3
 typelist: variable
 namelist: python_var_4
 posstypes: constant
@@ -273,4 +274,4 @@ END OF OBJECT
 
 
 
-__$99|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/Python_variable_4.test$6|python$17|Python variable 4$6|python$6|parser
+__$45|testsuite/parser_tests/Python_variable_4.test$6|python$17|Python variable 4$6|python$6|parser

@@ -41,7 +41,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 
 }
 $19|/*! HTML module */
-$0|$68853|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$68955|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -534,7 +534,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::CPPClass
         NAME: HTMLEmbedElement
-        APIUID: 
+        APIUID: //test_ref/idl/cl/html/HTMLEmbedElement
         ABSTRACT: ""
         DISCUSSION: "<p>HTML element class "
         UPDATED: ""
@@ -547,7 +547,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -593,7 +593,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -635,7 +635,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -677,7 +677,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -719,7 +719,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -761,7 +761,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -803,7 +803,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -2277,7 +2277,7 @@ END OF OBJECT
 
 
 
-$88843|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$88999|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -2770,7 +2770,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::CPPClass
         NAME: HTMLEmbedElement
-        APIUID: 
+        APIUID: //test_ref/idl/cl/html/HTMLEmbedElement
         ABSTRACT: ""
         DISCUSSION: "<p>HTML element class "
         UPDATED: ""
@@ -2783,7 +2783,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -2828,7 +2828,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -2870,7 +2870,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -2912,7 +2912,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -2954,7 +2954,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -2996,7 +2996,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -3038,7 +3038,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -3080,7 +3080,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -3122,7 +3122,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -3164,7 +3164,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -3206,7 +3206,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -3248,7 +3248,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -3290,7 +3290,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""

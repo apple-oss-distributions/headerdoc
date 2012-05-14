@@ -7,7 +7,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $65|/*! @category NSValue(MyAdditions)
     @abstract adds stuff.
  */
-$0|$7521|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$7560|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -175,7 +175,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCCategory
     NAME: NSValue(MyAdditions)
-    APIUID: 
+    APIUID: //test_ref/occ/cat/NSValue(MyAdditions)
     ABSTRACT: "<p>adds stuff.
 "
     DISCUSSION: "<p></p>"
@@ -264,7 +264,7 @@ END OF OBJECT
 
 
 
-$11505|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$11551|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -432,7 +432,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCCategory
     NAME: NSValue(MyAdditions)
-    APIUID: 
+    APIUID: //test_ref/occ/cat/NSValue(MyAdditions)
     ABSTRACT: "<p>adds stuff.
 "
     DISCUSSION: "<p></p>"
@@ -491,7 +491,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

@@ -46,7 +46,7 @@ $239|/*! @class This_Does_Not_Contain_Templates
         as template parameters.
     @updated 2003-04-01
 */
-$0|$44037|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$44086|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -393,7 +393,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: This_Does_Not_Contain_Templates
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/This_Does_Not_Contain_Templates
     ABSTRACT: ""
     DISCUSSION: "<p>This is a test class.  This tests to make sure that
 less than and greater than signs in code are not interpreted
@@ -1683,7 +1683,7 @@ END OF OBJECT
 
 
 
-$44037|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$44086|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -2030,7 +2030,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: This_Does_Not_Contain_Templates
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/This_Does_Not_Contain_Templates
     ABSTRACT: ""
     DISCUSSION: "<p>This is a test class.  This tests to make sure that
 less than and greater than signs in code are not interpreted

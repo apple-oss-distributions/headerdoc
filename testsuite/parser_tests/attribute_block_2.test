@@ -14,7 +14,7 @@ void foo();
 
 }
 $29|/*! myClass Documentation */
-$0|$10219|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$10276|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -223,7 +223,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: attribute_block_test_2_myClass
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/attribute_block_test_2_myClass
     ABSTRACT: ""
     DISCUSSION: "<p>myClass Documentation "
     UPDATED: ""
@@ -279,7 +279,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -391,7 +391,7 @@ END OF OBJECT
 
 
 
-$10219|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$10276|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -600,7 +600,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: attribute_block_test_2_myClass
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/attribute_block_test_2_myClass
     ABSTRACT: ""
     DISCUSSION: "<p>myClass Documentation "
     UPDATED: ""
@@ -656,7 +656,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

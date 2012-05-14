@@ -4,7 +4,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 def Python_tab_test_failure(baz):
 	print what
 $24|        Python_tab_test
-$0|$7573|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$7610|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -33,7 +33,7 @@ blockOffset: 0
 fullpath: /test_suite_bogus_path/Python_tab_test.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
 $parserState->{FULLPATH} => /test_suite_bogus_path/Python_tab_test.test
-$parserState->{autoContinue} => 2
+$parserState->{autoContinue} => 1
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -68,12 +68,13 @@ $parserState->{justLeftStringToken} => 0
 $parserState->{kr_c_function} => 0
 $parserState->{kr_c_name} => 
 $parserState->{lang} => python
+$parserState->{lastNLWasQuoted} => 0
 $parserState->{lastpart} => 
 $parserState->{leadspace} => 0
 $parserState->{macroNoTrunc} => 1
 $parserState->{name} => 
 $parserState->{namePending} => 0
-$parserState->{namepending} => 1
+$parserState->{namepending} => 0
 $parserState->{nestAfter} => 0
 $parserState->{noInsert} => 0
 $parserState->{occmethod} => 0
@@ -315,4 +316,4 @@ _$190|This is a test for tab to space conversion.  If this
 fails because of changes to that code, set the
 $test_pyspace variable in PythonParse.pm to 1,
 then run HeaderDoc to see what's going on.
-$97|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/Python_tab_test.test$6|python$15|Python tab test$6|python$6|parser
+$43|testsuite/parser_tests/Python_tab_test.test$6|python$15|Python tab test$6|python$6|parser

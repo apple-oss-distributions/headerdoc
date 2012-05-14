@@ -14,7 +14,7 @@ void *foo(int *foo);
 };
 $35|/*! @class linktest_fooclass_1
  */
-$0|$17779|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$17834|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -240,7 +240,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: linktest_fooclass_1
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/linktest_fooclass_1
     ABSTRACT: ""
     DISCUSSION: "<p></p>"
     UPDATED: ""
@@ -296,7 +296,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -381,7 +381,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -598,7 +598,7 @@ END OF OBJECT
 
 
 
-$17779|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$17834|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -824,7 +824,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: linktest_fooclass_1
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/linktest_fooclass_1
     ABSTRACT: ""
     DISCUSSION: "<p></p>"
     UPDATED: ""
@@ -880,7 +880,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -965,7 +965,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

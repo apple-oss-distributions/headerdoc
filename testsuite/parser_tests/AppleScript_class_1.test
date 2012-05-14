@@ -10,7 +10,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $79|            (*! MyObject class
                doesn't do much.
              *)
-$0|$15140|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$15174|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -232,7 +232,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: MyObject
-    APIUID: 
+    APIUID: //test_ref/applescript/cl/MyObject
     ABSTRACT: ""
     DISCUSSION: "<p>MyObject class
 doesn't do much."
@@ -571,4 +571,4 @@ END OF OBJECT
 
 
 
-__$47|testsuite/parser_tests/AppleScript_class_1.test$11|applescript$19|AppleScript class 1$11|applescript$6|parser
+__$101|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/AppleScript_class_1.test$11|applescript$19|AppleScript class 1$11|applescript$6|parser

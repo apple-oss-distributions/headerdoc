@@ -3,7 +3,7 @@
 # Class name: Test
 # Synopsis: Test Harness
 #
-# Last Updated: $Date: 2011/11/11 18:19:29 $
+# Last Updated: $Date: 2012/04/12 13:06:41 $
 #
 # Copyright (c) 2008 Apple Computer, Inc.  All rights reserved.
 #
@@ -160,7 +160,7 @@ if ($HeaderDoc::FreezeThaw_available) {
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::Test::VERSION = '$Revision: 1321064369 $';
+$HeaderDoc::Test::VERSION = '$Revision: 1334261201 $';
 
 # /*!
 #     @abstract
@@ -329,6 +329,9 @@ sub runtest_sub {
     $HeaderDoc::enableParanoidWarnings = 0;
     $HeaderDoc::outerNamesOnly = 0;
     $HeaderDoc::AccessControlState = "";
+
+    $HeaderDoc::OptionalOrRequired = "";
+
     $HeaderDoc::idl_language = "idl";
     %HeaderDoc::availability_defs = ();
     %HeaderDoc::availability_has_args = ();
@@ -371,6 +374,7 @@ sub runtest_sub {
 
     $HeaderDoc::lang = $self->{LANG};
     $HeaderDoc::sublang = $self->{SUBLANG};
+
     my $apiOwner = HeaderDoc::Header->new("LANG" => $self->{LANG}, "SUBLANG" => $self->{SUBLANG});
     $apiOwner->apiOwner($apiOwner);
     my $headerObject = $apiOwner;
@@ -759,6 +763,9 @@ print STDERR "ITEM NOW $item\n" if ($localDebug);
 		    }
 		}
 
+		$headerObject->fixupTypeRequests();
+		$headerObject->setupAPIReferences();
+
 		$results .= "-=: FOUND MATCH :=-\n";
 		$results .= $foundMatch."\n";
 		$results .= "-=: NAMED OBJECTS :=-\n";
@@ -1116,7 +1123,7 @@ sub showresults_sub
 				print WRITEFILE $got_parts{$key};
 				close(WRITEFILE);
 
-				system("/usr/bin/diff -u /tmp/headerdoc-diff-expected /tmp/headerdoc-diff-got");
+				system("/usr/bin/diff -u -U 15 /tmp/headerdoc-diff-expected /tmp/headerdoc-diff-got");
 
 				unlink("/tmp/headerdoc-diff-expected");
 				unlink("/tmp/headerdoc-diff-got");

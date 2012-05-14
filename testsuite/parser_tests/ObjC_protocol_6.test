@@ -35,7 +35,7 @@ $186|/*! @protocol Test_Of_optional_and_required
                 ObjC keywords.
     @discussion tests \@optional and \@required.
  */
-$0|$64086|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$64135|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -374,7 +374,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCProtocol
     NAME: Test_Of_optional_and_required
-    APIUID: 
+    APIUID: //test_ref/occ/intf/Test_Of_optional_and_required
     ABSTRACT: ""
     DISCUSSION: "<p>tests @optional and @required.
 "
@@ -2043,7 +2043,7 @@ END OF OBJECT
 
 
 
-$66301|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$66350|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -2382,7 +2382,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCProtocol
     NAME: Test_Of_optional_and_required
-    APIUID: 
+    APIUID: //test_ref/occ/intf/Test_Of_optional_and_required
     ABSTRACT: ""
     DISCUSSION: "<p>tests @optional and @required.
 "

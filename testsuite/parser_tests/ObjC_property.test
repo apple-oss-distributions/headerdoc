@@ -12,7 +12,7 @@ int bar;
 @end
 $19|/*! Interface */ 
 
-$0|$12517|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$12538|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -230,7 +230,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: foo
-    APIUID: 
+    APIUID: //test_ref/occ/cl/foo
     ABSTRACT: ""
     DISCUSSION: "<p>Interface "
     UPDATED: ""
@@ -467,7 +467,7 @@ END OF OBJECT
 
 
 
-$12517|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$12538|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -685,7 +685,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: foo
-    APIUID: 
+    APIUID: //test_ref/occ/cl/foo
     ABSTRACT: ""
     DISCUSSION: "<p>Interface "
     UPDATED: ""

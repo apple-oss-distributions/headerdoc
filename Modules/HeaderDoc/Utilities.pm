@@ -2,7 +2,7 @@
 # Utilities.pm
 # 
 # Common subroutines
-# Last Updated: $Date: 2011/09/29 11:25:23 $
+# Last Updated: $Date: 2012/04/12 13:06:41 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -75,7 +75,7 @@ my $depth = 0;
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::Utilities::VERSION = '$Revision: 1317320723 $';
+$HeaderDoc::Utilities::VERSION = '$Revision: 1334261201 $';
 @ISA = qw(Exporter);
 @EXPORT = qw(findRelativePath safeName safeNameNoCollide linesFromFile makeAbsolutePath
              printHash printArray fileNameFromPath folderPathForFile 
@@ -1015,6 +1015,8 @@ sub registerUID($$$)
     my $name = shift;
     my $object = shift;
     my $localDebug = 0;
+
+    cluck("registerUID: $name\n") if ($localDebug);
 
     if ($HeaderDoc::ignore_apiuid_errors == 2) { return; }
     if ($object->noRegisterUID()) { return; }
@@ -2096,6 +2098,10 @@ sub resolveLinks($$$)
     }
     if ( ! -x $resolverpath) {
 	$resolverpath = "/sw/bin/resolveLinks";
+    }
+    if ( ! -x $resolverpath) {
+		$resolverpath = $HeaderDoc::modulesPath."../../../../bin/resolveLinks";
+		# print "RP: $resolverpath\n";
     }
     if ( ! -x $resolverpath) {
 		$resolverpath = $HeaderDoc::modulesPath."bin/resolveLinks";

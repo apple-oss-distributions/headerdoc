@@ -3,7 +3,7 @@
 # Module name: BlockParse
 # Synopsis: Block parser code
 #
-# Last Updated: $Date: 2012/01/16 16:25:31 $
+# Last Updated: $Date: 2012/04/06 15:56:50 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -91,10 +91,14 @@ foreach (qw(Mac::Files Mac::MoreFiles)) {
     eval "use $_";
 }
 
+
+# /*! @abstract Stores whether Objective-C protocol methods are optional or required. */
+$HeaderDoc::OptionalOrRequired = "";
+
 # $HeaderDoc::disable_parms = 0;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(blockParse nspaces blockParseOutside getAndClearCPPHash cpp_remove buildCommentFromFields bracematching peekmatch cpp_add_cl);
+@EXPORT = qw(blockParse nspaces blockParseOutside getAndClearCPPHash cpp_remove buildCommentFromFields bracematching peekmatch cpp_add_cl pbs);
 @EXPORT_OK = qr(blockParseReturnState); # Used by Python parser.
 
 use HeaderDoc::Utilities qw(findRelativePath safeName printArray printHash parseTokens isKeyword warnHDComment classTypeFromFieldAndBPinfo casecmp addAvailabilityMacro printFields objectForUID peek);
@@ -118,7 +122,7 @@ use File::Basename qw(basename);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::BlockParse::VERSION = '$Revision: 1326759931 $';
+$HeaderDoc::BlockParse::VERSION = '$Revision: 1333753010 $';
 
 ################ Portability ###################################
 my $isMacOS;
@@ -165,8 +169,12 @@ my %CPP_HASH = ();
 #  */
 my %CPP_ARG_HASH = ();
 
+# 0, 1, or 2.
 my $cppDebugDefault = 0;
 my $cppDebug = 0;
+
+my $cppAddDebug = 0;
+
 my $cppDebugFromToken = "";
 my $nestedcommentwarn = 0;
 my $warnAllMultipleDefinitions = 1;
@@ -803,7 +811,7 @@ sub blockParse
     my $asDebug                 = 0;
     my $reMarkDebug             = 0;
 
-    $cppDebug = $cppDebugDefault || $HeaderDoc::fileDebug;
+    $cppDebug = $cppDebugDefault ? $cppDebugDefault : $HeaderDoc::fileDebug;
 
     # State variables (part 1 of 3)
     # my $typestring = "";
@@ -1204,7 +1212,7 @@ sub blockParse
 	if ($localDebug || $cppDebug || $spaceDebug || $cppDebugFromToken) {
 		foreach my $partlist (@parts) {
 			print STDERR "PARTLIST: \"$partlist\"\n";
-			if ($partlist eq $cppDebugFromToken) {
+			if ($partlist eq $cppDebugFromToken && length($cppDebugFromToken)) {
 				$cppDebug = 1; $parseDebug = 1; $macroDebug = 1;
 			}
 		}
@@ -3410,6 +3418,9 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 			print STDERR "REQUIRED REGEXP MATCH: \"$part\"\n" if ($localDebug || $parseDebug);
 			$hollowskip = 1;
 			print STDERR "hollowskip -> 1 (requiredregexp)\n" if ($parserStateInsertDebug);
+
+			$HeaderDoc::OptionalOrRequired = $part;
+			$parserState->{optionalOrRequired} = $part;
 
 			last SWITCH;
 		};
@@ -5895,6 +5906,7 @@ if (0) {
 
 	    print STDERR "OOGABOOGA\n" if ($parserStackDebug);
 	    if ($pushParserStateAfterToken == 1) {
+			if ($parserState->{inClass}) { configureAccessControlStateForClass($parserState); }
 			print STDERR "parserState pushed onto stack[token]\n" if ($parserStackDebug);
 			print STDERR "Last tree node set to $treeCur [11]\n" if ($parserStateInsertDebug);
 			$parserState->{lastTreeNode} = $treeCur;
@@ -5913,6 +5925,8 @@ if (0) {
 		if ($part =~ /\w/) {
 			print STDERR "parserState pushed onto stack[word]\n" if ($parserStackDebug);
 			print STDERR "Last tree node set to $treeCur [12]\n" if ($parserStateInsertDebug);
+
+			if ($parserState->{inClass}) { configureAccessControlStateForClass($parserState); }
 			$parserState->{lastTreeNode} = $treeCur;
 			$curline = "";
 			$parserState->{storeDec} = $declaration;
@@ -5940,6 +5954,9 @@ if (0) {
 		    $parseTokens{classisbrace}, $parseTokens{functionisbrace}, $case_sensitive, scalar(@braceStack))) {
 			if ($part =~ /[\n\r]/) { $parserState->{inRubyClass} = 2; }
 			$parserState->{ISFORWARDDECLARATION} = 0;
+
+			if ($parserState->{inClass}) { configureAccessControlStateForClass($parserState); }
+
 			print STDERR "parserState pushed onto stack[brace]\n" if ($parserStackDebug);
 			# if ($pushParserStateAtBrace == 2) {
 				# print STDERR "NOINSERT parserState: $parserState\n" if ($parserStackDebug);
@@ -9366,8 +9383,9 @@ print STDERR "NC: $newcount\n" if ($localDebug);
 			# $curname_inserted = 1;
 			my $newcurObj;
 			my $typestring = $curtype;
+			my $ncdeclaration = $parseTree->textTreeNC($lang, $sublang, 1);
 			($newcurObj, $classType, $varIsConstant) = objForType( $curObj, $parseTokens{typedefname}, $typestring,
-					$posstypes, $outertype, $curtype, $classType, $classKeyword, $declaration,
+					$posstypes, $outertype, $curtype, $classType, $classKeyword, $ncdeclaration,
 					\@fields, $functionGroup, $varIsConstant, $blockmode, $inClass, $inInterface,
 					$inTypedef, $inStruct, $fullpath, $inputCounter, $blockOffset, $lang, $sublang, 0, $functionContents,
 					$apiOwner, $subparseInputCounter, $subparseBlockOffset, $extendsClass, $implementsClass, 1, \%parseTokens);
@@ -9820,8 +9838,9 @@ print STDERR "setting curtype to UNKNOWN\n" if ($localDebug);
 				print STDERR "BAILFAST[1]: AT END IC: $inputCounter\n" if ($HeaderDoc::inputCounterDebug);
 				last;
 			    }
+			    my $ncdeclaration = $parseTree->textTreeNC($lang, $sublang, 1);
 			    ($extra, $classType, $varIsConstant) = objForType( $curObj, $parseTokens{typedefname}, $typestring,
-					$posstypes, $outertype, $curtype, $classType, $classKeyword, $declaration,
+					$posstypes, $outertype, $curtype, $classType, $classKeyword, $ncdeclaration,
 					\@fields, $functionGroup, $varIsConstant, $blockmode, $inClass, $inInterface,
 					$inTypedef, $inStruct, $fullpath, $inputCounter, $blockOffset, $lang, $sublang, $outerLocalDebug,
 					$functionContents, $apiOwner, $subparseInputCounter, $subparseBlockOffset,
@@ -10374,7 +10393,8 @@ print STDERR "setting curtype to UNKNOWN\n" if ($localDebug);
 					    # my $localDebug = 1;
 						print STDERR "ADDING \"".$extra->name."\" TO CLASSES/PROTOCOLS/*\n" if ($localDebug);
 					print STDERR "RAWDEC: $declaration\n" if ($localDebug);
-						$classType = classTypeFromFieldAndBPinfo($classKeyword, $typestring." ".$posstypes, $declaration, $fullpath, $inputCounter+$blockOffset, $sublang);
+						my $ncdeclaration = $parseTree->textTreeNC($lang, $sublang, 1);
+						$classType = classTypeFromFieldAndBPinfo($classKeyword, $typestring." ".$posstypes, $ncdeclaration, $fullpath, $inputCounter+$blockOffset, $sublang);
 						# print STDERR "CLASSTYPE: $classType\n";
 						if ($classType eq "intf") {
 							push (@classObjects, $extra);
@@ -11248,7 +11268,7 @@ sub cpp_add($$)
 
     $string =~ s/^\/\*.*?\*\///s;
 
-    # print STDERR "IN cpp_add: ADDING  \"$string\"\n";
+    print STDERR "IN cpp_add: ADDING  \"$string\"\n" if ($cppDebug || $cppAddDebug);
 
     return cpp_add_string($string, $dropdeclaration);
 }
@@ -11270,8 +11290,8 @@ sub cpp_add_string($$)
     my $slstring = $string;
     $slstring =~ s/\\\n/ /sg;
 
-    print STDERR "cpp_add: STRING WAS $string\n" if ($cppDebug || $localDebug || $cppDebugFromToken);
-    print STDERR "SLSTRING: $slstring\n" if ($localDebug || $cppDebug);
+    print STDERR "cpp_add: STRING WAS $string\n" if ($cppDebug || $localDebug || $cppDebugFromToken || $cppAddDebug);
+    print STDERR "SLSTRING: $slstring\n" if ($localDebug || $cppDebug || $cppAddDebug);
 
     # if ($slstring =~ s/^\s*#define\s+(\w+)\(//s) {
     if ($dropdeclaration && $slstring =~ s/^\s*#define\s+(\w+)(\s|$)//s) {
@@ -11479,9 +11499,9 @@ sub cpp_preprocess
 
     my $count = 0;
     if ($HeaderDoc::enable_cpp > 0) {
-# print STDERR "CPP ENABLE\n";
+print STDERR "CPP ENABLE\n" if ($cppDebug > 1);
       foreach my $hashhashref (@HeaderDoc::cppHashList) {
-# print STDERR "HASHREFCHECK\n";
+print STDERR "HASHREFCHECK\n" if ($cppDebug > 1);
 	my $hashref = $hashhashref->{HASHREF};
 	print STDERR "HASHREF: $hashref\n" if ($cppDebug);
 	if (!$hashref) {
@@ -11516,6 +11536,8 @@ sub cpp_preprocess
 	print STDERR "HASARGS: $hasargs\n" if ($cppDebug);
 	return ($altpart, $hasargs, $CPP_ARG_HASH{$part});
       }
+    } else {
+	print STDERR "C preprocessing is disabled.\n" if ($cppDebug);
     }
 
     # If we got here, either CPP is disabled or we didn't find anything.
@@ -12065,6 +12087,33 @@ sub cppHashMerge
     return ($hashret, $arghashret, $root, $curhashobj);
 }
 
+# /*!
+#     @abstract
+#         Configures the access control state and optional/required
+#         state for methods and variables within a class based on
+#         the current language and class type.
+#  */
+sub configureAccessControlStateForClass
+{
+    my $parserState = shift;
+
+    my $lang = $parserState->{lang};
+
+    if ($lang eq "php") {
+		$HeaderDoc::AccessControlState = "public";
+    } elsif ($lang eq "java") {
+		$HeaderDoc::AccessControlState = "package-private";
+    } elsif ($lang eq "C") {
+	if ($parserState->{classIsObjC} || ($parserState->{lang} eq "IDL" && $HeaderDoc::idl_language eq "occ")) {
+		$HeaderDoc::AccessControlState = "private";
+		if ($parserState->{inProtocol}) {
+			$HeaderDoc::OptionalOrRequired = "\@required"; # The default in Objective C
+		}
+	} else {
+		$HeaderDoc::AccessControlState = "protected";
+	}
+    }
+}
 
 1;
 

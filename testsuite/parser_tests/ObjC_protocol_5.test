@@ -12,7 +12,7 @@ $227|/*!
         @discussion All validator objects validate--in fact, they can't
         help themselves. That's what they do.
 */
-$0|$14586|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$14627|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -222,7 +222,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCProtocol
     NAME: ObjCValidatorProtocol
-    APIUID: 
+    APIUID: //test_ref/occ/intf/ObjCValidatorProtocol
     ABSTRACT: "<p>Protocol implemented by validator objects. 
 "
     DISCUSSION: "<p>All validator objects validate--in fact, they can't
@@ -479,7 +479,7 @@ END OF OBJECT
 
 
 
-$14586|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$14627|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -689,7 +689,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCProtocol
     NAME: ObjCValidatorProtocol
-    APIUID: 
+    APIUID: //test_ref/occ/intf/ObjCValidatorProtocol
     ABSTRACT: "<p>Protocol implemented by validator objects. 
 "
     DISCUSSION: "<p>All validator objects validate--in fact, they can't

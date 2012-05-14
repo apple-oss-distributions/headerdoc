@@ -12,7 +12,7 @@ $275|/*!
         @abstract The TrainsCanFly category adds levitation methods to the Train class.
         @discussion Methods declared in the TrainsCanFly category of the Train class can only be used with properly equiped Train objects.
 */
-$0|$13959|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$14007|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -219,7 +219,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCCategory
     NAME: Trains_2(TrainsCanFly)
-    APIUID: 
+    APIUID: //test_ref/occ/cat/Trains_2(TrainsCanFly)
     ABSTRACT: "<p>The TrainsCanFly category adds levitation methods to the Train class.
 "
     DISCUSSION: "<p>Methods declared in the TrainsCanFly category of the Train class can only be used with properly equiped Train objects.
@@ -280,7 +280,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -474,7 +474,7 @@ END OF OBJECT
 
 
 
-$13959|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$14007|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -681,7 +681,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCCategory
     NAME: Trains_2(TrainsCanFly)
-    APIUID: 
+    APIUID: //test_ref/occ/cat/Trains_2(TrainsCanFly)
     ABSTRACT: "<p>The TrainsCanFly category adds levitation methods to the Train class.
 "
     DISCUSSION: "<p>Methods declared in the TrainsCanFly category of the Train class can only be used with properly equiped Train objects.
@@ -742,7 +742,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

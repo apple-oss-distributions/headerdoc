@@ -16,7 +16,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $33|/*!
      @class group_test_10
 */
-$0|$15275|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$15309|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -246,7 +246,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: group_test_10
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/group_test_10
     ABSTRACT: ""
     DISCUSSION: "<p></p>"
     UPDATED: ""
@@ -305,7 +305,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -519,7 +519,7 @@ END OF OBJECT
 
 
 
-$15275|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$15309|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -749,7 +749,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: group_test_10
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/group_test_10
     ABSTRACT: ""
     DISCUSSION: "<p></p>"
     UPDATED: ""
@@ -808,7 +808,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

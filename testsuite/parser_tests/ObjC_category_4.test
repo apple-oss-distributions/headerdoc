@@ -11,7 +11,7 @@ $322|/*!
         @abstract The TrainsUnderWater category adds submarine methods to the Train class.
         @discussion Methods declared in the TrainsUnderWater category of the Train class can only be used with properly equiped Train objects and appropriate infrastructure.
 */
-$0|$13891|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$13943|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -218,7 +218,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCCategory
     NAME: Trains_2(TrainsUnderWater)
-    APIUID: 
+    APIUID: //test_ref/occ/cat/Trains_2(TrainsUnderWater)
     ABSTRACT: "<p>The TrainsUnderWater category adds submarine methods to the Train class.
 "
     DISCUSSION: "<p>Methods declared in the TrainsUnderWater category of the Train class can only be used with properly equiped Train objects and appropriate infrastructure.
@@ -279,7 +279,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -473,7 +473,7 @@ END OF OBJECT
 
 
 
-$13891|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$13943|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -680,7 +680,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCCategory
     NAME: Trains_2(TrainsUnderWater)
-    APIUID: 
+    APIUID: //test_ref/occ/cat/Trains_2(TrainsUnderWater)
     ABSTRACT: "<p>The TrainsUnderWater category adds submarine methods to the Train class.
 "
     DISCUSSION: "<p>Methods declared in the TrainsUnderWater category of the Train class can only be used with properly equiped Train objects and appropriate infrastructure.
@@ -741,7 +741,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

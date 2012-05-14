@@ -12,7 +12,7 @@ $274|/*!
         @discussion Methods declared in the BoatsCanFly category of the Boats class can only be u
 sed with properly equiped Boat objects.
 */
-$0|$13883|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$13927|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -220,7 +220,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCCategory
     NAME: Boats(BoatsCanFly)
-    APIUID: 
+    APIUID: //test_ref/occ/cat/Boats(BoatsCanFly)
     ABSTRACT: "<p>The BoatsCanFly category adds levitation methods to the Boat class.
 "
     DISCUSSION: "<p>Methods declared in the BoatsCanFly category of the Boats class can only be u
@@ -282,7 +282,7 @@ sed with properly equiped Boat objects.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -477,7 +477,7 @@ END OF OBJECT
 
 
 
-$13883|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$13927|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -685,7 +685,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCCategory
     NAME: Boats(BoatsCanFly)
-    APIUID: 
+    APIUID: //test_ref/occ/cat/Boats(BoatsCanFly)
     ABSTRACT: "<p>The BoatsCanFly category adds levitation methods to the Boat class.
 "
     DISCUSSION: "<p>Methods declared in the BoatsCanFly category of the Boats class can only be u
@@ -747,7 +747,7 @@ sed with properly equiped Boat objects.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

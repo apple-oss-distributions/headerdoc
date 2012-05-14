@@ -21,7 +21,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 
 };
 $13|/*! Class */
-$0|$40660|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$40744|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -258,7 +258,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: foo
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/foo
     ABSTRACT: ""
     DISCUSSION: "<p>Class "
     UPDATED: ""
@@ -317,7 +317,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -364,7 +364,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -411,7 +411,7 @@ Include the whole thing."
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -458,7 +458,7 @@ Include the whole thing."
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -632,7 +632,7 @@ Include the whole thing."
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -679,7 +679,7 @@ Include the whole thing."
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -726,7 +726,7 @@ Include the whole thing."
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1045,7 +1045,7 @@ END OF OBJECT
 
 
 
-$40660|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$40744|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -1282,7 +1282,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: foo
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/foo
     ABSTRACT: ""
     DISCUSSION: "<p>Class "
     UPDATED: ""
@@ -1341,7 +1341,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1388,7 +1388,7 @@ LONG ATTRIBUTES:
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -1435,7 +1435,7 @@ Include the whole thing."
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -1482,7 +1482,7 @@ Include the whole thing."
             XMLTHROWS: ""
             UPDATED: ""
             LINKAGESTATE: ""
-            ACCESSCONTROL: ""
+            ACCESSCONTROL: "protected"
             AVAILABILITY: ""
             LINKUID: ""
             ORIGCLASS: ""
@@ -1656,7 +1656,7 @@ Include the whole thing."
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1703,7 +1703,7 @@ Include the whole thing."
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1750,7 +1750,7 @@ Include the whole thing."
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

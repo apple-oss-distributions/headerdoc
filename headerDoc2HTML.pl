@@ -4,7 +4,7 @@
 # Synopsis: Scans a file for headerDoc comments and generates an HTML
 #           file from the comments it finds.
 #
-# Last Updated: $Date: 2012/01/11 09:43:51 $
+# Last Updated: $Date: 2012/04/12 13:06:41 $
 #
 # ObjC additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -29,7 +29,7 @@
 #
 # @APPLE_LICENSE_HEADER_END@
 #
-# $Revision: 1326303831 $
+# $Revision: 1334261201 $
 #####################################################################
 
 
@@ -61,7 +61,7 @@ my $HeaderDoc_Version = "8.9";
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-my $VERSION = '$Revision: 1326303831 $';
+my $VERSION = '$Revision: 1334261201 $';
 
 # /*!
 #     @abstract
@@ -2149,7 +2149,7 @@ foreach my $inputFile (@inputFiles) {
     my ($encoding, $arrayref) = linesFromFile($inputFile, 1);
     my @rawInputLines = @{$arrayref};
     if ($debugging) { print STDERR "Checking file $inputFile\n"; }
-    # Grab any #include directives.
+    # Grab any #include or #import directives.
     processIncludes(\@rawInputLines, $fullpath, $lang, $sublang);
 }
 if ($debugging) { print STDERR "Done processing includes.  Fixing dependencies.\n"; }
@@ -2254,6 +2254,8 @@ foreach my $inputFile (@fileList) {
 
     print STDERR "Top Level Point 200\n" if ($tlhangDebug);
     ($rootFileName, $lang, $sublang) = getLangAndSubLangFromFilename($filename);
+
+    $HeaderDoc::OptionalOrRequired = "";
 
     my $rootOutputDir;
     if (length ($specifiedOutputDir)) {
@@ -2429,6 +2431,10 @@ print STDERR "REDO" if ($debugging);
         my @inputLines = @$arrayRef;
 	# $HeaderDoc::nodec = 0;
 
+	$cppAccessControlState = "protected:"; # the default in C++
+	$objcAccessControlState = "private:"; # the default in Objective C
+	$HeaderDoc::AccessControlState = "";
+
 	print STDERR "Top Level Point 705\n" if ($tlhangDebug);
 
 	    # look for /*! comments and collect all comment fields into the appropriate objects
@@ -2452,9 +2458,10 @@ print STDERR "REDO" if ($debugging);
 			my $line = "";           
 
 			# print STDERR "inMLC: $inMLC\n";
-			print STDERR "LINE: \"".$inputLines[$inputCounter]."\"\n" if ($localDebug);
+			print STDERR "LINE: \"".$inputLines[$inputCounter]."\"\n" if ($localDebug || $includeDebug);
 	        
-			if ($inputLines[$inputCounter] =~ /^\s*#include[ \t]+(.*)$/) {
+			if ($inputLines[$inputCounter] =~ /^\s*#(?:include|import)[ \t]+(.*)$/) {
+				print STDERR "Include line: $1\n" if ($includeDebug);
 				my $rest = $1;
 				$rest =~ s/^\s*//s;
 				$rest =~ s/\s*$//s;
@@ -2470,6 +2477,7 @@ print STDERR "REDO" if ($debugging);
 					push(@HeaderDoc::cppHashList, $includehash);
 # print STDERR "PUSH HASH\n";
 					push(@HeaderDoc::cppArgHashList, $HeaderDoc::HeaderFileCPPArgHashHash{$filename});
+					print STDERR "Adding include for $filename.\n" if ($includeDebug);
 				}
 			}
 	        	print STDERR "Input line number[1]: $inputCounter\n" if ($localDebug);
@@ -2997,6 +3005,8 @@ print STDERR "REDO" if ($debugging);
 			print STDERR "FOUND.  MERGING HASHES\n" if ($includeDebug);
 			%headercpphash = (%headercpphash, %{$HeaderDoc::HeaderFileCPPHashHash{$includedfilename}});
 			%headercpparghash = (%headercpparghash, %{$HeaderDoc::HeaderFileCPPArgHashHash{$includedfilename}});
+
+			printCPPHashes(\%headercpphash, \%headercpparghash) if ($includeDebug)
 		}
 		print STDERR "\n" if ($includeDebug);
 	}
@@ -3079,6 +3089,8 @@ print STDERR "REDO" if ($debugging);
 			} elsif ($xml_output) {
 				$assocapio->writeHeaderElementsToXMLPage();
 			} else {
+				$assocapio->fixupTypeRequests();
+				$assocapio->setupAPIReferences();
 				$assocapio->createFramesetFile();
 				$assocapio->createTOCFile();
 				$assocapio->writeHeaderElements(); 
@@ -3107,6 +3119,7 @@ print STDERR "REDO" if ($debugging);
 	$headerObject->writeHeaderElementsToXMLPage();
       } else {
 	$headerObject->fixupTypeRequests();
+	$headerObject->setupAPIReferences();
 	# SDump($headerObject, "point5a1");
 	$headerObject->createFramesetFile();
 	# SDump($headerObject, "point5a2");
@@ -4804,6 +4817,24 @@ sub runResolveLinksTests
 	print "\n";
 
 	return ($okcount, $failcount);
+}
+
+# /*!
+#     @abstract Prints the CPP hashes for debugging purposes.
+#  */
+sub printCPPHashes
+{
+    my $tokenhashref = shift;
+    my $arghashref = shift;
+
+    my %tokenhash = %{$tokenhashref};
+    my %arghash = %{$arghashref};
+
+    print STDERR "DUMPING CPP HASHES\n";
+    foreach my $token (keys %tokenhash) {
+	print STDERR "CPP TOKEN $token -> ".$tokenhash{$token}."\n";
+	print STDERR "              ARGS: ".$arghash{$token}."\n";
+    }
 }
 
 

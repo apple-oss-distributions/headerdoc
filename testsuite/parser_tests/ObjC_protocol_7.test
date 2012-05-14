@@ -10,7 +10,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $63|/*!        @protocol MyProtocol
         @abstract Abstract.
 */
-$0|$10516|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$10546|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -226,7 +226,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCProtocol
     NAME: MyProtocol
-    APIUID: 
+    APIUID: //test_ref/occ/intf/MyProtocol
     ABSTRACT: "<p>Abstract.
 "
     DISCUSSION: "<p></p>"
@@ -384,7 +384,7 @@ END OF OBJECT
 
 
 
-$10516|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$10546|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -600,7 +600,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCProtocol
     NAME: MyProtocol
-    APIUID: 
+    APIUID: //test_ref/occ/intf/MyProtocol
     ABSTRACT: "<p>Abstract.
 "
     DISCUSSION: "<p></p>"

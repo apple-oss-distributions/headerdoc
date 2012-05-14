@@ -48,7 +48,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 
 @end
 $18|/*! test class */
-$0|$49880|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$49909|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -393,7 +393,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: objc_test_8
-    APIUID: 
+    APIUID: //test_ref/occ/cl/objc_test_8
     ABSTRACT: ""
     DISCUSSION: "<p>test class "
     UPDATED: ""
@@ -1594,7 +1594,7 @@ END OF OBJECT
 
 
 
-$61960|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$61989|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -1939,7 +1939,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: objc_test_8
-    APIUID: 
+    APIUID: //test_ref/occ/cl/objc_test_8
     ABSTRACT: ""
     DISCUSSION: "<p>test class "
     UPDATED: ""

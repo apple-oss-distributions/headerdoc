@@ -3,7 +3,7 @@
 # Module name: BlockParse
 # Synopsis: Block parser code
 #
-# Last Updated: $Date: 2011/02/18 19:02:59 $
+# Last Updated: $Date: 2012/02/28 15:37:59 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -88,7 +88,7 @@ use File::Basename qw(basename);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::PythonParse::VERSION = '$Revision: 1298084579 $';
+$HeaderDoc::PythonParse::VERSION = '$Revision: 1330472279 $';
 
 ################ Portability ###################################
 my $isMacOS;
@@ -307,7 +307,14 @@ sub pythonParse
     my $parseDebug = 0;
     my $liteDebug = 0;
     my $parmDebug = 0;
+    my $nameDebug = 0;
+    my $stateDebug = 0;
+    my $spaceDebug = 0;
+    my $stackDebug = 0;
     my $inputCounterDebug = 0;
+
+    my $anyDebug = ($parseDebug || $liteDebug || $parmDebug || $nameDebug || $stateDebug || $spaceDebug ||
+                    $stackDebug || $inputCounterDebug);
     # print STDERR "Test\n";
 
     my $treeTop = HeaderDoc::ParseTree->new();
@@ -359,6 +366,13 @@ sub pythonParse
 	my $part = "";
 	foreach my $nextpart (@parts) {
 		REDO:
+		if ($stackDebug) {
+			print STDERR "BEGIN STACK DUMP\n";
+			foreach my $token (@{$parserState->{braceStack}}) {
+				print "ITEM: $token\n";
+			}
+			print STDERR "END STACK DUMP\n";
+		}
 
 		if (!length($part)) {
 			# print STDERR "SKIP TO \"$nextpart\"\n";
@@ -372,34 +386,66 @@ sub pythonParse
 		my $treepart = $part;
 
 		if ($part =~ /\s/ && $part !~ /[\r\n]/) {
-			print STDERR "WSATTOP\n" if ($parseDebug);
+			print STDERR "WSATTOP\n" if ($parseDebug || $spaceDebug);
 			if ($parserState->{lastpart} =~ /[\n\r]/ || $parserState->{lastpart} eq "") {
+			    if (!$parserState->isContinuationLine()) {
 				# print STDERR "CMP ".pylength($part)." TO ".$parserState->{leadspace}."\n";
 				if ($parserState->{leadspace} == -1) {
 					if ($nextpart !~ /[\n\r]/) {
 						$parserState->{leadspace} = pylength($part);
 						$parserState->{setleading} = 1;
-						print STDERR "leadspace -> ".$parserState->{leadspace}."\n" if ($parseDebug);
+						print STDERR "SETLEADING -> 1[1]\n" if ($parseDebug || $stateDebug);
+						print STDERR "leadspace -> ".$parserState->{leadspace}."\n" if ($parseDebug || $stateDebug || $spaceDebug);
 						$treepart = "";
+					} else {
+						print STDERR "Ignoring leading space for blank line.\n" if ($spaceDebug);
 					}
+				} else {
+						print STDERR "Not setting leading space because it is already set (".$parserState->{leadspace}.").\n" if ($spaceDebug);
 				}
 				if ((!$parserState->{seenToken}) && (!$parserState->{seenLeading})) {
 					$parserState->{seenLeading} = pylength($part);
 				}
+			    } else {
+					print STDERR "Ignoring leading whitespace for continuation line.\n" if ($parseDebug || $spaceDebug);
+					print STDERR "LEADSPACE: ".$parserState->{leadspace}."\n" if ($spaceDebug);
+			    }
+			} else {
+			    print STDERR "Not setting leading whitespace because this is not the first whitespace\n"."on the line (lastpart is ".$parserState->{lastpart}.").\n" if ($spaceDebug);
 			}
 		} elsif ($part =~ /[\r\n]/) {
 			print STDERR "NLATTOP\n" if ($parseDebug);
 			$parserState->{seenLeading} = 0;
+			if ($parserState->{seenToken}) {
+				$parserState->{setleading} = 0;
+				print STDERR "SETLEADING -> 0\n" if ($parseDebug || $stateDebug);
+			}
 			$parserState->{seenToken} = 0;
-			$parserState->{setleading} = 0;
 		} else {
 			print STDERR "TEXTATTOP\n" if ($parseDebug);
+			if ($parserState->{leadspace} == -1) {
+				$parserState->{leadspace} = 0; # pylength($part);
+				$parserState->{setleading} = 1;
+				print STDERR "SETLEADING -> 1[1]\n" if ($parseDebug || $stateDebug);
+				print STDERR "leadspace -> ".$parserState->{leadspace}."\n" if ($parseDebug || $stateDebug);
+			}
+			if (!$parserState->{seenLeading}) { $parserState->{seenLeading} = 0; };
 
-			print STDERR "CMP: ".$parserState->{seenLeading}." TO ".$parserState->{leadspace}."\n" if ($parseDebug);
-			if ((!$parserState->{setleading}) && ($parserState->{seenLeading} <= $parserState->{parentLeading})) {
-				if ((!$parserState->{seenToken}) && (!$parserState->{onlyComments})) { $parserState->{endgame} = 3; }
-			} elsif ((!$parserState->{setleading}) && ($parserState->{seenLeading} <= $parserState->{leadspace})) {
-				if ((!$parserState->{seenToken}) && (!$parserState->{onlyComments})) { $parserState->{endgame} = 2; }
+			print STDERR "CMP: ".$parserState->{seenLeading}." TO ".$parserState->{leadspace}."\n" if ($parseDebug || $spaceDebug);
+			if ((!$parserState->isContinuationLine()) && (!$parserState->{setleading}) && ($parserState->{seenLeading} <= $parserState->{parentLeading}) && (!$parserState->{onlyComments})) {
+				if (!$parserState->{seenToken}) {
+					$parserState->{endgame} = 3;
+					print STDERR "ENDGAME -> 3[TAT-LTPARENTLEAD]\n" if ($parseDebug || $stateDebug);
+				} else {
+					print STDERR "ENDGAME NOT SET (ST: ".$parserState->{seenToken}.", OC: ".$parserState->{onlyComments}.") [TAT-LTPARENTLEAD]\n" if ($parseDebug);
+				}
+			} elsif ((!$parserState->isContinuationLine()) && (!$parserState->{setleading}) && ($parserState->{seenLeading} <= $parserState->{leadspace}) && (!$parserState->{onlyComments})) {
+				if (!$parserState->{seenToken}) {
+					$parserState->{endgame} = 2;
+					print STDERR "ENDGAME -> 2[TAT-LTLEAD]\n" if ($parseDebug || $stateDebug);
+				} else {
+					print STDERR "ENDGAME NOT SET (ST: ".$parserState->{seenToken}.", OC: ".$parserState->{onlyComments}.") [TAT-LTPARENTLEAD]\n" if ($parseDebug);
+				}
 			} elsif (!$parserState->{seenToken}) {
 				if ($parserState->{leadspace}) {
 					my $temp = ' ' x $parserState->{leadspace};
@@ -410,20 +456,24 @@ sub pythonParse
 			if (($parserState->{leadspace} == -1) && (!$parserState->{seenLeading})) {
 				$parserState->{leadspace} = 0;
 				$parserState->{setleading} = 1;
-				print STDERR "leadspace -> ".$parserState->{leadspace}."\n" if ($parseDebug);
+				print STDERR "SETLEADING -> 1[2]\n" if ($parseDebug || $stateDebug);
+				print STDERR "leadspace -> ".$parserState->{leadspace}."\n" if ($parseDebug || $stateDebug);
 			}
 			$parserState->{seenToken} = 1;
 		}
 		print STDERR "POSTCMP: ".$parserState->{seenLeading}." TO ".$parserState->{leadspace}."\n" if ($parseDebug);
 
 
-		SWITCH: {
-			($parserState->{endgame} == 1) && do {
+		if (($parserState->{endgame} != 2) && ($parserState->{endgame} != 3)) {
+		    SWITCH: {
+			($parserState->{endgame} == 1 && $part =~ /\S/) && do {
 				if ($parserState->{onlyComments}) { 
 					print STDERR "Only comments, so not setting endgame\n" if ($parseDebug);
 					$parserState->{endgame} = 0;
+					print STDERR "ENDGAME -> 0[ONLYCOMMENTS]\n" if ($parseDebug || $stateDebug);
 				} else {
 					$parserState->{endgame} = 2;
+					print STDERR "ENDGAME -> 2[WAS1]\n" if ($parseDebug || $stateDebug);
 					$parserState->{popAfter} = 1;
 					last SWITCH;
 				}
@@ -450,11 +500,17 @@ sub pythonParse
 			};
 			($part =~ /[\n\r]/) && do {
 				print STDERR "newline\n" if ($parseDebug);
-				if (!$parserState->isQuoted($lang, $sublang)) {
+				if ($parserState->isQuoted($lang, $sublang)) {
+					$parserState->{lastNLWasQuoted} = 1;
+					print STDERR "lastNLWasQuoted -> 1\n" if ($spaceDebug || $stateDebug);
+				} else {
 					print STDERR "MAYBE ENDGAME: AC IS ".$parserState->{autoContinue}."\n" if ($parseDebug);
+					$parserState->{lastNLWasQuoted} = 0;
+					print STDERR "lastNLWasQuoted -> 0\n" if ($spaceDebug || $stateDebug);
 					if ((!$parserState->{autoContinue}) && (!$parserState->{onlyComments})) {
 						print STDERR "ENDGAME\n" if ($parseDebug);
 						$parserState->{endgame} = 1;
+						print STDERR "ENDGAME -> 1[NEWLINE]\n" if ($parseDebug || $stateDebug);
 					}
 				}
 				last SWITCH;
@@ -581,7 +637,8 @@ sub pythonParse
 					$parserState->{classtype} = "class";
 					$parserState->{namepending} = 1;
 					$parserState->{bracePending} = 1;
-					$parserState->pushBrace($part);
+					# $parserState->pushBrace($part);
+					$parserState->{autoContinue}++;
 					$parserState->{pushParserStateOnBrace} = 1;
 				}
 				last SWITCH;
@@ -592,17 +649,18 @@ sub pythonParse
 					$parserState->{sodclass} = "function";
 					$parserState->{namepending} = 1;
 					$parserState->{bracePending} = 1;
-					$parserState->pushBrace($part);
+					# $parserState->pushBrace($part);
+					$parserState->{autoContinue}++;
 				}
 				last SWITCH;
 			};
 			{
-				print STDERR "NP: ".$parserState->{namepending}." PART \"$part\"\n" if ($parseDebug);
+				print STDERR "NP: ".$parserState->{namepending}." PART \"$part\"\n" if ($parseDebug || $nameDebug);
 				if (($parserState->{namepending}) &&
 				    ((!($parserState->{inString} || $parserState->{inComment} || $parserState->{inChar} ||
 				       $parserState->{inInlineComment})) && ($part =~ /\w/))) {
 
-					print STDERR "NAME CHANGED TO $part\n" if ($parseDebug);
+					print STDERR "NAME CHANGED TO $part\n" if ($parseDebug || $nameDebug);
 					$parserState->{sodname} = $part;
 					$parserState->{namepending} = 0;
 					if (!$parserState->{sodclass}) {
@@ -611,6 +669,7 @@ sub pythonParse
 				}
 				print STDERR "default\n" if ($parseDebug);
 			};
+		    }
 		}
 
 		if ($parserState->{parsedParamParse} == 1) {
@@ -634,28 +693,28 @@ sub pythonParse
 			if ($parserState->{onlyComments}) {
 				$parserState->{setHollowAfter} = 1;
 				# $parserState->setHollowWithLineNumbers($treeCur, $fileoffset, $inputCounter);
-				print STDERR "ONLYCOMMENTS -> 0\n" if ($parseDebug);
+				print STDERR "ONLYCOMMENTS -> 0\n" if ($parseDebug || $stateDebug);
 				$parserState->{onlyComments} = 0;
 			}
 		}
 
-		if ($parserState->{valuepending} == 1) {
-			# Skip the "=" part.
-			$parserState->{valuepending} = 2;
-			$parserState->{preEqualsSymbol} = $parserState->{sodname};
-		} elsif ($parserState->{valuepending} == 2) {
-			$parserState->{value} .= $part;
-		}
-
-		if ($part ne "\"") {
-			$parserState->{justLeftStringToken} = 0;
-			$parserState->{endOfTripleQuote} = 0;
-		}
-		if ($part ne "\\" && $part =~ /\S/) {
-			$parserState->resetBackslash();
-		}
-
 		if (($parserState->{endgame} != 2) && ($parserState->{endgame} != 3)) {
+			if ($parserState->{valuepending} == 1) {
+				# Skip the "=" part.
+				$parserState->{valuepending} = 2;
+				$parserState->{preEqualsSymbol} = $parserState->{sodname};
+			} elsif ($parserState->{valuepending} == 2) {
+				$parserState->{value} .= $part;
+			}
+
+			if ($part ne "\"") {
+				$parserState->{justLeftStringToken} = 0;
+				$parserState->{endOfTripleQuote} = 0;
+			}
+			if ($part ne "\\" && $part =~ /\S/) {
+				$parserState->resetBackslash();
+			}
+
 			if ($treepart ne "") {
 				print STDERR "ADDED PART AS SIBLING OF $treeCur: " if ($parseDebug);
 				$treeCur = $treeCur->addSibling($treepart, $parserState->{seenBraces});
@@ -691,19 +750,22 @@ sub pythonParse
 			my $leading = $parserState->{seenLeading};
 			my $parentLeading = $parserState->{leadspace};
 
-			print STDERR "NEW PARSER STATE (PPSOB)\n" if ($parseDebug);
+			print STDERR "NEW PARSER STATE (PPSOB)\n" if ($parseDebug || $stateDebug);
 			$parserState = HeaderDoc::ParserState->new( "FULLPATH" => $fullpath, "lang" => $lang, "sublang" => $sublang );
 			# $parserState->setHollowWithLineNumbers($treeCur, $fileoffset, $inputCounter);
 			$parserState->{lang} = $lang;
 			$parserState->{inputCounter} = $inputCounter;
 			$parserState->{initbsCount} = 0; # included for consistency....
 			$parserState->{parentLeading} = $parentLeading || 0;
+			$parserState->{leadspace} = -1;
+			print STDERR "PARENTLEADING -> ".$parserState->{parentLeading}."\n" if ($parseDebug || $stateDebug);
 
-			if ($leading ne "" && $leading != -1) {
-				print STDERR "SETTING LEAD SPACE TO \"$leading\"\n" if ($parseDebug);
-				$parserState->{seenLeading} = $leading;
-				$parserState->{leadspace} = $leading;
-			}
+			# In the brace case, we haven't gotten the leading space yet.
+			# if ($leading ne "" && $leading != -1) {
+				# print STDERR "SETTING LEAD SPACE TO \"$leading\"\n" if ($parseDebug);
+				# $parserState->{seenLeading} = $leading;
+				# $parserState->{leadspace} = $leading;
+			# }
 		}
 
 		if ($parserState->{setHollowAfter}) {
@@ -712,9 +774,9 @@ sub pythonParse
 			print STDERR "SET HOLLOW TO $treeCur\n" if ($parseDebug);
 		}
 
-		if ($parserState->{endgame}) {
-			# The part has to be reprocessed with the new parser
-			# state, so don't skip it.
+		if ($parserState->{endgame} == 2 || $parserState->{endgame} == 3) {
+			# Either the part has to be reprocessed with the new parser
+			# state (so redo it) or it's time to quit entirely.
 
 			if (!scalar(@parserStack)) {
 				$continue = 0;
@@ -724,7 +786,7 @@ sub pythonParse
 			} elsif (!$parserState->{onlyComments}) {
 				# @@@ FIXME? @@@
 				my $treeRef = $parserState->{hollow};
-				print STDERR "NEW PARSER STATE (ENDGAME)\n" if ($parseDebug);
+				print STDERR "NEW PARSER STATE (ENDGAME)\n" if ($parseDebug || $stateDebug);
 
 				my $leading = $parserState->{seenLeading};
 
@@ -765,7 +827,7 @@ sub pythonParse
 					$parserState->{parentLeading} = $parentLeading
 				}
 			}
-			if ($parseDebug) { print STDERR "REDO\n"; }
+			if ($anyDebug) { print STDERR "REDO\n"; }
 			goto REDO;
 		} else {
 			# This part has been handled.  Move on to the
@@ -790,6 +852,8 @@ sub pythonParse
     my $lastACS = "";
 
     # $retDebug = 1;
+
+    print STDERR "LEAVING PARSER\n" if ($parseDebug || $stateDebug);
 
     return HeaderDoc::BlockParse::blockParseReturnState($parserState, $treeTop, $argparse, $declaration, $inPrivateParamTypes, $publicDeclaration, $lastACS, $retDebug, $fileoffset, 0, $parseTokens{definename}, $inputCounter, $lang, $sublang);
 }

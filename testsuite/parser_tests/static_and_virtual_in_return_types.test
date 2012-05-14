@@ -13,7 +13,7 @@ $135|/*!
     This class contains methods whose return types contain symbols that
     contain (but are not equal to) static and virtual.
  */
-$0|$17547|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$17623|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -236,7 +236,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: static_and_virtual_in_return_types_class
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/static_and_virtual_in_return_types_class
     ABSTRACT: ""
     DISCUSSION: "<p>This class contains methods whose return types contain symbols that
 contain (but are not equal to) static and virtual.
@@ -293,7 +293,7 @@ contain (but are not equal to) static and virtual.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -377,7 +377,7 @@ contain (but are not equal to) static and virtual.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -587,7 +587,7 @@ END OF OBJECT
 
 
 
-$17547|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$17623|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -810,7 +810,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: static_and_virtual_in_return_types_class
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/static_and_virtual_in_return_types_class
     ABSTRACT: ""
     DISCUSSION: "<p>This class contains methods whose return types contain symbols that
 contain (but are not equal to) static and virtual.
@@ -867,7 +867,7 @@ contain (but are not equal to) static and virtual.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -951,7 +951,7 @@ contain (but are not equal to) static and virtual.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

@@ -3,7 +3,7 @@
 # Class name: APIOwner
 # Synopsis: Abstract superclass for Header and OO structures
 #
-# Last Updated: $Date: 2011/09/29 11:25:23 $
+# Last Updated: $Date: 2012/04/12 13:06:40 $
 # 
 # Method additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -230,7 +230,7 @@ use vars qw(@ISA);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::APIOwner::VERSION = '$Revision: 1317320723 $';
+$HeaderDoc::APIOwner::VERSION = '$Revision: 1334261200 $';
 
 my $addToDebug = 0;
 
@@ -3825,6 +3825,52 @@ sub writeFunctionListToStdOut {
     return;
 }
 
+# /*! 
+#     @abstract
+#         Recursively ensures that the {@link apirefSetup} method has been called 
+#         on everything that might get emitted later.
+#  */
+sub setupAPIReferences {
+
+    my $self = shift;
+
+    my @functions = $self->functions();
+    my @methods = $self->methods();
+    my @constants = $self->constants();
+    my @typedefs = $self->typedefs();
+    my @structs = $self->structs();
+    my @vars = $self->vars();
+    my @local_vars = ();
+    if ($self->can("variables")) { @local_vars = $self->variables(); }
+    my @enums = $self->enums();
+    my @pDefines = $self->pDefines();
+    my @classes = $self->classes();
+    my @categories = $self->categories();
+    my @protocols = $self->protocols();
+    my @properties = $self->props();
+
+    # pre-process everything to make sure we don't have any unregistered
+    # api refs.
+    my $prevignore = $HeaderDoc::ignore_apiuid_errors;
+    $HeaderDoc::ignore_apiuid_errors = 1;
+
+    my $junk = "";
+    if (@functions) { foreach my $obj (@functions) { $junk = $obj->apirefSetup();}}
+    if (@methods) { foreach my $obj (@methods) { $junk = $obj->apirefSetup();}}
+    if (@constants) { foreach my $obj (@constants) { $junk = $obj->apirefSetup();}}
+    if (@typedefs) { foreach my $obj (@typedefs) { $junk = $obj->apirefSetup();}}
+    if (@structs) { foreach my $obj (@structs) { $junk = $obj->apirefSetup();}}
+    if (@local_vars) { foreach my $obj (@local_vars) { $junk = $obj->apirefSetup();}}
+    if (@vars) { foreach my $obj (@vars) { $junk = $obj->apirefSetup();}}
+    if (@enums) { foreach my $obj (@enums) { $junk = $obj->apirefSetup();}}
+    if (@pDefines) { foreach my $obj (@pDefines) { $junk = $obj->apirefSetup();}}
+    if (@classes) { foreach my $obj (@classes) { $junk = $obj->apirefSetup(); $junk = $obj->docNavigatorComment(); $obj->setupAPIReferences(); }}
+    if (@categories) { foreach my $obj (@categories) { $junk = $obj->apirefSetup(); $junk = $obj->docNavigatorComment(); $obj->setupAPIReferences(); }}
+    if (@protocols) { foreach my $obj (@protocols) { $junk = $obj->apirefSetup(); $junk = $obj->docNavigatorComment(); $obj->setupAPIReferences(); }}
+    if (@properties) { foreach my $obj (@properties) { $junk = $obj->apirefSetup();}}
+    $HeaderDoc::ignore_apiuid_errors = $prevignore;
+}
+
 # /*!
 #     @abstract
 #         Writes the right-side content.
@@ -3860,11 +3906,7 @@ sub writeHeaderElements {
 		unless (mkdir ("$rootOutputDir", 0777)) {die ("Can't create output folder $rootOutputDir. \n$!");};
     }
 
-    # pre-process everything to make sure we don't have any unregistered
-    # api refs.
     my $junk = "";
-    my $prevignore = $HeaderDoc::ignore_apiuid_errors;
-    $HeaderDoc::ignore_apiuid_errors = 1;
     my @functions = $self->functions();
     my @methods = $self->methods();
     my @constants = $self->constants();
@@ -3886,18 +3928,6 @@ sub writeHeaderElements {
 	# }
     # }
 
-    if (@functions) { foreach my $obj (@functions) { $junk = $obj->apirefSetup();}}
-    if (@methods) { foreach my $obj (@methods) { $junk = $obj->apirefSetup();}}
-    if (@constants) { foreach my $obj (@constants) { $junk = $obj->apirefSetup();}}
-    if (@typedefs) { foreach my $obj (@typedefs) { $junk = $obj->apirefSetup();}}
-    if (@structs) { foreach my $obj (@structs) { $junk = $obj->apirefSetup();}}
-    if (@local_vars) { foreach my $obj (@local_vars) { $junk = $obj->apirefSetup();}}
-    if (@vars) { foreach my $obj (@vars) { $junk = $obj->apirefSetup();}}
-    if (@enums) { foreach my $obj (@enums) { $junk = $obj->apirefSetup();}}
-    if (@pDefines) { foreach my $obj (@pDefines) { $junk = $obj->apirefSetup();}}
-    if (@classes) { foreach my $obj (@classes) { $junk = $obj->apirefSetup();}}
-    if (@properties) { foreach my $obj (@properties) { $junk = $obj->apirefSetup();}}
-    $HeaderDoc::ignore_apiuid_errors = $prevignore;
 
     if (!$HeaderDoc::ClassAsComposite) {
     
@@ -4264,8 +4294,9 @@ sub writeProtocols {
         $obj->outputDir("$protocolsRootDir$pathSeparator$protocolName");
         $obj->createFramesetFile();
         $obj->createContentFile() if (!$HeaderDoc::ClassAsComposite);
+	$obj->writeHeaderElementsToCompositePage();
         $obj->createTOCFile();
-        $obj->writeHeaderElements(); 
+        $obj->writeHeaderElements();
     }
 }
 
@@ -4293,6 +4324,7 @@ sub writeCategories {
         $obj->outputDir("$categoriesRootDir$pathSeparator$categoryName");
         $obj->createFramesetFile();
         $obj->createContentFile() if (!$HeaderDoc::ClassAsComposite);
+	$obj->writeHeaderElementsToCompositePage();
         $obj->createTOCFile();
         $obj->writeHeaderElements(); 
     }

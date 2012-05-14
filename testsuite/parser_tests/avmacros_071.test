@@ -13,7 +13,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 @end
 $34|/*! @class avmacros_071_class
  */
-$0|$19410|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$19446|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -253,7 +253,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: avmacros_071_class
-    APIUID: 
+    APIUID: //test_ref/occ/cl/avmacros_071_class
     ABSTRACT: ""
     DISCUSSION: "<p></p>"
     UPDATED: ""
@@ -615,7 +615,7 @@ END OF OBJECT
 
 
 
-$21469|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$21505|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -855,7 +855,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: avmacros_071_class
-    APIUID: 
+    APIUID: //test_ref/occ/cl/avmacros_071_class
     ABSTRACT: ""
     DISCUSSION: "<p></p>"
     UPDATED: ""

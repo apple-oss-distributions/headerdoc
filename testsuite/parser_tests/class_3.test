@@ -198,7 +198,7 @@ source in the chain this reference is not retained.  The list 'owner' i.e. the
 client that creates the event, not the work-loop, is expected to retain the
 source.
 */
-$0|$197443|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$197474|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -942,7 +942,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOEventSource
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/IOEventSource
     ABSTRACT: "<p>Abstract class for all work-loop event sources.
 "
     DISCUSSION: "<p>The IOEventSource declares the abstract super class that all
@@ -8548,7 +8548,7 @@ END OF OBJECT
 
 
 
-$210059|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$210093|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -9292,7 +9292,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOEventSource
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/IOEventSource
     ABSTRACT: "<p>Abstract class for all work-loop event sources.
 "
     DISCUSSION: "<p>The IOEventSource declares the abstract super class that all
@@ -9393,7 +9393,7 @@ source.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

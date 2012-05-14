@@ -930,7 +930,7 @@ $1723|/*!	@interface IOFireWireDeviceInterface
 	</ul>
 
 */
-$0|$1967172|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$1967333|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 1
@@ -4827,7 +4827,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOFireWireDeviceInterface
-    APIUID: 
+    APIUID: //test_ref/c/cl/IOFireWireDeviceInterface
     ABSTRACT: "<p>IOFireWireDeviceInterface is your primary gateway to the functionality contained in
 IOFireWireLib.
 "
@@ -25590,7 +25590,7 @@ Pass the generation number to functions that take or return FireWire node IDs.
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOFireWireUnitInterface
-    APIUID: 
+    APIUID: //test_ref/c/cl/IOFireWireUnitInterface
     ABSTRACT: "<p>IOFireWireDeviceInterface is your primary gateway to the functionality contained in
 IOFireWireLib.
 "
@@ -25668,7 +25668,7 @@ synchronous/asynchronous read, write and lock operations. These include:</p></li
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOFireWireNubInterface
-    APIUID: 
+    APIUID: //test_ref/c/cl/IOFireWireNubInterface
     ABSTRACT: "<p>IOFireWireDeviceInterface is your primary gateway to the functionality contained in
 IOFireWireLib.
 "
@@ -25746,7 +25746,7 @@ synchronous/asynchronous read, write and lock operations. These include:</p></li
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOFireWireDeviceInterface_t
-    APIUID: 
+    APIUID: //test_ref/c/cl/IOFireWireDeviceInterface_t
     ABSTRACT: "<p>IOFireWireDeviceInterface is your primary gateway to the functionality contained in
 IOFireWireLib.
 "
@@ -46723,7 +46723,7 @@ END OF OBJECT
 
 
 
-$1967172|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$1967333|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 1
@@ -50620,7 +50620,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOFireWireDeviceInterface
-    APIUID: 
+    APIUID: //test_ref/c/cl/IOFireWireDeviceInterface
     ABSTRACT: "<p>IOFireWireDeviceInterface is your primary gateway to the functionality contained in
 IOFireWireLib.
 "
@@ -71383,7 +71383,7 @@ Pass the generation number to functions that take or return FireWire node IDs.
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOFireWireUnitInterface
-    APIUID: 
+    APIUID: //test_ref/c/cl/IOFireWireUnitInterface
     ABSTRACT: "<p>IOFireWireDeviceInterface is your primary gateway to the functionality contained in
 IOFireWireLib.
 "
@@ -71461,7 +71461,7 @@ synchronous/asynchronous read, write and lock operations. These include:</p></li
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOFireWireNubInterface
-    APIUID: 
+    APIUID: //test_ref/c/cl/IOFireWireNubInterface
     ABSTRACT: "<p>IOFireWireDeviceInterface is your primary gateway to the functionality contained in
 IOFireWireLib.
 "
@@ -71539,7 +71539,7 @@ synchronous/asynchronous read, write and lock operations. These include:</p></li
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOFireWireDeviceInterface_t
-    APIUID: 
+    APIUID: //test_ref/c/cl/IOFireWireDeviceInterface_t
     ABSTRACT: "<p>IOFireWireDeviceInterface is your primary gateway to the functionality contained in
 IOFireWireLib.
 "

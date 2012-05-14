@@ -25,7 +25,7 @@ $227|/*! @template This_Does_Contain_Templates
     @templatefield BAR this is the data type of correlated data
     @discussion This class does basic correlation of two data types
 */
-$0|$41188|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$41235|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -323,7 +323,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: This_Does_Contain_Templates
-    APIUID: 
+    APIUID: //test_ref/cpp/tmpl/This_Does_Contain_Templates
     ABSTRACT: ""
     DISCUSSION: "<p>This class does basic correlation of two data types
 "
@@ -1403,7 +1403,7 @@ END OF OBJECT
 
 
 
-$41188|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$41235|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -1701,7 +1701,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: This_Does_Contain_Templates
-    APIUID: 
+    APIUID: //test_ref/cpp/tmpl/This_Does_Contain_Templates
     ABSTRACT: ""
     DISCUSSION: "<p>This class does basic correlation of two data types
 "

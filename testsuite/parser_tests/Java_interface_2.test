@@ -3,7 +3,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
      void bar();
 }
 $32|/*! Java interface example 2 */
-$0|$9100|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$9150|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -196,7 +196,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: Java_Interface_2
-    APIUID: 
+    APIUID: //test_ref/java/cl/Java_Interface_2
     ABSTRACT: ""
     DISCUSSION: "<p>Java interface example 2 "
     UPDATED: ""
@@ -251,7 +251,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "package-private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -332,7 +332,7 @@ END OF OBJECT
 
 
 
-$9100|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$9150|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -525,7 +525,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: Java_Interface_2
-    APIUID: 
+    APIUID: //test_ref/java/cl/Java_Interface_2
     ABSTRACT: ""
     DISCUSSION: "<p>Java interface example 2 "
     UPDATED: ""
@@ -580,7 +580,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "package-private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

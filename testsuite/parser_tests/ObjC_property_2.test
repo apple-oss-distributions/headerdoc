@@ -20,7 +20,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $28|/*!
     This is a class.
 */
-$0|$14172|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$14212|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -260,7 +260,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: PSEnclosure_occ_prop_2
-    APIUID: 
+    APIUID: //test_ref/occ/cl/PSEnclosure_occ_prop_2
     ABSTRACT: ""
     DISCUSSION: "<p>This is a class.
 "
@@ -471,7 +471,7 @@ END OF OBJECT
 
 
 
-$15947|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$15987|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -711,7 +711,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: PSEnclosure_occ_prop_2
-    APIUID: 
+    APIUID: //test_ref/occ/cl/PSEnclosure_occ_prop_2
     ABSTRACT: ""
     DISCUSSION: "<p>This is a class.
 "

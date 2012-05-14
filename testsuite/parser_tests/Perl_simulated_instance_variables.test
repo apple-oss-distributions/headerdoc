@@ -4,7 +4,7 @@ $155|# /*! Instance variable test
 #     @var ivar_test_in_perl
 #          Description of ivar_test_in_perl goes here.
 #  */
-$0|$7977|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$8024|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -184,7 +184,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: HeaderDoc::ivar_test_package
-    APIUID: 
+    APIUID: //test_ref/perl/cl/HeaderDoc::ivar_test_package
     ABSTRACT: ""
     DISCUSSION: "<p>Instance variable test
 "
@@ -285,7 +285,7 @@ END OF OBJECT
 
 
 
-$7977|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$8024|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -465,7 +465,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: HeaderDoc::ivar_test_package
-    APIUID: 
+    APIUID: //test_ref/perl/cl/HeaderDoc::ivar_test_package
     ABSTRACT: ""
     DISCUSSION: "<p>Instance variable test
 "

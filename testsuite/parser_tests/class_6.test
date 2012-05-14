@@ -18,7 +18,7 @@ $572|/*!
     is an example of this implementing all the functions necessary to drive an
     OHCI controller.
 */
-$0|$13960|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$13993|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -243,7 +243,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOUSBController
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/IOUSBController
     ABSTRACT: "<p>Base class for USB hardware driver
 "
     DISCUSSION: "<p>Not many directly useful methods for USB device driver writers,
@@ -472,7 +472,7 @@ END OF OBJECT
 
 
 
-$13960|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$13993|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -697,7 +697,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: IOUSBController
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/IOUSBController
     ABSTRACT: "<p>Base class for USB hardware driver
 "
     DISCUSSION: "<p>Not many directly useful methods for USB device driver writers,

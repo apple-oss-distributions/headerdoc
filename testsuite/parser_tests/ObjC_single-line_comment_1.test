@@ -6,7 +6,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $27|/*!
   Testing headerdoc
 */
-$0|$10031|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$10074|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -209,7 +209,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: Foo_single_line_comment_1
-    APIUID: 
+    APIUID: //test_ref/occ/cl/Foo_single_line_comment_1
     ABSTRACT: ""
     DISCUSSION: "<p>Testing headerdoc
 "
@@ -359,7 +359,7 @@ END OF OBJECT
 
 
 
-$10031|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$10074|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -562,7 +562,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
     NAME: Foo_single_line_comment_1
-    APIUID: 
+    APIUID: //test_ref/occ/cl/Foo_single_line_comment_1
     ABSTRACT: ""
     DISCUSSION: "<p>Testing headerdoc
 "

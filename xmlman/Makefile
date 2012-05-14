@@ -17,7 +17,8 @@ ifneq ($(strip $(VERS)),)
 endif
 ifeq (${ARCH},Darwin)
 	DARWIN_CFLAGS=${VSTR}
-	DARWIN_LDFLAGS=-force_flat_namespace ${VSTR}
+	# For older versions of Mac OS X compilers, remove -pie.
+	DARWIN_LDFLAGS=-force_flat_namespace ${VSTR} -pie -Wl,-pie
 else
 	ifeq (${ARCH},Linux)
 		DARWIN_CFLAGS= -DUSE_STRCOMPAT -D_GNU_SOURCE

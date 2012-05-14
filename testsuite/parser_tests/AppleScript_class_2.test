@@ -8,7 +8,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 	end bar
 end script
 $40|(*! This is a comment about MyScript *)
-$0|$15789|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$15823|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -219,7 +219,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: MyScript
-    APIUID: 
+    APIUID: //test_ref/applescript/cl/MyScript
     ABSTRACT: ""
     DISCUSSION: "<p>This is a comment about MyScript"
     UPDATED: ""
@@ -584,4 +584,4 @@ END OF OBJECT
 
 
 
-__$47|testsuite/parser_tests/AppleScript_class_2.test$11|applescript$19|AppleScript class 2$11|applescript$6|parser
+__$101|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/AppleScript_class_2.test$11|applescript$19|AppleScript class 2$11|applescript$6|parser

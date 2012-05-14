@@ -1,4 +1,4 @@
-FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$1966|@interface ObjCClassBeta : NSObject
+FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$1968|@interface ObjCClassBeta_OCCClassTest6 : NSObject
 {
     /*All instance variables are private*/
     struct __bFlags {
@@ -57,13 +57,13 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 */              
 - (void)classTwoMethodFour:(NSTitlePosition)aPosition bogusOne:(NSView *)bogusOne bogusTwo:(NSView *)bogusTwo;          
 
-@end            
-$244|/*!
-        @class ObjCClassBeta
+@end
+$258|/*!
+        @class ObjCClassBeta_OCCClassTest6
         @abstract ObjCClassBeta provides a visual grouping element.
         @discussion An NSBox object is a simple NSView that can do two things: It can draw a border around itself, and it can title itself.
 */
-$0|$64260|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$65008|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -149,7 +149,7 @@ $parserState->{preTemplateSymbol} =>
 $parserState->{preclasssodtype} => interface
 $parserState->{prekeywordsodname} => 
 $parserState->{prekeywordsodtype} => 
-$parserState->{returntype} => @interface ObjCClassBeta : NSObject
+$parserState->{returntype} => @interface ObjCClassBeta_OCCClassTest6 : NSObject
 $parserState->{seenBraces} => 0
 $parserState->{seenMacroPart} => 0
 $parserState->{seenTilde} => 0
@@ -157,7 +157,7 @@ $parserState->{simpleTDcontents} =>
 $parserState->{simpleTypedef} => 0
 $parserState->{sodclass} => class
 $parserState->{sodname} => end
-$parserState->{sodtype} =>  ObjCClassBeta NSObject
+$parserState->{sodtype} =>  ObjCClassBeta_OCCClassTest6 NSObject
 $parserState->{sodtypeclasstoken} => interface
 $parserState->{stackFrozen} => 0
 $parserState->{startOfDec} => 2
@@ -168,10 +168,10 @@ $parserState->{valuepending} => 0
 -=: BLOCKPARSE RETURN VALUES :=-
 newcount: 26
 typelist: @interface
-namelist: ObjCClassBeta
+namelist: ObjCClassBeta_OCCClassTest6
 posstypes: NSObject
 value: 
-returntype: ObjCClassBeta NSObject
+returntype: ObjCClassBeta_OCCClassTest6 NSObject
 pridec: 
 simpleTDcontents: 
 bpavail: 
@@ -185,7 +185,7 @@ implementsClass:
 +---@
 +---interface
 |   +--- 
-|   +---ObjCClassBeta
+|   +---ObjCClassBeta_OCCClassTest6
 |   +--- 
 |   +---:
 |   +--- 
@@ -468,8 +468,8 @@ LONG ATTRIBUTES:
     INDEX GROUP: 
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
-    NAME: ObjCClassBeta
-    APIUID: 
+    NAME: ObjCClassBeta_OCCClassTest6
+    APIUID: //test_ref/occ/cl/ObjCClassBeta_OCCClassTest6
     ABSTRACT: "<p>ObjCClassBeta provides a visual grouping element.
 "
     DISCUSSION: "<p>An NSBox object is a simple NSView that can do two things: It can draw a border around itself, and it can title itself.
@@ -516,7 +516,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classTwoMethodOne
-        APIUID: //test_ref/occ/instm/ObjCClassBeta/classTwoMethodOne_DONTLINK_0
+        APIUID: //test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodOne
         ABSTRACT: "<p>Returns the receiver's border type.
 "
         DISCUSSION: "<p>Returns the receiver's border type. Border types are defined in NSView.h. Currently, the following border types are defined:
@@ -738,7 +738,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classTwoMethodTwo
-        APIUID: //test_ref/occ/instm/ObjCClassBeta/classTwoMethodTwo
+        APIUID: //test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodTwo
         ABSTRACT: "<p>Returns a constant representing the title position.
 "
         DISCUSSION: "<p></p>"
@@ -949,7 +949,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classTwoMethodThree:
-        APIUID: //test_ref/occ/instm/ObjCClassBeta/classTwoMethodThree:
+        APIUID: //test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodThree:
         ABSTRACT: "<p>Sets the border type to aType, which must be a valid border type.
 "
         DISCUSSION: "<p>Border types are defined in NSView.h. Currently, the following border types are defined:
@@ -1171,7 +1171,7 @@ LONG ATTRIBUTES:
             OBJECT TYPE: HeaderDoc::MinorAPIElement
             NAME: aType
             TYPE: 
-            APIUID: //test_ref/doc/methodparam/ObjCClassBeta/classTwoMethodThree:/aType
+            APIUID: //test_ref/doc/methodparam/ObjCClassBeta_OCCClassTest6/classTwoMethodThree:/aType
             ABSTRACT: ""
             DISCUSSION: "<p>The specified type."
             UPDATED: ""
@@ -1212,7 +1212,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classTwoMethodFour:bogusOne:bogusTwo:
-        APIUID: //test_ref/occ/instm/ObjCClassBeta/classTwoMethodFour:bogusOne:bogusTwo:
+        APIUID: //test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodFour:bogusOne:bogusTwo:
         ABSTRACT: "<p>Sets the title position and includes two bogus args for
 testing purposes        "
         DISCUSSION: "<p></p>"
@@ -1383,7 +1383,7 @@ testing purposes        "
             OBJECT TYPE: HeaderDoc::MinorAPIElement
             NAME: bogusOne
             TYPE: 
-            APIUID: //test_ref/doc/methodparam/ObjCClassBeta/classTwoMethodFour:bogusOne:bogusTwo:/bogusOne
+            APIUID: //test_ref/doc/methodparam/ObjCClassBeta_OCCClassTest6/classTwoMethodFour:bogusOne:bogusTwo:/bogusOne
             ABSTRACT: ""
             DISCUSSION: "<p>Fictive at best."
             UPDATED: ""
@@ -1425,7 +1425,7 @@ testing purposes        "
             OBJECT TYPE: HeaderDoc::MinorAPIElement
             NAME: bogusTwo
             TYPE: 
-            APIUID: //test_ref/doc/methodparam/ObjCClassBeta/classTwoMethodFour:bogusOne:bogusTwo:/bogusTwo
+            APIUID: //test_ref/doc/methodparam/ObjCClassBeta_OCCClassTest6/classTwoMethodFour:bogusOne:bogusTwo:/bogusTwo
             ABSTRACT: ""
             DISCUSSION: "<p>This argument is rarely used."
             UPDATED: ""
@@ -1462,11 +1462,11 @@ testing purposes        "
             SHORT ATTRIBUTES: 
             LONG ATTRIBUTES: 
 -=: NAMED OBJECT PARSE TREES :=-
-OBJECT: ObjCClassBeta (HeaderDoc::ObjCClass)
+OBJECT: ObjCClassBeta_OCCClassTest6 (HeaderDoc::ObjCClass)
 +---@
 +---interface
 |   +--- 
-|   +---ObjCClassBeta
+|   +---ObjCClassBeta_OCCClassTest6
 |   +--- 
 |   +---:
 |   +--- 
@@ -2034,8 +2034,8 @@ END OF OBJECT
 
 
 -=: HTML OUTPUT OF PARSE TREES :=-
-OBJECT: ObjCClassBeta (HeaderDoc::ObjCClass)
-	@<!-- a logicalPath="//test_ref/occ/cl/interface //test_ref/occ/tdef/interface //test_ref/occ/tag/interface //test_ref/occ/struct/interface //test_ref/occ/intf/interface //test_ref/doc/anysymbol/interface" machineGenerated="true" --><span class="type">interface</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/ObjCClassBeta //test_ref/occ/tdef/ObjCClassBeta //test_ref/occ/tag/ObjCClassBeta //test_ref/occ/struct/ObjCClassBeta //test_ref/occ/intf/ObjCClassBeta //test_ref/doc/anysymbol/ObjCClassBeta" machineGenerated="true" --><span class="type">ObjCClassBeta</span><!-- /a --> : <!-- a logicalPath="//test_ref/occ/cl/NSObject //test_ref/occ/tdef/NSObject //test_ref/occ/tag/NSObject //test_ref/occ/struct/NSObject //test_ref/occ/intf/NSObject //test_ref/doc/anysymbol/NSObject" machineGenerated="true" --><span class="type">NSObject</span><!-- /a --> { 
+OBJECT: ObjCClassBeta_OCCClassTest6 (HeaderDoc::ObjCClass)
+	@<!-- a logicalPath="//test_ref/occ/cl/interface //test_ref/occ/tdef/interface //test_ref/occ/tag/interface //test_ref/occ/struct/interface //test_ref/occ/intf/interface //test_ref/doc/anysymbol/interface" machineGenerated="true" --><span class="type">interface</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/ObjCClassBeta_OCCClassTest6 //test_ref/occ/tdef/ObjCClassBeta_OCCClassTest6 //test_ref/occ/tag/ObjCClassBeta_OCCClassTest6 //test_ref/occ/struct/ObjCClassBeta_OCCClassTest6 //test_ref/occ/intf/ObjCClassBeta_OCCClassTest6 //test_ref/doc/anysymbol/ObjCClassBeta_OCCClassTest6" machineGenerated="true" --><span class="type">ObjCClassBeta_OCCClassTest6</span><!-- /a --> : <!-- a logicalPath="//test_ref/occ/cl/NSObject //test_ref/occ/tdef/NSObject //test_ref/occ/tag/NSObject //test_ref/occ/struct/NSObject //test_ref/occ/intf/NSObject //test_ref/doc/anysymbol/NSObject" machineGenerated="true" --><span class="type">NSObject</span><!-- /a --> { 
 	        <span class="comment">/*All instance variables are private*/</span>
 	        <span class="keyword">struct</span> <!-- a logicalPath="//test_ref/occ/cl/__bFlags //test_ref/occ/tdef/__bFlags //test_ref/occ/tag/__bFlags //test_ref/occ/struct/__bFlags //test_ref/occ/intf/__bFlags //test_ref/doc/anysymbol/__bFlags" machineGenerated="true" --><span class="type">__bFlags</span><!-- /a --> { 
 	            <!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/borderType //test_ref/occ/tdef/borderType //test_ref/occ/tag/borderType //test_ref/occ/struct/borderType //test_ref/occ/intf/borderType //test_ref/doc/anysymbol/borderType" machineGenerated="true" --><span class="type">borderType</span><!-- /a -->:<span class="number">2</span>; 
@@ -2096,28 +2096,28 @@ END OF OBJECT
 
 
 OBJECT: classTwoMethodOne (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classTwoMethodOne //test_ref/occ/data/ObjCClassBeta/classTwoMethodOne //test_ref/occ/data/classTwoMethodOne //test_ref/occ/clconst/ObjCClassBeta/classTwoMethodOne " machineGenerated="true" --><span class="var">classTwoMethodOne</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classTwoMethodOne //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/classTwoMethodOne //test_ref/occ/data/classTwoMethodOne //test_ref/occ/clconst/ObjCClassBeta_OCCClassTest6/classTwoMethodOne " machineGenerated="true" --><span class="var">classTwoMethodOne</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: classTwoMethodTwo (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classTwoMethodTwo //test_ref/occ/data/ObjCClassBeta/classTwoMethodTwo //test_ref/occ/data/classTwoMethodTwo //test_ref/occ/clconst/ObjCClassBeta/classTwoMethodTwo " machineGenerated="true" --><span class="var">classTwoMethodTwo</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classTwoMethodTwo //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/classTwoMethodTwo //test_ref/occ/data/classTwoMethodTwo //test_ref/occ/clconst/ObjCClassBeta_OCCClassTest6/classTwoMethodTwo " machineGenerated="true" --><span class="var">classTwoMethodTwo</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: classTwoMethodThree: (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/void //test_ref/occ/tdef/void //test_ref/occ/tag/void //test_ref/occ/struct/void //test_ref/occ/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta/classTwoMethodThree //test_ref/occ/clm/ObjCClassBeta/classTwoMethodThree //test_ref/occ/intfcm/ObjCClassBeta/classTwoMethodThree //test_ref/occ/intfm/ObjCClassBeta/classTwoMethodThree //test_ref/occ/func/classTwoMethodThree //test_ref/occ/ftmplt/ObjCClassBeta/classTwoMethodThree //test_ref/occ/defn/classTwoMethodThree //test_ref/occ/macro/classTwoMethodThree //test_ref/doc/anysymbol/classTwoMethodThree" machineGenerated="true" --><span class="function">classTwoMethodThree</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/aType //test_ref/occ/data/ObjCClassBeta/aType //test_ref/occ/data/aType //test_ref/occ/clconst/ObjCClassBeta/aType " machineGenerated="true" --><span class="var">aType</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/void //test_ref/occ/tdef/void //test_ref/occ/tag/void //test_ref/occ/struct/void //test_ref/occ/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodThree //test_ref/occ/clm/ObjCClassBeta_OCCClassTest6/classTwoMethodThree //test_ref/occ/intfcm/ObjCClassBeta_OCCClassTest6/classTwoMethodThree //test_ref/occ/intfm/ObjCClassBeta_OCCClassTest6/classTwoMethodThree //test_ref/occ/func/classTwoMethodThree //test_ref/occ/ftmplt/ObjCClassBeta_OCCClassTest6/classTwoMethodThree //test_ref/occ/defn/classTwoMethodThree //test_ref/occ/macro/classTwoMethodThree //test_ref/doc/anysymbol/classTwoMethodThree" machineGenerated="true" --><span class="function">classTwoMethodThree</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/aType //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/aType //test_ref/occ/data/aType //test_ref/occ/clconst/ObjCClassBeta_OCCClassTest6/aType " machineGenerated="true" --><span class="var">aType</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: classTwoMethodFour:bogusOne:bogusTwo: (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/void //test_ref/occ/tdef/void //test_ref/occ/tag/void //test_ref/occ/struct/void //test_ref/occ/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta/classTwoMethodFour //test_ref/occ/clm/ObjCClassBeta/classTwoMethodFour //test_ref/occ/intfcm/ObjCClassBeta/classTwoMethodFour //test_ref/occ/intfm/ObjCClassBeta/classTwoMethodFour //test_ref/occ/func/classTwoMethodFour //test_ref/occ/ftmplt/ObjCClassBeta/classTwoMethodFour //test_ref/occ/defn/classTwoMethodFour //test_ref/occ/macro/classTwoMethodFour //test_ref/doc/anysymbol/classTwoMethodFour" machineGenerated="true" --><span class="function">classTwoMethodFour</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<span class="param">aPosition</span> 
-	        <!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta/bogusOne //test_ref/occ/clm/ObjCClassBeta/bogusOne //test_ref/occ/intfcm/ObjCClassBeta/bogusOne //test_ref/occ/intfm/ObjCClassBeta/bogusOne //test_ref/occ/func/bogusOne //test_ref/occ/ftmplt/ObjCClassBeta/bogusOne //test_ref/occ/defn/bogusOne //test_ref/occ/macro/bogusOne //test_ref/doc/anysymbol/bogusOne" machineGenerated="true" --><span class="function">bogusOne</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSView //test_ref/occ/tdef/NSView //test_ref/occ/tag/NSView //test_ref/occ/struct/NSView //test_ref/occ/intf/NSView //test_ref/doc/anysymbol/NSView" machineGenerated="true" --><span class="type">NSView</span><!-- /a --> <span class="type">*</span>)<span class="param">bogusOne</span> <!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta/bogusTwo //test_ref/occ/clm/ObjCClassBeta/bogusTwo //test_ref/occ/intfcm/ObjCClassBeta/bogusTwo //test_ref/occ/intfm/ObjCClassBeta/bogusTwo //test_ref/occ/func/bogusTwo //test_ref/occ/ftmplt/ObjCClassBeta/bogusTwo //test_ref/occ/defn/bogusTwo //test_ref/occ/macro/bogusTwo //test_ref/doc/anysymbol/bogusTwo" machineGenerated="true" --><span class="function">bogusTwo</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSView //test_ref/occ/tdef/NSView //test_ref/occ/tag/NSView //test_ref/occ/struct/NSView //test_ref/occ/intf/NSView //test_ref/doc/anysymbol/NSView" machineGenerated="true" --><span class="type">NSView</span><!-- /a --> <span class="type">*</span>)<!-- a logicalPath="//test_ref/occ/econst/bogusTwo //test_ref/occ/data/ObjCClassBeta/bogusTwo //test_ref/occ/data/bogusTwo //test_ref/occ/clconst/ObjCClassBeta/bogusTwo " machineGenerated="true" --><span class="var">bogusTwo</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/void //test_ref/occ/tdef/void //test_ref/occ/tag/void //test_ref/occ/struct/void //test_ref/occ/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodFour //test_ref/occ/clm/ObjCClassBeta_OCCClassTest6/classTwoMethodFour //test_ref/occ/intfcm/ObjCClassBeta_OCCClassTest6/classTwoMethodFour //test_ref/occ/intfm/ObjCClassBeta_OCCClassTest6/classTwoMethodFour //test_ref/occ/func/classTwoMethodFour //test_ref/occ/ftmplt/ObjCClassBeta_OCCClassTest6/classTwoMethodFour //test_ref/occ/defn/classTwoMethodFour //test_ref/occ/macro/classTwoMethodFour //test_ref/doc/anysymbol/classTwoMethodFour" machineGenerated="true" --><span class="function">classTwoMethodFour</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<span class="param">aPosition</span> 
+	        <!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/bogusOne //test_ref/occ/clm/ObjCClassBeta_OCCClassTest6/bogusOne //test_ref/occ/intfcm/ObjCClassBeta_OCCClassTest6/bogusOne //test_ref/occ/intfm/ObjCClassBeta_OCCClassTest6/bogusOne //test_ref/occ/func/bogusOne //test_ref/occ/ftmplt/ObjCClassBeta_OCCClassTest6/bogusOne //test_ref/occ/defn/bogusOne //test_ref/occ/macro/bogusOne //test_ref/doc/anysymbol/bogusOne" machineGenerated="true" --><span class="function">bogusOne</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSView //test_ref/occ/tdef/NSView //test_ref/occ/tag/NSView //test_ref/occ/struct/NSView //test_ref/occ/intf/NSView //test_ref/doc/anysymbol/NSView" machineGenerated="true" --><span class="type">NSView</span><!-- /a --> <span class="type">*</span>)<span class="param">bogusOne</span> <!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/clm/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/intfcm/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/intfm/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/func/bogusTwo //test_ref/occ/ftmplt/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/defn/bogusTwo //test_ref/occ/macro/bogusTwo //test_ref/doc/anysymbol/bogusTwo" machineGenerated="true" --><span class="function">bogusTwo</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSView //test_ref/occ/tdef/NSView //test_ref/occ/tag/NSView //test_ref/occ/struct/NSView //test_ref/occ/intf/NSView //test_ref/doc/anysymbol/NSView" machineGenerated="true" --><span class="type">NSView</span><!-- /a --> <span class="type">*</span>)<!-- a logicalPath="//test_ref/occ/econst/bogusTwo //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/data/bogusTwo //test_ref/occ/clconst/ObjCClassBeta_OCCClassTest6/bogusTwo " machineGenerated="true" --><span class="var">bogusTwo</span><!-- /a -->; 
 END OF OBJECT
 
 
 
-$89486|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$90360|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -2203,7 +2203,7 @@ $parserState->{preTemplateSymbol} =>
 $parserState->{preclasssodtype} => interface
 $parserState->{prekeywordsodname} => 
 $parserState->{prekeywordsodtype} => 
-$parserState->{returntype} => @interface ObjCClassBeta : NSObject
+$parserState->{returntype} => @interface ObjCClassBeta_OCCClassTest6 : NSObject
 $parserState->{seenBraces} => 0
 $parserState->{seenMacroPart} => 0
 $parserState->{seenTilde} => 0
@@ -2211,7 +2211,7 @@ $parserState->{simpleTDcontents} =>
 $parserState->{simpleTypedef} => 0
 $parserState->{sodclass} => class
 $parserState->{sodname} => end
-$parserState->{sodtype} =>  ObjCClassBeta NSObject
+$parserState->{sodtype} =>  ObjCClassBeta_OCCClassTest6 NSObject
 $parserState->{sodtypeclasstoken} => interface
 $parserState->{stackFrozen} => 0
 $parserState->{startOfDec} => 2
@@ -2222,10 +2222,10 @@ $parserState->{valuepending} => 0
 -=: BLOCKPARSE RETURN VALUES :=-
 newcount: 26
 typelist: @interface
-namelist: ObjCClassBeta
+namelist: ObjCClassBeta_OCCClassTest6
 posstypes: NSObject
 value: 
-returntype: ObjCClassBeta NSObject
+returntype: ObjCClassBeta_OCCClassTest6 NSObject
 pridec: 
 simpleTDcontents: 
 bpavail: 
@@ -2239,7 +2239,7 @@ implementsClass:
 +---@
 +---interface
 |   +--- 
-|   +---ObjCClassBeta
+|   +---ObjCClassBeta_OCCClassTest6
 |   +--- 
 |   +---:
 |   +--- 
@@ -2522,8 +2522,8 @@ LONG ATTRIBUTES:
     INDEX GROUP: 
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
-    NAME: ObjCClassBeta
-    APIUID: 
+    NAME: ObjCClassBeta_OCCClassTest6
+    APIUID: //test_ref/occ/cl/ObjCClassBeta_OCCClassTest6
     ABSTRACT: "<p>ObjCClassBeta provides a visual grouping element.
 "
     DISCUSSION: "<p>An NSBox object is a simple NSView that can do two things: It can draw a border around itself, and it can title itself.
@@ -2570,7 +2570,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classTwoMethodOne
-        APIUID: //test_ref/occ/instm/ObjCClassBeta/classTwoMethodOne_DONTLINK_0
+        APIUID: //test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodOne
         ABSTRACT: "<p>Returns the receiver's border type.
 "
         DISCUSSION: "<p>Returns the receiver's border type. Border types are defined in NSView.h. Currently, the following border types are defined:
@@ -2792,7 +2792,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classTwoMethodTwo
-        APIUID: //test_ref/occ/instm/ObjCClassBeta/classTwoMethodTwo
+        APIUID: //test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodTwo
         ABSTRACT: "<p>Returns a constant representing the title position.
 "
         DISCUSSION: "<p></p>"
@@ -3003,7 +3003,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classTwoMethodThree:
-        APIUID: //test_ref/occ/instm/ObjCClassBeta/classTwoMethodThree:
+        APIUID: //test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodThree:
         ABSTRACT: "<p>Sets the border type to aType, which must be a valid border type.
 "
         DISCUSSION: "<p>Border types are defined in NSView.h. Currently, the following border types are defined:
@@ -3225,7 +3225,7 @@ LONG ATTRIBUTES:
             OBJECT TYPE: HeaderDoc::MinorAPIElement
             NAME: aType
             TYPE: 
-            APIUID: //test_ref/doc/methodparam/ObjCClassBeta/classTwoMethodThree:/aType
+            APIUID: //test_ref/doc/methodparam/ObjCClassBeta_OCCClassTest6/classTwoMethodThree:/aType
             ABSTRACT: ""
             DISCUSSION: "<p>The specified type."
             UPDATED: ""
@@ -3266,7 +3266,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classTwoMethodFour:bogusOne:bogusTwo:
-        APIUID: //test_ref/occ/instm/ObjCClassBeta/classTwoMethodFour:bogusOne:bogusTwo:
+        APIUID: //test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodFour:bogusOne:bogusTwo:
         ABSTRACT: "<p>Sets the title position and includes two bogus args for
 testing purposes        "
         DISCUSSION: "<p></p>"
@@ -3437,7 +3437,7 @@ testing purposes        "
             OBJECT TYPE: HeaderDoc::MinorAPIElement
             NAME: bogusOne
             TYPE: 
-            APIUID: //test_ref/doc/methodparam/ObjCClassBeta/classTwoMethodFour:bogusOne:bogusTwo:/bogusOne
+            APIUID: //test_ref/doc/methodparam/ObjCClassBeta_OCCClassTest6/classTwoMethodFour:bogusOne:bogusTwo:/bogusOne
             ABSTRACT: ""
             DISCUSSION: "<p>Fictive at best."
             UPDATED: ""
@@ -3479,7 +3479,7 @@ testing purposes        "
             OBJECT TYPE: HeaderDoc::MinorAPIElement
             NAME: bogusTwo
             TYPE: 
-            APIUID: //test_ref/doc/methodparam/ObjCClassBeta/classTwoMethodFour:bogusOne:bogusTwo:/bogusTwo
+            APIUID: //test_ref/doc/methodparam/ObjCClassBeta_OCCClassTest6/classTwoMethodFour:bogusOne:bogusTwo:/bogusTwo
             ABSTRACT: ""
             DISCUSSION: "<p>This argument is rarely used."
             UPDATED: ""
@@ -3520,7 +3520,7 @@ testing purposes        "
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Struct
         NAME: _bFlags
-        APIUID: //test_ref/occ/tag/ObjCClassBeta/_bFlags
+        APIUID: //test_ref/occ/tag/ObjCClassBeta_OCCClassTest6/_bFlags
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -3772,7 +3772,7 @@ testing purposes        "
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Struct
         NAME: __bFlags
-        APIUID: //test_ref/occ/tag/ObjCClassBeta/__bFlags
+        APIUID: //test_ref/occ/tag/ObjCClassBeta_OCCClassTest6/__bFlags
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -4025,7 +4025,7 @@ testing purposes        "
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Var
         NAME: _unused
-        APIUID: //test_ref/occ/data/ObjCClassBeta/_unused
+        APIUID: //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/_unused
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -4062,11 +4062,11 @@ testing purposes        "
         SHORT ATTRIBUTES: 
         LONG ATTRIBUTES: 
 -=: NAMED OBJECT PARSE TREES :=-
-OBJECT: ObjCClassBeta (HeaderDoc::ObjCClass)
+OBJECT: ObjCClassBeta_OCCClassTest6 (HeaderDoc::ObjCClass)
 +---@
 +---interface
 |   +--- 
-|   +---ObjCClassBeta
+|   +---ObjCClassBeta_OCCClassTest6
 |   +--- 
 |   +---:
 |   +--- 
@@ -4790,8 +4790,8 @@ END OF OBJECT
 
 
 -=: HTML OUTPUT OF PARSE TREES :=-
-OBJECT: ObjCClassBeta (HeaderDoc::ObjCClass)
-	@<!-- a logicalPath="//test_ref/occ/cl/interface //test_ref/occ/tdef/interface //test_ref/occ/tag/interface //test_ref/occ/struct/interface //test_ref/occ/intf/interface //test_ref/doc/anysymbol/interface" machineGenerated="true" --><span class="type">interface</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/ObjCClassBeta //test_ref/occ/tdef/ObjCClassBeta //test_ref/occ/tag/ObjCClassBeta //test_ref/occ/struct/ObjCClassBeta //test_ref/occ/intf/ObjCClassBeta //test_ref/doc/anysymbol/ObjCClassBeta" machineGenerated="true" --><span class="type">ObjCClassBeta</span><!-- /a --> : <!-- a logicalPath="//test_ref/occ/cl/NSObject //test_ref/occ/tdef/NSObject //test_ref/occ/tag/NSObject //test_ref/occ/struct/NSObject //test_ref/occ/intf/NSObject //test_ref/doc/anysymbol/NSObject" machineGenerated="true" --><span class="type">NSObject</span><!-- /a --> { 
+OBJECT: ObjCClassBeta_OCCClassTest6 (HeaderDoc::ObjCClass)
+	@<!-- a logicalPath="//test_ref/occ/cl/interface //test_ref/occ/tdef/interface //test_ref/occ/tag/interface //test_ref/occ/struct/interface //test_ref/occ/intf/interface //test_ref/doc/anysymbol/interface" machineGenerated="true" --><span class="type">interface</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/ObjCClassBeta_OCCClassTest6 //test_ref/occ/tdef/ObjCClassBeta_OCCClassTest6 //test_ref/occ/tag/ObjCClassBeta_OCCClassTest6 //test_ref/occ/struct/ObjCClassBeta_OCCClassTest6 //test_ref/occ/intf/ObjCClassBeta_OCCClassTest6 //test_ref/doc/anysymbol/ObjCClassBeta_OCCClassTest6" machineGenerated="true" --><span class="type">ObjCClassBeta_OCCClassTest6</span><!-- /a --> : <!-- a logicalPath="//test_ref/occ/cl/NSObject //test_ref/occ/tdef/NSObject //test_ref/occ/tag/NSObject //test_ref/occ/struct/NSObject //test_ref/occ/intf/NSObject //test_ref/doc/anysymbol/NSObject" machineGenerated="true" --><span class="type">NSObject</span><!-- /a --> { 
 	        <span class="comment">/*All instance variables are private*/</span>
 	        <span class="keyword">struct</span> <!-- a logicalPath="//test_ref/occ/cl/__bFlags //test_ref/occ/tdef/__bFlags //test_ref/occ/tag/__bFlags //test_ref/occ/struct/__bFlags //test_ref/occ/intf/__bFlags //test_ref/doc/anysymbol/__bFlags" machineGenerated="true" --><span class="type">__bFlags</span><!-- /a --> { 
 	            <!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/borderType //test_ref/occ/tdef/borderType //test_ref/occ/tag/borderType //test_ref/occ/struct/borderType //test_ref/occ/intf/borderType //test_ref/doc/anysymbol/borderType" machineGenerated="true" --><span class="type">borderType</span><!-- /a -->:<span class="number">2</span>; 
@@ -4852,23 +4852,23 @@ END OF OBJECT
 
 
 OBJECT: classTwoMethodOne (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classTwoMethodOne //test_ref/occ/data/ObjCClassBeta/classTwoMethodOne //test_ref/occ/data/classTwoMethodOne //test_ref/occ/clconst/ObjCClassBeta/classTwoMethodOne " machineGenerated="true" --><span class="var">classTwoMethodOne</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classTwoMethodOne //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/classTwoMethodOne //test_ref/occ/data/classTwoMethodOne //test_ref/occ/clconst/ObjCClassBeta_OCCClassTest6/classTwoMethodOne " machineGenerated="true" --><span class="var">classTwoMethodOne</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: classTwoMethodTwo (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classTwoMethodTwo //test_ref/occ/data/ObjCClassBeta/classTwoMethodTwo //test_ref/occ/data/classTwoMethodTwo //test_ref/occ/clconst/ObjCClassBeta/classTwoMethodTwo " machineGenerated="true" --><span class="var">classTwoMethodTwo</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classTwoMethodTwo //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/classTwoMethodTwo //test_ref/occ/data/classTwoMethodTwo //test_ref/occ/clconst/ObjCClassBeta_OCCClassTest6/classTwoMethodTwo " machineGenerated="true" --><span class="var">classTwoMethodTwo</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: classTwoMethodThree: (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/void //test_ref/occ/tdef/void //test_ref/occ/tag/void //test_ref/occ/struct/void //test_ref/occ/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta/classTwoMethodThree //test_ref/occ/clm/ObjCClassBeta/classTwoMethodThree //test_ref/occ/intfcm/ObjCClassBeta/classTwoMethodThree //test_ref/occ/intfm/ObjCClassBeta/classTwoMethodThree //test_ref/occ/func/classTwoMethodThree //test_ref/occ/ftmplt/ObjCClassBeta/classTwoMethodThree //test_ref/occ/defn/classTwoMethodThree //test_ref/occ/macro/classTwoMethodThree //test_ref/doc/anysymbol/classTwoMethodThree" machineGenerated="true" --><span class="function">classTwoMethodThree</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/aType //test_ref/occ/data/ObjCClassBeta/aType //test_ref/occ/data/aType //test_ref/occ/clconst/ObjCClassBeta/aType " machineGenerated="true" --><span class="var">aType</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/void //test_ref/occ/tdef/void //test_ref/occ/tag/void //test_ref/occ/struct/void //test_ref/occ/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodThree //test_ref/occ/clm/ObjCClassBeta_OCCClassTest6/classTwoMethodThree //test_ref/occ/intfcm/ObjCClassBeta_OCCClassTest6/classTwoMethodThree //test_ref/occ/intfm/ObjCClassBeta_OCCClassTest6/classTwoMethodThree //test_ref/occ/func/classTwoMethodThree //test_ref/occ/ftmplt/ObjCClassBeta_OCCClassTest6/classTwoMethodThree //test_ref/occ/defn/classTwoMethodThree //test_ref/occ/macro/classTwoMethodThree //test_ref/doc/anysymbol/classTwoMethodThree" machineGenerated="true" --><span class="function">classTwoMethodThree</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/aType //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/aType //test_ref/occ/data/aType //test_ref/occ/clconst/ObjCClassBeta_OCCClassTest6/aType " machineGenerated="true" --><span class="var">aType</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: classTwoMethodFour:bogusOne:bogusTwo: (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/void //test_ref/occ/tdef/void //test_ref/occ/tag/void //test_ref/occ/struct/void //test_ref/occ/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta/classTwoMethodFour //test_ref/occ/clm/ObjCClassBeta/classTwoMethodFour //test_ref/occ/intfcm/ObjCClassBeta/classTwoMethodFour //test_ref/occ/intfm/ObjCClassBeta/classTwoMethodFour //test_ref/occ/func/classTwoMethodFour //test_ref/occ/ftmplt/ObjCClassBeta/classTwoMethodFour //test_ref/occ/defn/classTwoMethodFour //test_ref/occ/macro/classTwoMethodFour //test_ref/doc/anysymbol/classTwoMethodFour" machineGenerated="true" --><span class="function">classTwoMethodFour</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<span class="param">aPosition</span> 
-	        <!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta/bogusOne //test_ref/occ/clm/ObjCClassBeta/bogusOne //test_ref/occ/intfcm/ObjCClassBeta/bogusOne //test_ref/occ/intfm/ObjCClassBeta/bogusOne //test_ref/occ/func/bogusOne //test_ref/occ/ftmplt/ObjCClassBeta/bogusOne //test_ref/occ/defn/bogusOne //test_ref/occ/macro/bogusOne //test_ref/doc/anysymbol/bogusOne" machineGenerated="true" --><span class="function">bogusOne</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSView //test_ref/occ/tdef/NSView //test_ref/occ/tag/NSView //test_ref/occ/struct/NSView //test_ref/occ/intf/NSView //test_ref/doc/anysymbol/NSView" machineGenerated="true" --><span class="type">NSView</span><!-- /a --> <span class="type">*</span>)<span class="param">bogusOne</span> <!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta/bogusTwo //test_ref/occ/clm/ObjCClassBeta/bogusTwo //test_ref/occ/intfcm/ObjCClassBeta/bogusTwo //test_ref/occ/intfm/ObjCClassBeta/bogusTwo //test_ref/occ/func/bogusTwo //test_ref/occ/ftmplt/ObjCClassBeta/bogusTwo //test_ref/occ/defn/bogusTwo //test_ref/occ/macro/bogusTwo //test_ref/doc/anysymbol/bogusTwo" machineGenerated="true" --><span class="function">bogusTwo</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSView //test_ref/occ/tdef/NSView //test_ref/occ/tag/NSView //test_ref/occ/struct/NSView //test_ref/occ/intf/NSView //test_ref/doc/anysymbol/NSView" machineGenerated="true" --><span class="type">NSView</span><!-- /a --> <span class="type">*</span>)<!-- a logicalPath="//test_ref/occ/econst/bogusTwo //test_ref/occ/data/ObjCClassBeta/bogusTwo //test_ref/occ/data/bogusTwo //test_ref/occ/clconst/ObjCClassBeta/bogusTwo " machineGenerated="true" --><span class="var">bogusTwo</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/void //test_ref/occ/tdef/void //test_ref/occ/tag/void //test_ref/occ/struct/void //test_ref/occ/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/classTwoMethodFour //test_ref/occ/clm/ObjCClassBeta_OCCClassTest6/classTwoMethodFour //test_ref/occ/intfcm/ObjCClassBeta_OCCClassTest6/classTwoMethodFour //test_ref/occ/intfm/ObjCClassBeta_OCCClassTest6/classTwoMethodFour //test_ref/occ/func/classTwoMethodFour //test_ref/occ/ftmplt/ObjCClassBeta_OCCClassTest6/classTwoMethodFour //test_ref/occ/defn/classTwoMethodFour //test_ref/occ/macro/classTwoMethodFour //test_ref/doc/anysymbol/classTwoMethodFour" machineGenerated="true" --><span class="function">classTwoMethodFour</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<span class="param">aPosition</span> 
+	        <!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/bogusOne //test_ref/occ/clm/ObjCClassBeta_OCCClassTest6/bogusOne //test_ref/occ/intfcm/ObjCClassBeta_OCCClassTest6/bogusOne //test_ref/occ/intfm/ObjCClassBeta_OCCClassTest6/bogusOne //test_ref/occ/func/bogusOne //test_ref/occ/ftmplt/ObjCClassBeta_OCCClassTest6/bogusOne //test_ref/occ/defn/bogusOne //test_ref/occ/macro/bogusOne //test_ref/doc/anysymbol/bogusOne" machineGenerated="true" --><span class="function">bogusOne</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSView //test_ref/occ/tdef/NSView //test_ref/occ/tag/NSView //test_ref/occ/struct/NSView //test_ref/occ/intf/NSView //test_ref/doc/anysymbol/NSView" machineGenerated="true" --><span class="type">NSView</span><!-- /a --> <span class="type">*</span>)<span class="param">bogusOne</span> <!-- a logicalPath="//test_ref/occ/instm/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/clm/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/intfcm/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/intfm/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/func/bogusTwo //test_ref/occ/ftmplt/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/defn/bogusTwo //test_ref/occ/macro/bogusTwo //test_ref/doc/anysymbol/bogusTwo" machineGenerated="true" --><span class="function">bogusTwo</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSView //test_ref/occ/tdef/NSView //test_ref/occ/tag/NSView //test_ref/occ/struct/NSView //test_ref/occ/intf/NSView //test_ref/doc/anysymbol/NSView" machineGenerated="true" --><span class="type">NSView</span><!-- /a --> <span class="type">*</span>)<!-- a logicalPath="//test_ref/occ/econst/bogusTwo //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/bogusTwo //test_ref/occ/data/bogusTwo //test_ref/occ/clconst/ObjCClassBeta_OCCClassTest6/bogusTwo " machineGenerated="true" --><span class="var">bogusTwo</span><!-- /a -->; 
 END OF OBJECT
 
 
@@ -4879,7 +4879,7 @@ OBJECT: __bFlags (HeaderDoc::Struct)
 	    <span class="keyword">unsigned</span> <!-- a logicalPath="//test_ref/occ/cl/int //test_ref/occ/tdef/int //test_ref/occ/tag/int //test_ref/occ/struct/int //test_ref/occ/intf/int //test_ref/doc/anysymbol/int" machineGenerated="true" --><span class="type">int</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/transparent //test_ref/occ/tdef/transparent //test_ref/occ/tag/transparent //test_ref/occ/struct/transparent //test_ref/occ/intf/transparent //test_ref/doc/anysymbol/transparent" machineGenerated="true" --><span class="type">transparent</span><!-- /a -->:<span class="number">1</span>; 
 	    <span class="keyword">unsigned</span> <!-- a logicalPath="//test_ref/occ/cl/int //test_ref/occ/tdef/int //test_ref/occ/tag/int //test_ref/occ/struct/int //test_ref/occ/intf/int //test_ref/doc/anysymbol/int" machineGenerated="true" --><span class="type">int</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/boxType //test_ref/occ/tdef/boxType //test_ref/occ/tag/boxType //test_ref/occ/struct/boxType //test_ref/occ/intf/boxType //test_ref/doc/anysymbol/boxType" machineGenerated="true" --><span class="type">boxType</span><!-- /a -->:<span class="number">2</span>; 
 	    <span class="keyword">unsigned</span> <!-- a logicalPath="//test_ref/occ/cl/int //test_ref/occ/tdef/int //test_ref/occ/tag/int //test_ref/occ/struct/int //test_ref/occ/intf/int //test_ref/doc/anysymbol/int" machineGenerated="true" --><span class="type">int</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/_RESERVED //test_ref/occ/tdef/_RESERVED //test_ref/occ/tag/_RESERVED //test_ref/occ/struct/_RESERVED //test_ref/occ/intf/_RESERVED //test_ref/doc/anysymbol/_RESERVED" machineGenerated="true" --><span class="type">_RESERVED</span><!-- /a -->:<span class="number">24</span>; 
-	} <!-- a logicalPath="//test_ref/occ/econst/_bFlags //test_ref/occ/data/ObjCClassBeta/_bFlags //test_ref/occ/data/_bFlags //test_ref/occ/clconst/ObjCClassBeta/_bFlags " machineGenerated="true" --><span class="var">_bFlags</span><!-- /a -->; 
+	} <!-- a logicalPath="//test_ref/occ/econst/_bFlags //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/_bFlags //test_ref/occ/data/_bFlags //test_ref/occ/clconst/ObjCClassBeta_OCCClassTest6/_bFlags " machineGenerated="true" --><span class="var">_bFlags</span><!-- /a -->; 
 END OF OBJECT
 
 
@@ -4890,14 +4890,14 @@ OBJECT: __bFlags (HeaderDoc::Struct)
 	    <span class="keyword">unsigned</span> <!-- a logicalPath="//test_ref/occ/cl/int //test_ref/occ/tdef/int //test_ref/occ/tag/int //test_ref/occ/struct/int //test_ref/occ/intf/int //test_ref/doc/anysymbol/int" machineGenerated="true" --><span class="type">int</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/transparent //test_ref/occ/tdef/transparent //test_ref/occ/tag/transparent //test_ref/occ/struct/transparent //test_ref/occ/intf/transparent //test_ref/doc/anysymbol/transparent" machineGenerated="true" --><span class="type">transparent</span><!-- /a -->:<span class="number">1</span>; 
 	    <span class="keyword">unsigned</span> <!-- a logicalPath="//test_ref/occ/cl/int //test_ref/occ/tdef/int //test_ref/occ/tag/int //test_ref/occ/struct/int //test_ref/occ/intf/int //test_ref/doc/anysymbol/int" machineGenerated="true" --><span class="type">int</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/boxType //test_ref/occ/tdef/boxType //test_ref/occ/tag/boxType //test_ref/occ/struct/boxType //test_ref/occ/intf/boxType //test_ref/doc/anysymbol/boxType" machineGenerated="true" --><span class="type">boxType</span><!-- /a -->:<span class="number">2</span>; 
 	    <span class="keyword">unsigned</span> <!-- a logicalPath="//test_ref/occ/cl/int //test_ref/occ/tdef/int //test_ref/occ/tag/int //test_ref/occ/struct/int //test_ref/occ/intf/int //test_ref/doc/anysymbol/int" machineGenerated="true" --><span class="type">int</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/_RESERVED //test_ref/occ/tdef/_RESERVED //test_ref/occ/tag/_RESERVED //test_ref/occ/struct/_RESERVED //test_ref/occ/intf/_RESERVED //test_ref/doc/anysymbol/_RESERVED" machineGenerated="true" --><span class="type">_RESERVED</span><!-- /a -->:<span class="number">24</span>; 
-	} <!-- a logicalPath="//test_ref/occ/econst/_bFlags //test_ref/occ/data/ObjCClassBeta/_bFlags //test_ref/occ/data/_bFlags //test_ref/occ/clconst/ObjCClassBeta/_bFlags " machineGenerated="true" --><span class="var">_bFlags</span><!-- /a -->; 
+	} <!-- a logicalPath="//test_ref/occ/econst/_bFlags //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/_bFlags //test_ref/occ/data/_bFlags //test_ref/occ/clconst/ObjCClassBeta_OCCClassTest6/_bFlags " machineGenerated="true" --><span class="var">_bFlags</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: _unused (HeaderDoc::Var)
-	<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_unused //test_ref/occ/data/ObjCClassBeta/_unused //test_ref/occ/data/_unused //test_ref/occ/clconst/ObjCClassBeta/_unused " machineGenerated="true" --><span class="var">_unused</span><!-- /a -->; 
+	<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_unused //test_ref/occ/data/ObjCClassBeta_OCCClassTest6/_unused //test_ref/occ/data/_unused //test_ref/occ/clconst/ObjCClassBeta_OCCClassTest6/_unused " machineGenerated="true" --><span class="var">_unused</span><!-- /a -->; 
 END OF OBJECT
 
 
 
-_$94|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/ObjC_class_6.test$1|C$12|ObjC class 6$1|C$6|parser
+_$17|ObjC_class_6.test$1|C$12|ObjC class 6$1|C$6|parser

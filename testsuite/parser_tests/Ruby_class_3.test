@@ -18,7 +18,7 @@ def myfunc(name)
 end
 
 $41|	Another class that throws an exception.
-$0|$14444|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$14485|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -228,7 +228,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: RubyClassWithException
-    APIUID: 
+    APIUID: //test_ref/ruby/cl/RubyClassWithException
     ABSTRACT: ""
     DISCUSSION: "<p>Another class that throws an exception.
 "

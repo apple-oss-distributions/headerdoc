@@ -1,7 +1,7 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$37|python_var_1 = 3
 python_var_junk = 4
 $29|        python_var_1 comment
-$0|$5703|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$5739|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -42,7 +42,7 @@ $parserState->{callbackNamePending} => 0
 $parserState->{categoryClass} => 
 $parserState->{classtype} => 
 $parserState->{endOfTripleQuote} => 0
-$parserState->{endgame} => 1
+$parserState->{endgame} => 3
 $parserState->{freezeStack} => ARRAY(OBJID)
 $parserState->{freezereturn} => 0
 $parserState->{frozensodname} => 
@@ -65,7 +65,8 @@ $parserState->{justLeftStringToken} => 0
 $parserState->{kr_c_function} => 0
 $parserState->{kr_c_name} => 
 $parserState->{lang} => python
-$parserState->{lastpart} => 3
+$parserState->{lastNLWasQuoted} => 0
+$parserState->{lastpart} => 
 $parserState->{leadspace} => 0
 $parserState->{macroNoTrunc} => 1
 $parserState->{name} => 
@@ -89,7 +90,7 @@ $parserState->{seenBraces} => 0
 $parserState->{seenLeading} => 0
 $parserState->{seenMacroPart} => 0
 $parserState->{seenTilde} => 0
-$parserState->{seenToken} => 0
+$parserState->{seenToken} => 1
 $parserState->{setHollowAfter} => 0
 $parserState->{setleading} => 0
 $parserState->{simpleTDcontents} => 
@@ -105,7 +106,7 @@ $parserState->{value} =>  3
 
 $parserState->{valuepending} => 2
 -=: BLOCKPARSE RETURN VALUES :=-
-newcount: 0
+newcount: 1
 typelist: variable
 namelist: python_var_1
 posstypes: constant
@@ -238,4 +239,4 @@ END OF OBJECT
 
 
 
-__$99|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/Python_variable_1.test$6|python$17|Python variable 1$6|python$6|parser
+__$45|testsuite/parser_tests/Python_variable_1.test$6|python$17|Python variable 1$6|python$6|parser

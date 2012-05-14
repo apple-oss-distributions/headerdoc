@@ -9,7 +9,7 @@ int testfunc(struct test &blah);
 ampersand_test_class_2_t operator &(ampersand_test_class_2_t &a);
 };
 $13|/*! class */
-$0|$18437|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$18497|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -234,7 +234,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: ampersand_test_class_2_t
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/ampersand_test_class_2_t
     ABSTRACT: ""
     DISCUSSION: "<p>class "
     UPDATED: ""
@@ -289,7 +289,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -416,7 +416,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -629,7 +629,7 @@ END OF OBJECT
 
 
 
-$18437|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$18497|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -854,7 +854,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: ampersand_test_class_2_t
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/ampersand_test_class_2_t
     ABSTRACT: ""
     DISCUSSION: "<p>class "
     UPDATED: ""
@@ -909,7 +909,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1036,7 +1036,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""

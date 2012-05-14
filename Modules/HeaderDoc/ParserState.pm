@@ -2,7 +2,7 @@
 #
 # Class name: 	ParserState
 # Synopsis: 	Used by headerDoc2HTML.pl to hold parser state
-# Last Updated: $Date: 2011/12/03 10:08:35 $
+# Last Updated: $Date: 2012/04/06 15:56:50 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -876,6 +876,10 @@
 #             Set on parser state objects that represent declarations
 #             within classes so that it does not get processed twice.
 #
+#         @var optionalOrRequired
+#             Either \@optional or \@required, depending on the current
+#             state of the parser.
+#
 #    @vargroup Parsing actual code
 #         @var seenIf
 #             If <code>$HeaderDoc::parseIfElse</code> is 1, this
@@ -1086,6 +1090,11 @@
 #             of a function sets this to 1, an if statement
 #             inside that function increases it to 2, and so on).
 #
+#         @var lastNLWasQuoted
+#             In Python, set to 1 if the last newline was preceded
+#             by a backslash, else unset.  Used to determine
+#             whether to care about the leading whitespace count.
+#
 #         @var pushParserStateOnBrace
 #             Set to 1 when a keyword is encountered that should
 #             cause the parser state to be pushed the next time the
@@ -1204,7 +1213,7 @@ use Carp qw(cluck);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::ParserState::VERSION = '$Revision: 1322935715 $';
+$HeaderDoc::ParserState::VERSION = '$Revision: 1333753010 $';
 ################ General Constants ###################################
 my $debugging = 0;
 
@@ -1380,6 +1389,10 @@ sub new {
 
 	my @tempb = ();
 	$self->{treeStack} = \@tempb;
+    }
+
+    if (length $HeaderDoc::OptionalOrRequired) {
+	$self->{optionalOrRequired} = $HeaderDoc::OptionalOrRequired;
     }
 
     # Now grab any key => value pairs passed in
@@ -1904,6 +1917,63 @@ sub peekBrace
 
 	$self->pushBrace($temp);
 	return $temp;
+}
+
+# /*!
+#     @abstract
+#         Looks at the top token on the brace stack and
+#         returns the closing token that would match it.
+#     @param self
+#         This object.
+#     @discussion
+#         This is currently only used for the Python
+#         parser.  Eventually, the main parser should
+#         be modified to share this stack instead of
+#         using a local variable.
+#  */
+sub braceCount
+{
+	my $self = shift;
+	return scalar(@{$self->{braceStack}});
+}
+
+# /*!
+#     @abstract
+#         Returns whether the current line is a Python continuation line.
+#     @discussion
+#         In Python, if you are inside a string, a multiline string,
+#         a parenthesized expression, an array, etc., subsequent lines
+#         are treated as part of the current line implicitly.  Those
+#         subsequent lines are called continuation lines.
+#
+#         A continuation line also occurs explicitly when the previous
+#         line ends with a backslash.
+#  */
+sub isContinuationLine
+{
+	my $self = shift;
+	my $localDebug = 0;
+
+	if ($self->braceCount()) {
+		print STDERR "In isContinuationLine: brace count is ".$self->braceCount()."\n" if ($localDebug);
+		if ($localDebug > 1) {
+			print STDERR "begin stack dump\n";
+			foreach  my $item (@{$self->{braceStack}}) {
+				print STDERR "ITEM: $item\n";
+			}
+			print STDERR "end stack dump\n";
+		}
+
+		return 1;
+	}
+	if ($self->{lastNLWasQuoted}) {
+		print STDERR "In isContinuationLine: lastNLWasQuoted.\n" if ($localDebug);
+		return 1;
+	}
+
+	print STDERR "In isContinuationLine: returning 0.\n" if ($localDebug);
+
+	return 0;
 }
 
 # /*!

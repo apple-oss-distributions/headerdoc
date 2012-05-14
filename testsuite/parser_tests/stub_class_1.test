@@ -8,7 +8,7 @@ class myclass
 $53|/*! @class myclass
         This is a class test.
  */
-$0|$5796|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$5824|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -185,7 +185,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: otherclass
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/otherclass
     ABSTRACT: ""
     DISCUSSION: "<p>This is a class test."
     UPDATED: ""
@@ -241,7 +241,7 @@ END OF OBJECT
 
 
 
-$5796|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$5824|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -418,7 +418,7 @@ LONG ATTRIBUTES:
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
     NAME: otherclass
-    APIUID: 
+    APIUID: //test_ref/cpp/cl/otherclass
     ABSTRACT: ""
     DISCUSSION: "<p>This is a class test."
     UPDATED: ""

@@ -1,4 +1,4 @@
-FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$1540|@interface ObjCClassOne : NSObject <NSCopying>
+FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$1477|@interface ObjCClassOne_OCCCLASSTEST3 : NSObject <NSCopying>
 {
     /*All instance variables are private*/
     id                  _titleCell;
@@ -9,20 +9,20 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
     id                  _unused;
 }
 
-/*!     
+/*!
         @method classOneMethodOne
         @abstract Returns the receiver's border type.
         @discussion Returns the receiver's border type. Border types are defined
         in NSView.h. Currently, the following border types are defined:
-                
+
                 * NSNoBorder
-                
+
                 * NSLineBorder
-                
+
                 * NSBezelBorder
-                
+
                 * NSGrooveBorder
-        
+
         By default, an NSBox's border type is NSGrooveBorder.
 */
 - (NSBorderType)classOneMethodOne;
@@ -47,13 +47,13 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 
 
 @end
-$248|/*!     
-        @class ObjCClassOne
+$257|/*!
+        @class ObjCClassOne_OCCCLASSTEST3
         @abstract NSBox provides a visual grouping element.
         @discussion An NSBox object is a simple NSView that can do two things:
         It can draw a border around itself, and it can title itself.
 */
-$0|$41138|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$41746|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -139,7 +139,7 @@ $parserState->{preTemplateSymbol} =>
 $parserState->{preclasssodtype} => interface
 $parserState->{prekeywordsodname} => 
 $parserState->{prekeywordsodtype} => 
-$parserState->{returntype} => @interface ObjCClassOne : NSObject < NSCopying 
+$parserState->{returntype} => @interface ObjCClassOne_OCCCLASSTEST3 : NSObject < NSCopying 
 $parserState->{seenBraces} => 0
 $parserState->{seenMacroPart} => 0
 $parserState->{seenTilde} => 0
@@ -147,21 +147,22 @@ $parserState->{simpleTDcontents} =>
 $parserState->{simpleTypedef} => 0
 $parserState->{sodclass} => class
 $parserState->{sodname} => end
-$parserState->{sodtype} =>  ObjCClassOne NSObject
+$parserState->{sodtype} =>  ObjCClassOne_OCCCLASSTEST3 NSObject
 $parserState->{sodtypeclasstoken} => interface
 $parserState->{stackFrozen} => 0
 $parserState->{startOfDec} => 2
-$parserState->{storeDec} => 
+$parserState->{storeDec} => @interface ObjCClassOne_OCCCLASSTEST3 : NSObject < NSCopying 
+
 $parserState->{sublang} => C
 $parserState->{value} => 
 $parserState->{valuepending} => 0
 -=: BLOCKPARSE RETURN VALUES :=-
 newcount: 23
 typelist: @interface
-namelist: ObjCClassOne
+namelist: ObjCClassOne_OCCCLASSTEST3
 posstypes: NSObject
 value: 
-returntype: ObjCClassOne NSObject
+returntype: ObjCClassOne_OCCCLASSTEST3 NSObject
 pridec: 
 simpleTDcontents: 
 bpavail: 
@@ -175,7 +176,7 @@ implementsClass:
 +---@
 +---interface
 |   +--- 
-|   +---ObjCClassOne
+|   +---ObjCClassOne_OCCCLASSTEST3
 |   +--- 
 |   +---:
 |   +--- 
@@ -241,7 +242,6 @@ implementsClass:
 |   +---[ NEWLINE ]
 |   +---/*
 |   |   +---!
-|   |   +---     
 |   |   +---
 @method classOneMethodOne
 |   |   +---
@@ -401,8 +401,8 @@ LONG ATTRIBUTES:
     INDEX GROUP: 
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
-    NAME: ObjCClassOne
-    APIUID: 
+    NAME: ObjCClassOne_OCCCLASSTEST3
+    APIUID: //test_ref/occ/cl/ObjCClassOne_OCCCLASSTEST3
     ABSTRACT: "<p>NSBox provides a visual grouping element.
 "
     DISCUSSION: "<p>An NSBox object is a simple NSView that can do two things:
@@ -453,7 +453,7 @@ It can draw a border around itself, and it can title itself.
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classOneMethodOne
-        APIUID: //test_ref/occ/instm/ObjCClassOne/classOneMethodOne
+        APIUID: //test_ref/occ/instm/ObjCClassOne_OCCCLASSTEST3/classOneMethodOne
         ABSTRACT: "<p>Returns the receiver's border type.
 "
         DISCUSSION: "<p>Returns the receiver's border type. Border types are defined
@@ -479,7 +479,7 @@ in NSView.h. Currently, the following border types are defined:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -592,7 +592,7 @@ in NSView.h. Currently, the following border types are defined:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classOneMethodTwo
-        APIUID: //test_ref/occ/instm/ObjCClassOne/classOneMethodTwo
+        APIUID: //test_ref/occ/instm/ObjCClassOne_OCCCLASSTEST3/classOneMethodTwo
         ABSTRACT: "<p>Returns a constant representing the title position.
 "
         DISCUSSION: "<p></p>"
@@ -606,7 +606,7 @@ in NSView.h. Currently, the following border types are defined:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -719,7 +719,7 @@ in NSView.h. Currently, the following border types are defined:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: dateWithString:calendarFormat:
-        APIUID: //test_ref/occ/clm/ObjCClassOne/dateWithString:calendarFormat:
+        APIUID: //test_ref/occ/clm/ObjCClassOne_OCCCLASSTEST3/dateWithString:calendarFormat:
         ABSTRACT: "<p>Creates and returns a calendar date initialized with the date
 specified in the string description.
 "
@@ -735,7 +735,7 @@ specified in the string description.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -850,7 +850,7 @@ specified in the string description.
             OBJECT TYPE: HeaderDoc::MinorAPIElement
             NAME: description
             TYPE: 
-            APIUID: //test_ref/doc/methodparam/ObjCClassOne/dateWithString:calendarFormat:/description
+            APIUID: //test_ref/doc/methodparam/ObjCClassOne_OCCCLASSTEST3/dateWithString:calendarFormat:/description
             ABSTRACT: ""
             DISCUSSION: "<p>A string specifying the date."
             UPDATED: ""
@@ -892,7 +892,7 @@ specified in the string description.
             OBJECT TYPE: HeaderDoc::MinorAPIElement
             NAME: format
             TYPE: 
-            APIUID: //test_ref/doc/methodparam/ObjCClassOne/dateWithString:calendarFormat:/format
+            APIUID: //test_ref/doc/methodparam/ObjCClassOne_OCCCLASSTEST3/dateWithString:calendarFormat:/format
             ABSTRACT: ""
             DISCUSSION: "<p>Conversion specifiers similar to those used in strftime()."
             UPDATED: ""
@@ -929,11 +929,11 @@ specified in the string description.
             SHORT ATTRIBUTES: 
             LONG ATTRIBUTES: 
 -=: NAMED OBJECT PARSE TREES :=-
-OBJECT: ObjCClassOne (HeaderDoc::ObjCClass)
+OBJECT: ObjCClassOne_OCCCLASSTEST3 (HeaderDoc::ObjCClass)
 +---@
 +---interface
 |   +--- 
-|   +---ObjCClassOne
+|   +---ObjCClassOne_OCCCLASSTEST3
 |   +--- 
 |   +---:
 |   +--- 
@@ -999,7 +999,6 @@ OBJECT: ObjCClassOne (HeaderDoc::ObjCClass)
 |   +---[ NEWLINE ]
 |   +---/*
 |   |   +---!
-|   |   +---     
 |   |   +---
 @method classOneMethodOne
 |   |   +---
@@ -1291,8 +1290,8 @@ END OF OBJECT
 
 
 -=: HTML OUTPUT OF PARSE TREES :=-
-OBJECT: ObjCClassOne (HeaderDoc::ObjCClass)
-	@<!-- a logicalPath="//test_ref/occ/cl/interface //test_ref/occ/tdef/interface //test_ref/occ/tag/interface //test_ref/occ/struct/interface //test_ref/occ/intf/interface //test_ref/doc/anysymbol/interface" machineGenerated="true" --><span class="type">interface</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/ObjCClassOne //test_ref/occ/tdef/ObjCClassOne //test_ref/occ/tag/ObjCClassOne //test_ref/occ/struct/ObjCClassOne //test_ref/occ/intf/ObjCClassOne //test_ref/doc/anysymbol/ObjCClassOne" machineGenerated="true" --><span class="type">ObjCClassOne</span><!-- /a --> : <!-- a logicalPath="//test_ref/occ/cl/NSObject //test_ref/occ/tdef/NSObject //test_ref/occ/tag/NSObject //test_ref/occ/struct/NSObject //test_ref/occ/intf/NSObject //test_ref/doc/anysymbol/NSObject" machineGenerated="true" --><span class="type">NSObject</span><!-- /a --> &lt;<!-- a logicalPath="//test_ref/occ/cl/NSCopying //test_ref/occ/tdef/NSCopying //test_ref/occ/tag/NSCopying //test_ref/occ/struct/NSCopying //test_ref/occ/intf/NSCopying //test_ref/doc/anysymbol/NSCopying" machineGenerated="true" --><span class="type">NSCopying</span><!-- /a -->&gt; { 
+OBJECT: ObjCClassOne_OCCCLASSTEST3 (HeaderDoc::ObjCClass)
+	@<!-- a logicalPath="//test_ref/occ/cl/interface //test_ref/occ/tdef/interface //test_ref/occ/tag/interface //test_ref/occ/struct/interface //test_ref/occ/intf/interface //test_ref/doc/anysymbol/interface" machineGenerated="true" --><span class="type">interface</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/ObjCClassOne_OCCCLASSTEST3 //test_ref/occ/tdef/ObjCClassOne_OCCCLASSTEST3 //test_ref/occ/tag/ObjCClassOne_OCCCLASSTEST3 //test_ref/occ/struct/ObjCClassOne_OCCCLASSTEST3 //test_ref/occ/intf/ObjCClassOne_OCCCLASSTEST3 //test_ref/doc/anysymbol/ObjCClassOne_OCCCLASSTEST3" machineGenerated="true" --><span class="type">ObjCClassOne_OCCCLASSTEST3</span><!-- /a --> : <!-- a logicalPath="//test_ref/occ/cl/NSObject //test_ref/occ/tdef/NSObject //test_ref/occ/tag/NSObject //test_ref/occ/struct/NSObject //test_ref/occ/intf/NSObject //test_ref/doc/anysymbol/NSObject" machineGenerated="true" --><span class="type">NSObject</span><!-- /a --> &lt;<!-- a logicalPath="//test_ref/occ/cl/NSCopying //test_ref/occ/tdef/NSCopying //test_ref/occ/tag/NSCopying //test_ref/occ/struct/NSCopying //test_ref/occ/intf/NSCopying //test_ref/doc/anysymbol/NSCopying" machineGenerated="true" --><span class="type">NSCopying</span><!-- /a -->&gt; { 
 	        <span class="comment">/*All instance variables are private*/</span>
 	        <!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_titleCell //test_ref/occ/data/_titleCell //test_ref/occ/clconst/_titleCell " machineGenerated="true" --><span class="var">_titleCell</span><!-- /a -->; 
 	        <!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_contentView //test_ref/occ/data/_contentView //test_ref/occ/clconst/_contentView " machineGenerated="true" --><span class="var">_contentView</span><!-- /a -->; 
@@ -1300,7 +1299,7 @@ OBJECT: ObjCClassOne (HeaderDoc::ObjCClass)
 	        <!-- a logicalPath="//test_ref/occ/cl/NSRect //test_ref/occ/tdef/NSRect //test_ref/occ/tag/NSRect //test_ref/occ/struct/NSRect //test_ref/occ/intf/NSRect //test_ref/doc/anysymbol/NSRect" machineGenerated="true" --><span class="type">NSRect</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_borderRect //test_ref/occ/data/_borderRect //test_ref/occ/clconst/_borderRect " machineGenerated="true" --><span class="var">_borderRect</span><!-- /a -->; 
 	        <!-- a logicalPath="//test_ref/occ/cl/NSRect //test_ref/occ/tdef/NSRect //test_ref/occ/tag/NSRect //test_ref/occ/struct/NSRect //test_ref/occ/intf/NSRect //test_ref/doc/anysymbol/NSRect" machineGenerated="true" --><span class="type">NSRect</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_titleRect //test_ref/occ/data/_titleRect //test_ref/occ/clconst/_titleRect " machineGenerated="true" --><span class="var">_titleRect</span><!-- /a -->; 
 	        <!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_unused //test_ref/occ/data/_unused //test_ref/occ/clconst/_unused " machineGenerated="true" --><span class="var">_unused</span><!-- /a -->; 
-	        }  <span class="comment">/*! 
+	        }  <span class="comment">/*!
 	@method classOneMethodOne
 	@abstract Returns the receiver's border type.
 	@discussion Returns the receiver's border type. Border types are defined
@@ -1339,22 +1338,22 @@ END OF OBJECT
 
 
 OBJECT: classOneMethodOne (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classOneMethodOne //test_ref/occ/data/ObjCClassOne/classOneMethodOne //test_ref/occ/data/classOneMethodOne //test_ref/occ/clconst/ObjCClassOne/classOneMethodOne " machineGenerated="true" --><span class="var">classOneMethodOne</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classOneMethodOne //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/classOneMethodOne //test_ref/occ/data/classOneMethodOne //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/classOneMethodOne " machineGenerated="true" --><span class="var">classOneMethodOne</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: classOneMethodTwo (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classOneMethodTwo //test_ref/occ/data/ObjCClassOne/classOneMethodTwo //test_ref/occ/data/classOneMethodTwo //test_ref/occ/clconst/ObjCClassOne/classOneMethodTwo " machineGenerated="true" --><span class="var">classOneMethodTwo</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classOneMethodTwo //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/classOneMethodTwo //test_ref/occ/data/classOneMethodTwo //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/classOneMethodTwo " machineGenerated="true" --><span class="var">classOneMethodTwo</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: dateWithString:calendarFormat: (HeaderDoc::Method)
-	+ (<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassOne/dateWithString //test_ref/occ/clm/ObjCClassOne/dateWithString //test_ref/occ/intfcm/ObjCClassOne/dateWithString //test_ref/occ/intfm/ObjCClassOne/dateWithString //test_ref/occ/func/dateWithString //test_ref/occ/ftmplt/ObjCClassOne/dateWithString //test_ref/occ/defn/dateWithString //test_ref/occ/macro/dateWithString //test_ref/doc/anysymbol/dateWithString" machineGenerated="true" --><span class="function">dateWithString</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSString //test_ref/occ/tdef/NSString //test_ref/occ/tag/NSString //test_ref/occ/struct/NSString //test_ref/occ/intf/NSString //test_ref/doc/anysymbol/NSString" machineGenerated="true" --><span class="type">NSString</span><!-- /a --> <span class="type">*</span>)<span class="param">description</span> <!-- a logicalPath="//test_ref/occ/instm/ObjCClassOne/calendarFormat //test_ref/occ/clm/ObjCClassOne/calendarFormat //test_ref/occ/intfcm/ObjCClassOne/calendarFormat //test_ref/occ/intfm/ObjCClassOne/calendarFormat //test_ref/occ/func/calendarFormat //test_ref/occ/ftmplt/ObjCClassOne/calendarFormat //test_ref/occ/defn/calendarFormat //test_ref/occ/macro/calendarFormat //test_ref/doc/anysymbol/calendarFormat" machineGenerated="true" --><span class="function">calendarFormat</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSString //test_ref/occ/tdef/NSString //test_ref/occ/tag/NSString //test_ref/occ/struct/NSString //test_ref/occ/intf/NSString //test_ref/doc/anysymbol/NSString" machineGenerated="true" --><span class="type">NSString</span><!-- /a --> <span class="type">*</span>)<!-- a logicalPath="//test_ref/occ/econst/format //test_ref/occ/data/ObjCClassOne/format //test_ref/occ/data/format //test_ref/occ/clconst/ObjCClassOne/format " machineGenerated="true" --><span class="var">format</span><!-- /a -->; 
+	+ (<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassOne_OCCCLASSTEST3/dateWithString //test_ref/occ/clm/ObjCClassOne_OCCCLASSTEST3/dateWithString //test_ref/occ/intfcm/ObjCClassOne_OCCCLASSTEST3/dateWithString //test_ref/occ/intfm/ObjCClassOne_OCCCLASSTEST3/dateWithString //test_ref/occ/func/dateWithString //test_ref/occ/ftmplt/ObjCClassOne_OCCCLASSTEST3/dateWithString //test_ref/occ/defn/dateWithString //test_ref/occ/macro/dateWithString //test_ref/doc/anysymbol/dateWithString" machineGenerated="true" --><span class="function">dateWithString</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSString //test_ref/occ/tdef/NSString //test_ref/occ/tag/NSString //test_ref/occ/struct/NSString //test_ref/occ/intf/NSString //test_ref/doc/anysymbol/NSString" machineGenerated="true" --><span class="type">NSString</span><!-- /a --> <span class="type">*</span>)<span class="param">description</span> <!-- a logicalPath="//test_ref/occ/instm/ObjCClassOne_OCCCLASSTEST3/calendarFormat //test_ref/occ/clm/ObjCClassOne_OCCCLASSTEST3/calendarFormat //test_ref/occ/intfcm/ObjCClassOne_OCCCLASSTEST3/calendarFormat //test_ref/occ/intfm/ObjCClassOne_OCCCLASSTEST3/calendarFormat //test_ref/occ/func/calendarFormat //test_ref/occ/ftmplt/ObjCClassOne_OCCCLASSTEST3/calendarFormat //test_ref/occ/defn/calendarFormat //test_ref/occ/macro/calendarFormat //test_ref/doc/anysymbol/calendarFormat" machineGenerated="true" --><span class="function">calendarFormat</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSString //test_ref/occ/tdef/NSString //test_ref/occ/tag/NSString //test_ref/occ/struct/NSString //test_ref/occ/intf/NSString //test_ref/doc/anysymbol/NSString" machineGenerated="true" --><span class="type">NSString</span><!-- /a --> <span class="type">*</span>)<!-- a logicalPath="//test_ref/occ/econst/format //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/format //test_ref/occ/data/format //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/format " machineGenerated="true" --><span class="var">format</span><!-- /a -->; 
 END OF OBJECT
 
 
 
-$53200|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$54102|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -1440,7 +1439,7 @@ $parserState->{preTemplateSymbol} =>
 $parserState->{preclasssodtype} => interface
 $parserState->{prekeywordsodname} => 
 $parserState->{prekeywordsodtype} => 
-$parserState->{returntype} => @interface ObjCClassOne : NSObject < NSCopying 
+$parserState->{returntype} => @interface ObjCClassOne_OCCCLASSTEST3 : NSObject < NSCopying 
 $parserState->{seenBraces} => 0
 $parserState->{seenMacroPart} => 0
 $parserState->{seenTilde} => 0
@@ -1448,21 +1447,22 @@ $parserState->{simpleTDcontents} =>
 $parserState->{simpleTypedef} => 0
 $parserState->{sodclass} => class
 $parserState->{sodname} => end
-$parserState->{sodtype} =>  ObjCClassOne NSObject
+$parserState->{sodtype} =>  ObjCClassOne_OCCCLASSTEST3 NSObject
 $parserState->{sodtypeclasstoken} => interface
 $parserState->{stackFrozen} => 0
 $parserState->{startOfDec} => 2
-$parserState->{storeDec} => 
+$parserState->{storeDec} => @interface ObjCClassOne_OCCCLASSTEST3 : NSObject < NSCopying 
+
 $parserState->{sublang} => C
 $parserState->{value} => 
 $parserState->{valuepending} => 0
 -=: BLOCKPARSE RETURN VALUES :=-
 newcount: 23
 typelist: @interface
-namelist: ObjCClassOne
+namelist: ObjCClassOne_OCCCLASSTEST3
 posstypes: NSObject
 value: 
-returntype: ObjCClassOne NSObject
+returntype: ObjCClassOne_OCCCLASSTEST3 NSObject
 pridec: 
 simpleTDcontents: 
 bpavail: 
@@ -1476,7 +1476,7 @@ implementsClass:
 +---@
 +---interface
 |   +--- 
-|   +---ObjCClassOne
+|   +---ObjCClassOne_OCCCLASSTEST3
 |   +--- 
 |   +---:
 |   +--- 
@@ -1542,7 +1542,6 @@ implementsClass:
 |   +---[ NEWLINE ]
 |   +---/*
 |   |   +---!
-|   |   +---     
 |   |   +---
 @method classOneMethodOne
 |   |   +---
@@ -1702,8 +1701,8 @@ LONG ATTRIBUTES:
     INDEX GROUP: 
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::ObjCClass
-    NAME: ObjCClassOne
-    APIUID: 
+    NAME: ObjCClassOne_OCCCLASSTEST3
+    APIUID: //test_ref/occ/cl/ObjCClassOne_OCCCLASSTEST3
     ABSTRACT: "<p>NSBox provides a visual grouping element.
 "
     DISCUSSION: "<p>An NSBox object is a simple NSView that can do two things:
@@ -1754,7 +1753,7 @@ It can draw a border around itself, and it can title itself.
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classOneMethodOne
-        APIUID: //test_ref/occ/instm/ObjCClassOne/classOneMethodOne
+        APIUID: //test_ref/occ/instm/ObjCClassOne_OCCCLASSTEST3/classOneMethodOne
         ABSTRACT: "<p>Returns the receiver's border type.
 "
         DISCUSSION: "<p>Returns the receiver's border type. Border types are defined
@@ -1780,7 +1779,7 @@ in NSView.h. Currently, the following border types are defined:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1893,7 +1892,7 @@ in NSView.h. Currently, the following border types are defined:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: classOneMethodTwo
-        APIUID: //test_ref/occ/instm/ObjCClassOne/classOneMethodTwo
+        APIUID: //test_ref/occ/instm/ObjCClassOne_OCCCLASSTEST3/classOneMethodTwo
         ABSTRACT: "<p>Returns a constant representing the title position.
 "
         DISCUSSION: "<p></p>"
@@ -1907,7 +1906,7 @@ in NSView.h. Currently, the following border types are defined:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -2020,7 +2019,7 @@ in NSView.h. Currently, the following border types are defined:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Method
         NAME: dateWithString:calendarFormat:
-        APIUID: //test_ref/occ/clm/ObjCClassOne/dateWithString:calendarFormat:
+        APIUID: //test_ref/occ/clm/ObjCClassOne_OCCCLASSTEST3/dateWithString:calendarFormat:
         ABSTRACT: "<p>Creates and returns a calendar date initialized with the date
 specified in the string description.
 "
@@ -2036,7 +2035,7 @@ specified in the string description.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -2151,7 +2150,7 @@ specified in the string description.
             OBJECT TYPE: HeaderDoc::MinorAPIElement
             NAME: description
             TYPE: 
-            APIUID: //test_ref/doc/methodparam/ObjCClassOne/dateWithString:calendarFormat:/description
+            APIUID: //test_ref/doc/methodparam/ObjCClassOne_OCCCLASSTEST3/dateWithString:calendarFormat:/description
             ABSTRACT: ""
             DISCUSSION: "<p>A string specifying the date."
             UPDATED: ""
@@ -2193,7 +2192,7 @@ specified in the string description.
             OBJECT TYPE: HeaderDoc::MinorAPIElement
             NAME: format
             TYPE: 
-            APIUID: //test_ref/doc/methodparam/ObjCClassOne/dateWithString:calendarFormat:/format
+            APIUID: //test_ref/doc/methodparam/ObjCClassOne_OCCCLASSTEST3/dateWithString:calendarFormat:/format
             ABSTRACT: ""
             DISCUSSION: "<p>Conversion specifiers similar to those used in strftime()."
             UPDATED: ""
@@ -2235,7 +2234,7 @@ specified in the string description.
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Var
         NAME: _titleCell
-        APIUID: //test_ref/occ/data/ObjCClassOne/_titleCell
+        APIUID: //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_titleCell
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -2248,7 +2247,7 @@ specified in the string description.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -2277,7 +2276,7 @@ specified in the string description.
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Var
         NAME: _contentView
-        APIUID: //test_ref/occ/data/ObjCClassOne/_contentView
+        APIUID: //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_contentView
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -2290,7 +2289,7 @@ specified in the string description.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -2319,7 +2318,7 @@ specified in the string description.
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Var
         NAME: _offsets
-        APIUID: //test_ref/occ/data/ObjCClassOne/_offsets
+        APIUID: //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_offsets
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -2332,7 +2331,7 @@ specified in the string description.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -2361,7 +2360,7 @@ specified in the string description.
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Var
         NAME: _borderRect
-        APIUID: //test_ref/occ/data/ObjCClassOne/_borderRect
+        APIUID: //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_borderRect
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -2374,7 +2373,7 @@ specified in the string description.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -2403,7 +2402,7 @@ specified in the string description.
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Var
         NAME: _titleRect
-        APIUID: //test_ref/occ/data/ObjCClassOne/_titleRect
+        APIUID: //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_titleRect
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -2416,7 +2415,7 @@ specified in the string description.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -2445,7 +2444,7 @@ specified in the string description.
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Var
         NAME: _unused
-        APIUID: //test_ref/occ/data/ObjCClassOne/_unused
+        APIUID: //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_unused
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -2458,7 +2457,7 @@ specified in the string description.
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: ""
+        ACCESSCONTROL: "private"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -2482,11 +2481,11 @@ specified in the string description.
         SHORT ATTRIBUTES: 
         LONG ATTRIBUTES: 
 -=: NAMED OBJECT PARSE TREES :=-
-OBJECT: ObjCClassOne (HeaderDoc::ObjCClass)
+OBJECT: ObjCClassOne_OCCCLASSTEST3 (HeaderDoc::ObjCClass)
 +---@
 +---interface
 |   +--- 
-|   +---ObjCClassOne
+|   +---ObjCClassOne_OCCCLASSTEST3
 |   +--- 
 |   +---:
 |   +--- 
@@ -2552,7 +2551,6 @@ OBJECT: ObjCClassOne (HeaderDoc::ObjCClass)
 |   +---[ NEWLINE ]
 |   +---/*
 |   |   +---!
-|   |   +---     
 |   |   +---
 @method classOneMethodOne
 |   |   +---
@@ -3021,8 +3019,8 @@ END OF OBJECT
 
 
 -=: HTML OUTPUT OF PARSE TREES :=-
-OBJECT: ObjCClassOne (HeaderDoc::ObjCClass)
-	@<!-- a logicalPath="//test_ref/occ/cl/interface //test_ref/occ/tdef/interface //test_ref/occ/tag/interface //test_ref/occ/struct/interface //test_ref/occ/intf/interface //test_ref/doc/anysymbol/interface" machineGenerated="true" --><span class="type">interface</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/ObjCClassOne //test_ref/occ/tdef/ObjCClassOne //test_ref/occ/tag/ObjCClassOne //test_ref/occ/struct/ObjCClassOne //test_ref/occ/intf/ObjCClassOne //test_ref/doc/anysymbol/ObjCClassOne" machineGenerated="true" --><span class="type">ObjCClassOne</span><!-- /a --> : <!-- a logicalPath="//test_ref/occ/cl/NSObject //test_ref/occ/tdef/NSObject //test_ref/occ/tag/NSObject //test_ref/occ/struct/NSObject //test_ref/occ/intf/NSObject //test_ref/doc/anysymbol/NSObject" machineGenerated="true" --><span class="type">NSObject</span><!-- /a --> &lt;<!-- a logicalPath="//test_ref/occ/cl/NSCopying //test_ref/occ/tdef/NSCopying //test_ref/occ/tag/NSCopying //test_ref/occ/struct/NSCopying //test_ref/occ/intf/NSCopying //test_ref/doc/anysymbol/NSCopying" machineGenerated="true" --><span class="type">NSCopying</span><!-- /a -->&gt; { 
+OBJECT: ObjCClassOne_OCCCLASSTEST3 (HeaderDoc::ObjCClass)
+	@<!-- a logicalPath="//test_ref/occ/cl/interface //test_ref/occ/tdef/interface //test_ref/occ/tag/interface //test_ref/occ/struct/interface //test_ref/occ/intf/interface //test_ref/doc/anysymbol/interface" machineGenerated="true" --><span class="type">interface</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/cl/ObjCClassOne_OCCCLASSTEST3 //test_ref/occ/tdef/ObjCClassOne_OCCCLASSTEST3 //test_ref/occ/tag/ObjCClassOne_OCCCLASSTEST3 //test_ref/occ/struct/ObjCClassOne_OCCCLASSTEST3 //test_ref/occ/intf/ObjCClassOne_OCCCLASSTEST3 //test_ref/doc/anysymbol/ObjCClassOne_OCCCLASSTEST3" machineGenerated="true" --><span class="type">ObjCClassOne_OCCCLASSTEST3</span><!-- /a --> : <!-- a logicalPath="//test_ref/occ/cl/NSObject //test_ref/occ/tdef/NSObject //test_ref/occ/tag/NSObject //test_ref/occ/struct/NSObject //test_ref/occ/intf/NSObject //test_ref/doc/anysymbol/NSObject" machineGenerated="true" --><span class="type">NSObject</span><!-- /a --> &lt;<!-- a logicalPath="//test_ref/occ/cl/NSCopying //test_ref/occ/tdef/NSCopying //test_ref/occ/tag/NSCopying //test_ref/occ/struct/NSCopying //test_ref/occ/intf/NSCopying //test_ref/doc/anysymbol/NSCopying" machineGenerated="true" --><span class="type">NSCopying</span><!-- /a -->&gt; { 
 	        <span class="comment">/*All instance variables are private*/</span>
 	        <!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_titleCell //test_ref/occ/data/_titleCell //test_ref/occ/clconst/_titleCell " machineGenerated="true" --><span class="var">_titleCell</span><!-- /a -->; 
 	        <!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_contentView //test_ref/occ/data/_contentView //test_ref/occ/clconst/_contentView " machineGenerated="true" --><span class="var">_contentView</span><!-- /a -->; 
@@ -3030,7 +3028,7 @@ OBJECT: ObjCClassOne (HeaderDoc::ObjCClass)
 	        <!-- a logicalPath="//test_ref/occ/cl/NSRect //test_ref/occ/tdef/NSRect //test_ref/occ/tag/NSRect //test_ref/occ/struct/NSRect //test_ref/occ/intf/NSRect //test_ref/doc/anysymbol/NSRect" machineGenerated="true" --><span class="type">NSRect</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_borderRect //test_ref/occ/data/_borderRect //test_ref/occ/clconst/_borderRect " machineGenerated="true" --><span class="var">_borderRect</span><!-- /a -->; 
 	        <!-- a logicalPath="//test_ref/occ/cl/NSRect //test_ref/occ/tdef/NSRect //test_ref/occ/tag/NSRect //test_ref/occ/struct/NSRect //test_ref/occ/intf/NSRect //test_ref/doc/anysymbol/NSRect" machineGenerated="true" --><span class="type">NSRect</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_titleRect //test_ref/occ/data/_titleRect //test_ref/occ/clconst/_titleRect " machineGenerated="true" --><span class="var">_titleRect</span><!-- /a -->; 
 	        <!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_unused //test_ref/occ/data/_unused //test_ref/occ/clconst/_unused " machineGenerated="true" --><span class="var">_unused</span><!-- /a -->; 
-	        }  <span class="comment">/*! 
+	        }  <span class="comment">/*!
 	@method classOneMethodOne
 	@abstract Returns the receiver's border type.
 	@discussion Returns the receiver's border type. Border types are defined
@@ -3069,49 +3067,49 @@ END OF OBJECT
 
 
 OBJECT: classOneMethodOne (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classOneMethodOne //test_ref/occ/data/ObjCClassOne/classOneMethodOne //test_ref/occ/data/classOneMethodOne //test_ref/occ/clconst/ObjCClassOne/classOneMethodOne " machineGenerated="true" --><span class="var">classOneMethodOne</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/NSBorderType //test_ref/occ/tdef/NSBorderType //test_ref/occ/tag/NSBorderType //test_ref/occ/struct/NSBorderType //test_ref/occ/intf/NSBorderType //test_ref/doc/anysymbol/NSBorderType" machineGenerated="true" --><span class="type">NSBorderType</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classOneMethodOne //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/classOneMethodOne //test_ref/occ/data/classOneMethodOne //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/classOneMethodOne " machineGenerated="true" --><span class="var">classOneMethodOne</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: classOneMethodTwo (HeaderDoc::Method)
-	- (<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classOneMethodTwo //test_ref/occ/data/ObjCClassOne/classOneMethodTwo //test_ref/occ/data/classOneMethodTwo //test_ref/occ/clconst/ObjCClassOne/classOneMethodTwo " machineGenerated="true" --><span class="var">classOneMethodTwo</span><!-- /a -->; 
+	- (<!-- a logicalPath="//test_ref/occ/cl/NSTitlePosition //test_ref/occ/tdef/NSTitlePosition //test_ref/occ/tag/NSTitlePosition //test_ref/occ/struct/NSTitlePosition //test_ref/occ/intf/NSTitlePosition //test_ref/doc/anysymbol/NSTitlePosition" machineGenerated="true" --><span class="type">NSTitlePosition</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/econst/classOneMethodTwo //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/classOneMethodTwo //test_ref/occ/data/classOneMethodTwo //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/classOneMethodTwo " machineGenerated="true" --><span class="var">classOneMethodTwo</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: dateWithString:calendarFormat: (HeaderDoc::Method)
-	+ (<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassOne/dateWithString //test_ref/occ/clm/ObjCClassOne/dateWithString //test_ref/occ/intfcm/ObjCClassOne/dateWithString //test_ref/occ/intfm/ObjCClassOne/dateWithString //test_ref/occ/func/dateWithString //test_ref/occ/ftmplt/ObjCClassOne/dateWithString //test_ref/occ/defn/dateWithString //test_ref/occ/macro/dateWithString //test_ref/doc/anysymbol/dateWithString" machineGenerated="true" --><span class="function">dateWithString</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSString //test_ref/occ/tdef/NSString //test_ref/occ/tag/NSString //test_ref/occ/struct/NSString //test_ref/occ/intf/NSString //test_ref/doc/anysymbol/NSString" machineGenerated="true" --><span class="type">NSString</span><!-- /a --> <span class="type">*</span>)<span class="param">description</span> <!-- a logicalPath="//test_ref/occ/instm/ObjCClassOne/calendarFormat //test_ref/occ/clm/ObjCClassOne/calendarFormat //test_ref/occ/intfcm/ObjCClassOne/calendarFormat //test_ref/occ/intfm/ObjCClassOne/calendarFormat //test_ref/occ/func/calendarFormat //test_ref/occ/ftmplt/ObjCClassOne/calendarFormat //test_ref/occ/defn/calendarFormat //test_ref/occ/macro/calendarFormat //test_ref/doc/anysymbol/calendarFormat" machineGenerated="true" --><span class="function">calendarFormat</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSString //test_ref/occ/tdef/NSString //test_ref/occ/tag/NSString //test_ref/occ/struct/NSString //test_ref/occ/intf/NSString //test_ref/doc/anysymbol/NSString" machineGenerated="true" --><span class="type">NSString</span><!-- /a --> <span class="type">*</span>)<!-- a logicalPath="//test_ref/occ/econst/format //test_ref/occ/data/ObjCClassOne/format //test_ref/occ/data/format //test_ref/occ/clconst/ObjCClassOne/format " machineGenerated="true" --><span class="var">format</span><!-- /a -->; 
+	+ (<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a -->)<!-- a logicalPath="//test_ref/occ/instm/ObjCClassOne_OCCCLASSTEST3/dateWithString //test_ref/occ/clm/ObjCClassOne_OCCCLASSTEST3/dateWithString //test_ref/occ/intfcm/ObjCClassOne_OCCCLASSTEST3/dateWithString //test_ref/occ/intfm/ObjCClassOne_OCCCLASSTEST3/dateWithString //test_ref/occ/func/dateWithString //test_ref/occ/ftmplt/ObjCClassOne_OCCCLASSTEST3/dateWithString //test_ref/occ/defn/dateWithString //test_ref/occ/macro/dateWithString //test_ref/doc/anysymbol/dateWithString" machineGenerated="true" --><span class="function">dateWithString</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSString //test_ref/occ/tdef/NSString //test_ref/occ/tag/NSString //test_ref/occ/struct/NSString //test_ref/occ/intf/NSString //test_ref/doc/anysymbol/NSString" machineGenerated="true" --><span class="type">NSString</span><!-- /a --> <span class="type">*</span>)<span class="param">description</span> <!-- a logicalPath="//test_ref/occ/instm/ObjCClassOne_OCCCLASSTEST3/calendarFormat //test_ref/occ/clm/ObjCClassOne_OCCCLASSTEST3/calendarFormat //test_ref/occ/intfcm/ObjCClassOne_OCCCLASSTEST3/calendarFormat //test_ref/occ/intfm/ObjCClassOne_OCCCLASSTEST3/calendarFormat //test_ref/occ/func/calendarFormat //test_ref/occ/ftmplt/ObjCClassOne_OCCCLASSTEST3/calendarFormat //test_ref/occ/defn/calendarFormat //test_ref/occ/macro/calendarFormat //test_ref/doc/anysymbol/calendarFormat" machineGenerated="true" --><span class="function">calendarFormat</span><!-- /a -->:(<!-- a logicalPath="//test_ref/occ/cl/NSString //test_ref/occ/tdef/NSString //test_ref/occ/tag/NSString //test_ref/occ/struct/NSString //test_ref/occ/intf/NSString //test_ref/doc/anysymbol/NSString" machineGenerated="true" --><span class="type">NSString</span><!-- /a --> <span class="type">*</span>)<!-- a logicalPath="//test_ref/occ/econst/format //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/format //test_ref/occ/data/format //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/format " machineGenerated="true" --><span class="var">format</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: _titleCell (HeaderDoc::Var)
-	<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_titleCell //test_ref/occ/data/ObjCClassOne/_titleCell //test_ref/occ/data/_titleCell //test_ref/occ/clconst/ObjCClassOne/_titleCell " machineGenerated="true" --><span class="var">_titleCell</span><!-- /a -->; 
+	<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_titleCell //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_titleCell //test_ref/occ/data/_titleCell //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/_titleCell " machineGenerated="true" --><span class="var">_titleCell</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: _contentView (HeaderDoc::Var)
-	<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_contentView //test_ref/occ/data/ObjCClassOne/_contentView //test_ref/occ/data/_contentView //test_ref/occ/clconst/ObjCClassOne/_contentView " machineGenerated="true" --><span class="var">_contentView</span><!-- /a -->; 
+	<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_contentView //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_contentView //test_ref/occ/data/_contentView //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/_contentView " machineGenerated="true" --><span class="var">_contentView</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: _offsets (HeaderDoc::Var)
-	<!-- a logicalPath="//test_ref/occ/cl/NSSize //test_ref/occ/tdef/NSSize //test_ref/occ/tag/NSSize //test_ref/occ/struct/NSSize //test_ref/occ/intf/NSSize //test_ref/doc/anysymbol/NSSize" machineGenerated="true" --><span class="type">NSSize</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_offsets //test_ref/occ/data/ObjCClassOne/_offsets //test_ref/occ/data/_offsets //test_ref/occ/clconst/ObjCClassOne/_offsets " machineGenerated="true" --><span class="var">_offsets</span><!-- /a -->; 
+	<!-- a logicalPath="//test_ref/occ/cl/NSSize //test_ref/occ/tdef/NSSize //test_ref/occ/tag/NSSize //test_ref/occ/struct/NSSize //test_ref/occ/intf/NSSize //test_ref/doc/anysymbol/NSSize" machineGenerated="true" --><span class="type">NSSize</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_offsets //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_offsets //test_ref/occ/data/_offsets //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/_offsets " machineGenerated="true" --><span class="var">_offsets</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: _borderRect (HeaderDoc::Var)
-	<!-- a logicalPath="//test_ref/occ/cl/NSRect //test_ref/occ/tdef/NSRect //test_ref/occ/tag/NSRect //test_ref/occ/struct/NSRect //test_ref/occ/intf/NSRect //test_ref/doc/anysymbol/NSRect" machineGenerated="true" --><span class="type">NSRect</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_borderRect //test_ref/occ/data/ObjCClassOne/_borderRect //test_ref/occ/data/_borderRect //test_ref/occ/clconst/ObjCClassOne/_borderRect " machineGenerated="true" --><span class="var">_borderRect</span><!-- /a -->; 
+	<!-- a logicalPath="//test_ref/occ/cl/NSRect //test_ref/occ/tdef/NSRect //test_ref/occ/tag/NSRect //test_ref/occ/struct/NSRect //test_ref/occ/intf/NSRect //test_ref/doc/anysymbol/NSRect" machineGenerated="true" --><span class="type">NSRect</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_borderRect //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_borderRect //test_ref/occ/data/_borderRect //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/_borderRect " machineGenerated="true" --><span class="var">_borderRect</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: _titleRect (HeaderDoc::Var)
-	<!-- a logicalPath="//test_ref/occ/cl/NSRect //test_ref/occ/tdef/NSRect //test_ref/occ/tag/NSRect //test_ref/occ/struct/NSRect //test_ref/occ/intf/NSRect //test_ref/doc/anysymbol/NSRect" machineGenerated="true" --><span class="type">NSRect</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_titleRect //test_ref/occ/data/ObjCClassOne/_titleRect //test_ref/occ/data/_titleRect //test_ref/occ/clconst/ObjCClassOne/_titleRect " machineGenerated="true" --><span class="var">_titleRect</span><!-- /a -->; 
+	<!-- a logicalPath="//test_ref/occ/cl/NSRect //test_ref/occ/tdef/NSRect //test_ref/occ/tag/NSRect //test_ref/occ/struct/NSRect //test_ref/occ/intf/NSRect //test_ref/doc/anysymbol/NSRect" machineGenerated="true" --><span class="type">NSRect</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_titleRect //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_titleRect //test_ref/occ/data/_titleRect //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/_titleRect " machineGenerated="true" --><span class="var">_titleRect</span><!-- /a -->; 
 END OF OBJECT
 
 
 OBJECT: _unused (HeaderDoc::Var)
-	<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_unused //test_ref/occ/data/ObjCClassOne/_unused //test_ref/occ/data/_unused //test_ref/occ/clconst/ObjCClassOne/_unused " machineGenerated="true" --><span class="var">_unused</span><!-- /a -->; 
+	<!-- a logicalPath="//test_ref/occ/cl/id //test_ref/occ/tdef/id //test_ref/occ/tag/id //test_ref/occ/struct/id //test_ref/occ/intf/id //test_ref/doc/anysymbol/id" machineGenerated="true" --><span class="type">id</span><!-- /a --> <!-- a logicalPath="//test_ref/occ/econst/_unused //test_ref/occ/data/ObjCClassOne_OCCCLASSTEST3/_unused //test_ref/occ/data/_unused //test_ref/occ/clconst/ObjCClassOne_OCCCLASSTEST3/_unused " machineGenerated="true" --><span class="var">_unused</span><!-- /a -->; 
 END OF OBJECT
 
 
 
-_$94|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/ObjC_class_3.test$1|C$12|ObjC class 3$1|C$6|parser
+_$17|ObjC_class_3.test$1|C$12|ObjC class 3$1|C$6|parser

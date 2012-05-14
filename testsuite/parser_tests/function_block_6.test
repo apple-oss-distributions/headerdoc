@@ -1,4 +1,4 @@
-FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$573|class foo : public IOService
+FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$591|class function_block_6_test : public IOService
 {
         /*! @function
                 First one
@@ -26,7 +26,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
         char *another_hidden_function(char *this_function_also_should_not_appear);
 };
 $24|/*! This is a class. */
-$0|$30957|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$31488|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -68,7 +68,7 @@ $parserState->{categoryClass} =>
 $parserState->{classNameFound} => 1
 $parserState->{classtype} => class
 $parserState->{forceClassDone} => 1
-$parserState->{forceClassName} => foo
+$parserState->{forceClassName} => function_block_6_test
 $parserState->{forceClassSuper} =>  public IOService 
 $parserState->{freezeStack} => ARRAY(OBJID)
 $parserState->{freezereturn} => 1
@@ -113,7 +113,7 @@ $parserState->{preTemplateSymbol} =>
 $parserState->{preclasssodtype} => class
 $parserState->{prekeywordsodname} => 
 $parserState->{prekeywordsodtype} => 
-$parserState->{returntype} => class foo : public IOService  
+$parserState->{returntype} => class function_block_6_test : public IOService  
 $parserState->{seenBraces} => 0
 $parserState->{seenMacroPart} => 0
 $parserState->{seenTilde} => 0
@@ -134,7 +134,7 @@ $parserState->{valuepending} => 0
 -=: BLOCKPARSE RETURN VALUES :=-
 newcount: 23
 typelist: class
-namelist: foo
+namelist: function_block_6_test
 posstypes:   IOService 
 value: 
 returntype: public
@@ -150,7 +150,7 @@ implementsClass:
 -=: DUMP OF PARSE TREE :=-
 +---class
 +--- 
-+---foo
++---function_block_6_test
 +--- 
 +---:
 +--- 
@@ -364,8 +364,8 @@ LONG ATTRIBUTES:
     INDEX GROUP: 
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
-    NAME: foo
-    APIUID: 
+    NAME: function_block_6_test
+    APIUID: //test_ref/cpp/cl/function_block_6_test
     ABSTRACT: ""
     DISCUSSION: "<p>This is a class. "
     UPDATED: ""
@@ -410,7 +410,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Function
         NAME: first_func
-        APIUID: //test_ref/cpp/instm/foo/first_func/char*/(void*)
+        APIUID: //test_ref/cpp/instm/function_block_6_test/first_func/char*/(void*)
         ABSTRACT: ""
         DISCUSSION: "<p>First one
 "
@@ -424,7 +424,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -495,7 +495,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Function
         NAME: second_func
-        APIUID: //test_ref/cpp/instm/foo/second_func/char*/(void*)
+        APIUID: //test_ref/cpp/instm/function_block_6_test/second_func/char*/(void*)
         ABSTRACT: ""
         DISCUSSION: "<p>second one
 "
@@ -509,7 +509,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -576,10 +576,10 @@ LONG ATTRIBUTES:
             SHORT ATTRIBUTES: 
             LONG ATTRIBUTES: 
 -=: NAMED OBJECT PARSE TREES :=-
-OBJECT: foo (HeaderDoc::CPPClass)
+OBJECT: function_block_6_test (HeaderDoc::CPPClass)
 +---class
 +--- 
-+---foo
++---function_block_6_test
 +--- 
 +---:
 +--- 
@@ -950,8 +950,8 @@ END OF OBJECT
 
 
 -=: HTML OUTPUT OF PARSE TREES :=-
-OBJECT: foo (HeaderDoc::CPPClass)
-	<span class="keyword">class</span> <!-- a logicalPath="//test_ref/cpp/cl/foo //test_ref/cpp/tdef/foo //test_ref/cpp/tag/foo //test_ref/cpp/struct/foo //test_ref/cpp/intf/foo //test_ref/doc/anysymbol/foo" machineGenerated="true" --><span class="type">foo</span><!-- /a --> : <span class="keyword">public</span> <!-- a logicalPath="//test_ref/cpp/cl/IOService //test_ref/cpp/tdef/IOService //test_ref/cpp/tag/IOService //test_ref/cpp/struct/IOService //test_ref/cpp/intf/IOService //test_ref/doc/anysymbol/IOService" machineGenerated="true" --><span class="type">IOService</span><!-- /a --> { 
+OBJECT: function_block_6_test (HeaderDoc::CPPClass)
+	<span class="keyword">class</span> <!-- a logicalPath="//test_ref/cpp/cl/function_block_6_test //test_ref/cpp/tdef/function_block_6_test //test_ref/cpp/tag/function_block_6_test //test_ref/cpp/struct/function_block_6_test //test_ref/cpp/intf/function_block_6_test //test_ref/doc/anysymbol/function_block_6_test" machineGenerated="true" --><span class="type">function_block_6_test</span><!-- /a --> : <span class="keyword">public</span> <!-- a logicalPath="//test_ref/cpp/cl/IOService //test_ref/cpp/tdef/IOService //test_ref/cpp/tag/IOService //test_ref/cpp/struct/IOService //test_ref/cpp/intf/IOService //test_ref/doc/anysymbol/IOService" machineGenerated="true" --><span class="type">IOService</span><!-- /a --> { 
 	    <span class="comment">/*! @function
 	First one</span>
 	        <span class="comment">*/</span>
@@ -985,19 +985,19 @@ END OF OBJECT
 
 
 OBJECT: first_func (HeaderDoc::Function)
-	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/foo/first_func //test_ref/cpp/clm/foo/first_func //test_ref/cpp/intfcm/foo/first_func //test_ref/cpp/intfm/foo/first_func //test_ref/cpp/func/first_func //test_ref/cpp/ftmplt/foo/first_func //test_ref/cpp/defn/first_func //test_ref/cpp/macro/first_func //test_ref/doc/anysymbol/first_func" machineGenerated="true" --><span class="function">first_func</span><!-- /a -->(
+	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/function_block_6_test/first_func //test_ref/cpp/clm/function_block_6_test/first_func //test_ref/cpp/intfcm/function_block_6_test/first_func //test_ref/cpp/intfm/function_block_6_test/first_func //test_ref/cpp/func/first_func //test_ref/cpp/ftmplt/function_block_6_test/first_func //test_ref/cpp/defn/first_func //test_ref/cpp/macro/first_func //test_ref/doc/anysymbol/first_func" machineGenerated="true" --><span class="function">first_func</span><!-- /a -->(
 	    <!-- a logicalPath="//test_ref/cpp/cl/void //test_ref/cpp/tdef/void //test_ref/cpp/tag/void //test_ref/cpp/struct/void //test_ref/cpp/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a --> <span class="type">*</span><span class="param">x</span>); 
 END OF OBJECT
 
 
 OBJECT: second_func (HeaderDoc::Function)
-	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/foo/second_func //test_ref/cpp/clm/foo/second_func //test_ref/cpp/intfcm/foo/second_func //test_ref/cpp/intfm/foo/second_func //test_ref/cpp/func/second_func //test_ref/cpp/ftmplt/foo/second_func //test_ref/cpp/defn/second_func //test_ref/cpp/macro/second_func //test_ref/doc/anysymbol/second_func" machineGenerated="true" --><span class="function">second_func</span><!-- /a -->(
+	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/function_block_6_test/second_func //test_ref/cpp/clm/function_block_6_test/second_func //test_ref/cpp/intfcm/function_block_6_test/second_func //test_ref/cpp/intfm/function_block_6_test/second_func //test_ref/cpp/func/second_func //test_ref/cpp/ftmplt/function_block_6_test/second_func //test_ref/cpp/defn/second_func //test_ref/cpp/macro/second_func //test_ref/doc/anysymbol/second_func" machineGenerated="true" --><span class="function">second_func</span><!-- /a -->(
 	    <!-- a logicalPath="//test_ref/cpp/cl/void //test_ref/cpp/tdef/void //test_ref/cpp/tag/void //test_ref/cpp/struct/void //test_ref/cpp/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a --> <span class="type">*</span><span class="param">x</span>); 
 END OF OBJECT
 
 
 
-$56706|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$57903|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -1039,7 +1039,7 @@ $parserState->{categoryClass} =>
 $parserState->{classNameFound} => 1
 $parserState->{classtype} => class
 $parserState->{forceClassDone} => 1
-$parserState->{forceClassName} => foo
+$parserState->{forceClassName} => function_block_6_test
 $parserState->{forceClassSuper} =>  public IOService 
 $parserState->{freezeStack} => ARRAY(OBJID)
 $parserState->{freezereturn} => 1
@@ -1084,7 +1084,7 @@ $parserState->{preTemplateSymbol} =>
 $parserState->{preclasssodtype} => class
 $parserState->{prekeywordsodname} => 
 $parserState->{prekeywordsodtype} => 
-$parserState->{returntype} => class foo : public IOService  
+$parserState->{returntype} => class function_block_6_test : public IOService  
 $parserState->{seenBraces} => 0
 $parserState->{seenMacroPart} => 0
 $parserState->{seenTilde} => 0
@@ -1105,7 +1105,7 @@ $parserState->{valuepending} => 0
 -=: BLOCKPARSE RETURN VALUES :=-
 newcount: 23
 typelist: class
-namelist: foo
+namelist: function_block_6_test
 posstypes:   IOService 
 value: 
 returntype: public
@@ -1121,7 +1121,7 @@ implementsClass:
 -=: DUMP OF PARSE TREE :=-
 +---class
 +--- 
-+---foo
++---function_block_6_test
 +--- 
 +---:
 +--- 
@@ -1335,8 +1335,8 @@ LONG ATTRIBUTES:
     INDEX GROUP: 
     IS BLOCK: 
     OBJECT TYPE: HeaderDoc::CPPClass
-    NAME: foo
-    APIUID: 
+    NAME: function_block_6_test
+    APIUID: //test_ref/cpp/cl/function_block_6_test
     ABSTRACT: ""
     DISCUSSION: "<p>This is a class. "
     UPDATED: ""
@@ -1381,7 +1381,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Function
         NAME: first_func
-        APIUID: //test_ref/cpp/instm/foo/first_func/char*/(void*)
+        APIUID: //test_ref/cpp/instm/function_block_6_test/first_func/char*/(void*)
         ABSTRACT: ""
         DISCUSSION: "<p>First one
 "
@@ -1395,7 +1395,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1466,7 +1466,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Function
         NAME: first_func
-        APIUID: //test_ref/cpp/instm/foo/first_func/char*/(long)
+        APIUID: //test_ref/cpp/instm/function_block_6_test/first_func/char*/(long)
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -1479,7 +1479,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1550,7 +1550,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Function
         NAME: first_func64
-        APIUID: //test_ref/cpp/instm/foo/first_func64/char*/(void*)
+        APIUID: //test_ref/cpp/instm/function_block_6_test/first_func64/char*/(void*)
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -1563,7 +1563,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1634,7 +1634,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Function
         NAME: hidden_2
-        APIUID: //test_ref/cpp/instm/foo/hidden_2/int/(int)
+        APIUID: //test_ref/cpp/instm/function_block_6_test/hidden_2/int/(int)
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -1647,7 +1647,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1718,7 +1718,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Function
         NAME: second_func
-        APIUID: //test_ref/cpp/instm/foo/second_func/char*/(void*)
+        APIUID: //test_ref/cpp/instm/function_block_6_test/second_func/char*/(void*)
         ABSTRACT: ""
         DISCUSSION: "<p>second one
 "
@@ -1732,7 +1732,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1803,7 +1803,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Function
         NAME: second_func64
-        APIUID: //test_ref/cpp/instm/foo/second_func64/char*/(void*)
+        APIUID: //test_ref/cpp/instm/function_block_6_test/second_func64/char*/(void*)
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -1816,7 +1816,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1887,7 +1887,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Function
         NAME: second_func
-        APIUID: //test_ref/cpp/instm/foo/second_func/char*/(long)
+        APIUID: //test_ref/cpp/instm/function_block_6_test/second_func/char*/(long)
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -1900,7 +1900,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1971,7 +1971,7 @@ LONG ATTRIBUTES:
         IS BLOCK: 
         OBJECT TYPE: HeaderDoc::Function
         NAME: another_hidden_function
-        APIUID: //test_ref/cpp/instm/foo/another_hidden_function/char*/(char*)
+        APIUID: //test_ref/cpp/instm/function_block_6_test/another_hidden_function/char*/(char*)
         ABSTRACT: ""
         DISCUSSION: "<p></p>"
         UPDATED: ""
@@ -1984,7 +1984,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "public"
+        ACCESSCONTROL: "protected"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -2051,10 +2051,10 @@ LONG ATTRIBUTES:
             SHORT ATTRIBUTES: 
             LONG ATTRIBUTES: 
 -=: NAMED OBJECT PARSE TREES :=-
-OBJECT: foo (HeaderDoc::CPPClass)
+OBJECT: function_block_6_test (HeaderDoc::CPPClass)
 +---class
 +--- 
-+---foo
++---function_block_6_test
 +--- 
 +---:
 +--- 
@@ -2854,8 +2854,8 @@ END OF OBJECT
 
 
 -=: HTML OUTPUT OF PARSE TREES :=-
-OBJECT: foo (HeaderDoc::CPPClass)
-	<span class="keyword">class</span> <!-- a logicalPath="//test_ref/cpp/cl/foo //test_ref/cpp/tdef/foo //test_ref/cpp/tag/foo //test_ref/cpp/struct/foo //test_ref/cpp/intf/foo //test_ref/doc/anysymbol/foo" machineGenerated="true" --><span class="type">foo</span><!-- /a --> : <span class="keyword">public</span> <!-- a logicalPath="//test_ref/cpp/cl/IOService //test_ref/cpp/tdef/IOService //test_ref/cpp/tag/IOService //test_ref/cpp/struct/IOService //test_ref/cpp/intf/IOService //test_ref/doc/anysymbol/IOService" machineGenerated="true" --><span class="type">IOService</span><!-- /a --> { 
+OBJECT: function_block_6_test (HeaderDoc::CPPClass)
+	<span class="keyword">class</span> <!-- a logicalPath="//test_ref/cpp/cl/function_block_6_test //test_ref/cpp/tdef/function_block_6_test //test_ref/cpp/tag/function_block_6_test //test_ref/cpp/struct/function_block_6_test //test_ref/cpp/intf/function_block_6_test //test_ref/doc/anysymbol/function_block_6_test" machineGenerated="true" --><span class="type">function_block_6_test</span><!-- /a --> : <span class="keyword">public</span> <!-- a logicalPath="//test_ref/cpp/cl/IOService //test_ref/cpp/tdef/IOService //test_ref/cpp/tag/IOService //test_ref/cpp/struct/IOService //test_ref/cpp/intf/IOService //test_ref/doc/anysymbol/IOService" machineGenerated="true" --><span class="type">IOService</span><!-- /a --> { 
 	    <span class="comment">/*! @function
 	First one</span>
 	        <span class="comment">*/</span>
@@ -2889,52 +2889,52 @@ END OF OBJECT
 
 
 OBJECT: first_func (HeaderDoc::Function)
-	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/foo/first_func //test_ref/cpp/clm/foo/first_func //test_ref/cpp/intfcm/foo/first_func //test_ref/cpp/intfm/foo/first_func //test_ref/cpp/func/first_func //test_ref/cpp/ftmplt/foo/first_func //test_ref/cpp/defn/first_func //test_ref/cpp/macro/first_func //test_ref/doc/anysymbol/first_func" machineGenerated="true" --><span class="function">first_func</span><!-- /a -->(
+	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/function_block_6_test/first_func //test_ref/cpp/clm/function_block_6_test/first_func //test_ref/cpp/intfcm/function_block_6_test/first_func //test_ref/cpp/intfm/function_block_6_test/first_func //test_ref/cpp/func/first_func //test_ref/cpp/ftmplt/function_block_6_test/first_func //test_ref/cpp/defn/first_func //test_ref/cpp/macro/first_func //test_ref/doc/anysymbol/first_func" machineGenerated="true" --><span class="function">first_func</span><!-- /a -->(
 	    <!-- a logicalPath="//test_ref/cpp/cl/void //test_ref/cpp/tdef/void //test_ref/cpp/tag/void //test_ref/cpp/struct/void //test_ref/cpp/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a --> <span class="type">*</span><span class="param">x</span>); 
 END OF OBJECT
 
 
 OBJECT: first_func (HeaderDoc::Function)
-	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/foo/first_func //test_ref/cpp/clm/foo/first_func //test_ref/cpp/intfcm/foo/first_func //test_ref/cpp/intfm/foo/first_func //test_ref/cpp/func/first_func //test_ref/cpp/ftmplt/foo/first_func //test_ref/cpp/defn/first_func //test_ref/cpp/macro/first_func //test_ref/doc/anysymbol/first_func" machineGenerated="true" --><span class="function">first_func</span><!-- /a -->(
+	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/function_block_6_test/first_func //test_ref/cpp/clm/function_block_6_test/first_func //test_ref/cpp/intfcm/function_block_6_test/first_func //test_ref/cpp/intfm/function_block_6_test/first_func //test_ref/cpp/func/first_func //test_ref/cpp/ftmplt/function_block_6_test/first_func //test_ref/cpp/defn/first_func //test_ref/cpp/macro/first_func //test_ref/doc/anysymbol/first_func" machineGenerated="true" --><span class="function">first_func</span><!-- /a -->(
 	    <!-- a logicalPath="//test_ref/cpp/cl/long //test_ref/cpp/tdef/long //test_ref/cpp/tag/long //test_ref/cpp/struct/long //test_ref/cpp/intf/long //test_ref/doc/anysymbol/long" machineGenerated="true" --><span class="type">long</span><!-- /a --> <span class="param">x</span>); 
 END OF OBJECT
 
 
 OBJECT: first_func64 (HeaderDoc::Function)
-	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/foo/first_func64 //test_ref/cpp/clm/foo/first_func64 //test_ref/cpp/intfcm/foo/first_func64 //test_ref/cpp/intfm/foo/first_func64 //test_ref/cpp/func/first_func64 //test_ref/cpp/ftmplt/foo/first_func64 //test_ref/cpp/defn/first_func64 //test_ref/cpp/macro/first_func64 //test_ref/doc/anysymbol/first_func64" machineGenerated="true" --><span class="function">first_func64</span><!-- /a -->(
+	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/function_block_6_test/first_func64 //test_ref/cpp/clm/function_block_6_test/first_func64 //test_ref/cpp/intfcm/function_block_6_test/first_func64 //test_ref/cpp/intfm/function_block_6_test/first_func64 //test_ref/cpp/func/first_func64 //test_ref/cpp/ftmplt/function_block_6_test/first_func64 //test_ref/cpp/defn/first_func64 //test_ref/cpp/macro/first_func64 //test_ref/doc/anysymbol/first_func64" machineGenerated="true" --><span class="function">first_func64</span><!-- /a -->(
 	    <!-- a logicalPath="//test_ref/cpp/cl/void //test_ref/cpp/tdef/void //test_ref/cpp/tag/void //test_ref/cpp/struct/void //test_ref/cpp/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a --> <span class="type">*</span><span class="param">x</span>); 
 END OF OBJECT
 
 
 OBJECT: hidden_2 (HeaderDoc::Function)
-	<!-- a logicalPath="//test_ref/cpp/cl/int //test_ref/cpp/tdef/int //test_ref/cpp/tag/int //test_ref/cpp/struct/int //test_ref/cpp/intf/int //test_ref/doc/anysymbol/int" machineGenerated="true" --><span class="type">int</span><!-- /a --> <!-- a logicalPath="//test_ref/cpp/instm/foo/hidden_2 //test_ref/cpp/clm/foo/hidden_2 //test_ref/cpp/intfcm/foo/hidden_2 //test_ref/cpp/intfm/foo/hidden_2 //test_ref/cpp/func/hidden_2 //test_ref/cpp/ftmplt/foo/hidden_2 //test_ref/cpp/defn/hidden_2 //test_ref/cpp/macro/hidden_2 //test_ref/doc/anysymbol/hidden_2" machineGenerated="true" --><span class="function">hidden_2</span><!-- /a -->(
+	<!-- a logicalPath="//test_ref/cpp/cl/int //test_ref/cpp/tdef/int //test_ref/cpp/tag/int //test_ref/cpp/struct/int //test_ref/cpp/intf/int //test_ref/doc/anysymbol/int" machineGenerated="true" --><span class="type">int</span><!-- /a --> <!-- a logicalPath="//test_ref/cpp/instm/function_block_6_test/hidden_2 //test_ref/cpp/clm/function_block_6_test/hidden_2 //test_ref/cpp/intfcm/function_block_6_test/hidden_2 //test_ref/cpp/intfm/function_block_6_test/hidden_2 //test_ref/cpp/func/hidden_2 //test_ref/cpp/ftmplt/function_block_6_test/hidden_2 //test_ref/cpp/defn/hidden_2 //test_ref/cpp/macro/hidden_2 //test_ref/doc/anysymbol/hidden_2" machineGenerated="true" --><span class="function">hidden_2</span><!-- /a -->(
 	    <!-- a logicalPath="//test_ref/cpp/cl/int //test_ref/cpp/tdef/int //test_ref/cpp/tag/int //test_ref/cpp/struct/int //test_ref/cpp/intf/int //test_ref/doc/anysymbol/int" machineGenerated="true" --><span class="type">int</span><!-- /a --> <span class="param">this_function_should_not_appear_either</span>); 
 END OF OBJECT
 
 
 OBJECT: second_func (HeaderDoc::Function)
-	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/foo/second_func //test_ref/cpp/clm/foo/second_func //test_ref/cpp/intfcm/foo/second_func //test_ref/cpp/intfm/foo/second_func //test_ref/cpp/func/second_func //test_ref/cpp/ftmplt/foo/second_func //test_ref/cpp/defn/second_func //test_ref/cpp/macro/second_func //test_ref/doc/anysymbol/second_func" machineGenerated="true" --><span class="function">second_func</span><!-- /a -->(
+	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/function_block_6_test/second_func //test_ref/cpp/clm/function_block_6_test/second_func //test_ref/cpp/intfcm/function_block_6_test/second_func //test_ref/cpp/intfm/function_block_6_test/second_func //test_ref/cpp/func/second_func //test_ref/cpp/ftmplt/function_block_6_test/second_func //test_ref/cpp/defn/second_func //test_ref/cpp/macro/second_func //test_ref/doc/anysymbol/second_func" machineGenerated="true" --><span class="function">second_func</span><!-- /a -->(
 	    <!-- a logicalPath="//test_ref/cpp/cl/void //test_ref/cpp/tdef/void //test_ref/cpp/tag/void //test_ref/cpp/struct/void //test_ref/cpp/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a --> <span class="type">*</span><span class="param">x</span>); 
 END OF OBJECT
 
 
 OBJECT: second_func64 (HeaderDoc::Function)
-	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/foo/second_func64 //test_ref/cpp/clm/foo/second_func64 //test_ref/cpp/intfcm/foo/second_func64 //test_ref/cpp/intfm/foo/second_func64 //test_ref/cpp/func/second_func64 //test_ref/cpp/ftmplt/foo/second_func64 //test_ref/cpp/defn/second_func64 //test_ref/cpp/macro/second_func64 //test_ref/doc/anysymbol/second_func64" machineGenerated="true" --><span class="function">second_func64</span><!-- /a -->(
+	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/function_block_6_test/second_func64 //test_ref/cpp/clm/function_block_6_test/second_func64 //test_ref/cpp/intfcm/function_block_6_test/second_func64 //test_ref/cpp/intfm/function_block_6_test/second_func64 //test_ref/cpp/func/second_func64 //test_ref/cpp/ftmplt/function_block_6_test/second_func64 //test_ref/cpp/defn/second_func64 //test_ref/cpp/macro/second_func64 //test_ref/doc/anysymbol/second_func64" machineGenerated="true" --><span class="function">second_func64</span><!-- /a -->(
 	    <!-- a logicalPath="//test_ref/cpp/cl/void //test_ref/cpp/tdef/void //test_ref/cpp/tag/void //test_ref/cpp/struct/void //test_ref/cpp/intf/void //test_ref/doc/anysymbol/void" machineGenerated="true" --><span class="type">void</span><!-- /a --> <span class="type">*</span><span class="param">x</span>); 
 END OF OBJECT
 
 
 OBJECT: second_func (HeaderDoc::Function)
-	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/foo/second_func //test_ref/cpp/clm/foo/second_func //test_ref/cpp/intfcm/foo/second_func //test_ref/cpp/intfm/foo/second_func //test_ref/cpp/func/second_func //test_ref/cpp/ftmplt/foo/second_func //test_ref/cpp/defn/second_func //test_ref/cpp/macro/second_func //test_ref/doc/anysymbol/second_func" machineGenerated="true" --><span class="function">second_func</span><!-- /a -->(
+	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/function_block_6_test/second_func //test_ref/cpp/clm/function_block_6_test/second_func //test_ref/cpp/intfcm/function_block_6_test/second_func //test_ref/cpp/intfm/function_block_6_test/second_func //test_ref/cpp/func/second_func //test_ref/cpp/ftmplt/function_block_6_test/second_func //test_ref/cpp/defn/second_func //test_ref/cpp/macro/second_func //test_ref/doc/anysymbol/second_func" machineGenerated="true" --><span class="function">second_func</span><!-- /a -->(
 	    <!-- a logicalPath="//test_ref/cpp/cl/long //test_ref/cpp/tdef/long //test_ref/cpp/tag/long //test_ref/cpp/struct/long //test_ref/cpp/intf/long //test_ref/doc/anysymbol/long" machineGenerated="true" --><span class="type">long</span><!-- /a --> <span class="param">x</span>); 
 END OF OBJECT
 
 
 OBJECT: another_hidden_function (HeaderDoc::Function)
-	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/foo/another_hidden_function //test_ref/cpp/clm/foo/another_hidden_function //test_ref/cpp/intfcm/foo/another_hidden_function //test_ref/cpp/intfm/foo/another_hidden_function //test_ref/cpp/func/another_hidden_function //test_ref/cpp/ftmplt/foo/another_hidden_function //test_ref/cpp/defn/another_hidden_function //test_ref/cpp/macro/another_hidden_function //test_ref/doc/anysymbol/another_hidden_function" machineGenerated="true" --><span class="function">another_hidden_function</span><!-- /a -->(
+	<!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><!-- a logicalPath="//test_ref/cpp/instm/function_block_6_test/another_hidden_function //test_ref/cpp/clm/function_block_6_test/another_hidden_function //test_ref/cpp/intfcm/function_block_6_test/another_hidden_function //test_ref/cpp/intfm/function_block_6_test/another_hidden_function //test_ref/cpp/func/another_hidden_function //test_ref/cpp/ftmplt/function_block_6_test/another_hidden_function //test_ref/cpp/defn/another_hidden_function //test_ref/cpp/macro/another_hidden_function //test_ref/doc/anysymbol/another_hidden_function" machineGenerated="true" --><span class="function">another_hidden_function</span><!-- /a -->(
 	    <!-- a logicalPath="//test_ref/cpp/cl/char //test_ref/cpp/tdef/char //test_ref/cpp/tag/char //test_ref/cpp/struct/char //test_ref/cpp/intf/char //test_ref/doc/anysymbol/char" machineGenerated="true" --><span class="type">char</span><!-- /a --> <span class="type">*</span><span class="param">this_function_also_should_not_appear</span>); 
 END OF OBJECT
 
 
 
-_$98|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/function_block_6.test$1|C$16|function block 6$1|C$6|parser
+_$21|function_block_6.test$1|C$16|function block 6$1|C$6|parser
