@@ -3,7 +3,7 @@
 # Class name: HeaderElement
 # Synopsis: Root class for Function, Typedef, Constant, etc. -- used by HeaderDoc.
 #
-# Last Updated: $Date: 2012/04/06 15:46:10 $
+# Last Updated: $Date: 2012/06/29 16:13:19 $
 #
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -361,7 +361,7 @@ use Devel::Peek;
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::HeaderElement::VERSION = '$Revision: 1333752370 $';
+$HeaderDoc::HeaderElement::VERSION = '$Revision: 1341011599 $';
 
 # /*!
 #     @abstract
@@ -6596,12 +6596,16 @@ sub XMLdocumentationBlock {
 	};
     }
 
+    my $indexgroup = $self->indexgroup();
+
     my $throws = $self->XMLthrows();
     $compositePageString .= "<$type id=\"$uid\" $defineinfo"."lang=\"$langstring\"$extra$accessControl$optionalOrRequired>"; # e.g. "<class type=\"C++\">";
 
     if (length($name)) {
 	$compositePageString .= "<name>$name</name>\n";
     }
+
+    if ($indexgroup =~ /\S/) { $compositePageString .= "<indexgroup>".textToXML($indexgroup)."</indexgroup>"; }
 
     if (length($abstract)) {
 	$compositePageString .= "<abstract>$abstract</abstract>\n";
@@ -7682,6 +7686,21 @@ sub processComment
 			$top_level_field = 0;
 		} elsif ($top_level_field && $seen_top_level_field && ($fieldname eq "var")) {
 			$top_level_field = 0;
+		}
+
+		# Fix for another common mistake: people using @field for a class
+		# member variable instead of @var or @const.
+		if ($class =~ /HeaderDoc\:\:Var/ && !$isProperty) {
+			if (!$seen_top_level_field && $fieldname eq "field") {
+				if ($sublang !~ /^occ/o) {
+					warn "Field \@$fieldname found in \@var declaration.\nYou probably meant \@var instead.\n" if (!$HeaderDoc::running_test);
+					$field =~ s/^(\w+)(\s)//s;
+					my $spc = $2;
+
+					$field = "var$spc$field";
+					$top_level_field = 1;
+				}
+			}
 		}
 	}
 	# warn("FN: \"$fieldname\"\n");

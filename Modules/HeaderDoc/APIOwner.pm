@@ -3,7 +3,7 @@
 # Class name: APIOwner
 # Synopsis: Abstract superclass for Header and OO structures
 #
-# Last Updated: $Date: 2012/04/12 13:06:40 $
+# Last Updated: $Date: 2012/06/19 16:53:38 $
 # 
 # Method additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -230,7 +230,7 @@ use vars qw(@ISA);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::APIOwner::VERSION = '$Revision: 1334261200 $';
+$HeaderDoc::APIOwner::VERSION = '$Revision: 1340150018 $';
 
 my $addToDebug = 0;
 
@@ -7294,7 +7294,7 @@ sub groupDoc()
 				my $desc = $group->discussion();
 				if ($xml) {
 					$string .= "<groupinfo>\n";
-					$string .= "<name>$groupname</name>\n";
+					$string .= "<name>".$self->textToXML($groupname)."</name>\n";
 					if ($abs =~ /\S/) {
 						$string .= "<abstract>".$self->htmlToXML($abs)."</abstract>";
 					}
