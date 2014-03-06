@@ -3,7 +3,7 @@
 # Class name: APIOwner
 # Synopsis: Abstract superclass for Header and OO structures
 #
-# Last Updated: $Date: 2013/04/26 16:22:31 $
+# Last Updated: $Date: 2014/02/25 14:46:13 $
 # 
 # Method additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -213,7 +213,6 @@ BEGIN {
 }
 use HeaderDoc::HeaderElement;
 use HeaderDoc::Group;
-use HeaderDoc::DBLookup;
 use HeaderDoc::Utilities qw(findRelativePath safeName getAPINameAndDisc printArray printHash resolveLink sanitize dereferenceUIDObject validTag objName byLinkage byAccessControl objGroup linkageAndObjName byMethodType html_fixup_links xml_fixup_links calcDepth);
 use HeaderDoc::BlockParse qw(blockParseOutside);
 use File::Basename;
@@ -230,7 +229,7 @@ use vars qw(@ISA);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::APIOwner::VERSION = '$Revision: 1367018551 $';
+$HeaderDoc::APIOwner::VERSION = '$Revision: 1393368373 $';
 
 my $addToDebug = 0;
 
@@ -4674,6 +4673,33 @@ sub _getFunctionXMLDetailString {
     return $contentString;
 }
 
+# /*!
+#     @abstract
+#         Returns the XML content string for classes in this class or header.
+#     @param self
+#         The <code>APIOwner</code> object.
+#     @discussion
+#         Called by {@link _getXMLPageString}.
+#  */
+sub _getEmbeddedClassXMLDetailString {
+    my $self = shift;
+    my $classObjsRef = shift;
+    my @classObjs = @{$classObjsRef};
+    my $contentString = "";
+
+    my @tempobjs = ();
+    if (!$self->unsorted()) {
+	@tempobjs = sort objName @classObjs;
+    } else {
+	@tempobjs = @classObjs;
+    }
+    foreach my $obj (@tempobjs) {
+	# print STDERR "outputting class ".$obj->name.".";
+	my $documentationBlock = $obj->XMLdocumentationBlock();
+	$contentString .= $documentationBlock;
+    }
+    return $contentString;
+}
 
 # /*!
 #     @abstract
@@ -5736,8 +5762,8 @@ sub _createXMLOutputFile {
 		$doctype = "framework";
 	}
 
-	# print OUTFILE "<!DOCTYPE $doctype PUBLIC \"-//Apple Computer//DTD HEADERDOC 1.0//EN\" \"http://www.apple.com/DTDs/HeaderDoc-1.2.dtd\">\n";
-	print OUTFILE "<!DOCTYPE $doctype PUBLIC \"-//Apple Computer//DTD HEADERDOC 1.2//EN\" \"/System/Library/DTDs/HeaderDoc-1.2.dtd\">\n";
+	# print OUTFILE "<!DOCTYPE $doctype PUBLIC \"-//Apple Computer//DTD HEADERDOC 1.6//EN\" \"http://www.apple.com/DTDs/HeaderDoc-1.6.dtd\">\n";
+	print OUTFILE "<!DOCTYPE $doctype PUBLIC \"-//Apple Computer//DTD HEADERDOC 1.6//EN\" \"/System/Library/DTDs/HeaderDoc-1.6.dtd\">\n";
 	# print OUTFILE "<header filename=\"$heading\" headerpath=\"$fullpath\" headerclass=\"\">";
 	# print OUTFILE "<name>$heading</name>\n";
 
@@ -6738,6 +6764,10 @@ sub processComment
 
 		# @@@ FIXME DAG
 		my $cppAccessControlState = "protected:";
+
+		if ($sublang eq "IDL") {
+			$cppAccessControlState = "public:"; # IDLs have no notion of protection, typically.
+		}
 
 		my $fieldsref = \@fields;
 		my $filename = $self->filename;

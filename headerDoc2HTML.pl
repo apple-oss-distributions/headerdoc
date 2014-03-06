@@ -4,7 +4,7 @@
 # Synopsis: Scans a file for headerDoc comments and generates an HTML
 #           file from the comments it finds.
 #
-# Last Updated: $Date: 2012/10/11 17:47:41 $
+# Last Updated: $Date: 2014/02/14 17:55:29 $
 #
 # ObjC additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -29,7 +29,7 @@
 #
 # @APPLE_LICENSE_HEADER_END@
 #
-# $Revision: 1350002861 $
+# $Revision: 1392429329 $
 #####################################################################
 
 
@@ -61,7 +61,7 @@ my $HeaderDoc_Version = "8.9";
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-my $VERSION = '$Revision: 1350002861 $';
+my $VERSION = '$Revision: 1392429329 $';
 
 # /*!
 #     @abstract
@@ -1133,6 +1133,7 @@ BEGIN {
 	$options{H} = 1;
 	$options{j} = 1;
 	$options{n} = 1;
+	$options{N} = 1;
 	$options{p} = 1;
 	$options{O} = 1;
 	$options{Q} = 1;
@@ -1611,7 +1612,6 @@ use lib $uninstalledModulesPath;
 # use Devel::Peek;
 
 # Classes and other modules specific to HeaderDoc
-# use HeaderDoc::DBLookup;
 use HeaderDoc::Utilities qw(linesFromFile emptyHDok addAvailabilityMacro);
 use HeaderDoc::Utilities qw(findRelativePath safeName
                             printArray linesFromFile printHash
@@ -2082,11 +2082,6 @@ if ($config{"superclassName"}) {
 }
 
 
-# ################ Exporting ##############################
-# if ($export || $testingExport) {
-	# HeaderDoc::DBLookup->loadUsingFolderAndFiles($lookupTableDir, $functionFilename, $typesFilename, $enumsFilename);
-# }
-
 ################### States ###########################################
 my $inHeader        = 0;
 my $inJavaSource    = 0;
@@ -2280,6 +2275,10 @@ foreach my $inputFile (@fileList) {
     print STDERR "Top Level Point 200\n" if ($tlhangDebug);
     ($rootFileName, $lang, $sublang) = getLangAndSubLangFromFilename($filename);
 
+    if ($sublang eq "IDL") {
+	$cppAccessControlState = "public:"; # IDLs have no notion of protection, typically.
+    }
+
     $HeaderDoc::OptionalOrRequired = "";
 
     my $rootOutputDir;
@@ -2458,6 +2457,11 @@ print STDERR "REDO" if ($debugging);
 
 	$cppAccessControlState = "protected:"; # the default in C++
 	$objcAccessControlState = "private:"; # the default in Objective C
+
+	if ($sublang eq "IDL") {
+		$cppAccessControlState = "public:"; # IDLs have no notion of protection, typically.
+	}
+
 	$HeaderDoc::AccessControlState = "";
 
 	print STDERR "Top Level Point 705\n" if ($tlhangDebug);

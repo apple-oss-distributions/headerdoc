@@ -3,7 +3,7 @@
 # Class name: AvailHelper
 # Synopsis: Helper code for availability
 #
-# Last Updated: $Date: 2011/02/18 19:02:57 $
+# Last Updated: $Date: 2014/02/14 17:55:29 $
 # 
 # Copyright (c) 2006 Apple Computer, Inc.  All rights reserved.
 #
@@ -59,7 +59,6 @@ BEGIN {
     }
 }
 use HeaderDoc::HeaderElement;
-use HeaderDoc::DBLookup;
 use HeaderDoc::Utilities qw(findRelativePath safeName printArray printHash sanitize);
 use File::Basename;
 use Cwd;
@@ -75,7 +74,7 @@ use vars qw(@ISA);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::AvailHelper::VERSION = '$Revision: 1298084577 $';
+$HeaderDoc::AvailHelper::VERSION = '$Revision: 1392429329 $';
 
 # Inheritance
 # @ISA = qw(HeaderDoc::HeaderElement);

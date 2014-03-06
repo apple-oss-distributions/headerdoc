@@ -16,7 +16,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 		bar.baz q;
 	};
 $21|/*! bar.baz class */
-$0|$24279|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$24264|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -356,7 +356,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "protected"
+        ACCESSCONTROL: "public"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -440,7 +440,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "protected"
+        ACCESSCONTROL: "public"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -482,7 +482,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "protected"
+        ACCESSCONTROL: "public"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -524,7 +524,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "protected"
+        ACCESSCONTROL: "public"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -566,7 +566,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "protected"
+        ACCESSCONTROL: "public"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -996,7 +996,7 @@ END OF OBJECT
 
 
 
-$24279|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$24264|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -1336,7 +1336,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "protected"
+        ACCESSCONTROL: "public"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1420,7 +1420,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "protected"
+        ACCESSCONTROL: "public"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1462,7 +1462,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "protected"
+        ACCESSCONTROL: "public"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1504,7 +1504,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "protected"
+        ACCESSCONTROL: "public"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1546,7 +1546,7 @@ LONG ATTRIBUTES:
         XMLTHROWS: ""
         UPDATED: ""
         LINKAGESTATE: ""
-        ACCESSCONTROL: "protected"
+        ACCESSCONTROL: "public"
         AVAILABILITY: ""
         LINKUID: ""
         ORIGCLASS: ""
@@ -1977,4 +1977,4 @@ END OF OBJECT
 
 
 $30|Tests periods in class names.
-$87|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/idl_3.test$1|C$5|idl 3$3|IDL$6|parser
+$33|testsuite/parser_tests/idl_3.test$1|C$5|idl 3$3|IDL$6|parser

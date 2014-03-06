@@ -63,4 +63,4 @@ request type => functiongroup
 name => test function group 6
 Description =>  
 $39|This tests multi-word function groups.
-$129|/Network/Servers/hills/Volumes/tienda/dgatwood/headerdoc-8.8.20/Modules/HeaderDoc//../../testsuite/parser_tests/group_test_6.test$1|C$12|group test 6$1|C$6|parser
+$40|testsuite/parser_tests/group_test_6.test$1|C$12|group test 6$1|C$6|parser

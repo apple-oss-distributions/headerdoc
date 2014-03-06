@@ -28,7 +28,7 @@ all: all_internal test apidoc
 
 # Override the default compiler to GCC 4.0 if building for Snow Leopard internally.
 all_internal:
-	cd xmlman ; make all CC=`if [ "$$DEVELOPER_BIN_DIR" != "" -a "$(building_ppc)" != "0" ] ; then echo "gcc-4.0" ; else echo "cc"; fi` ARCH=`uname` VERS=`{ echo "10.7"; sw_vers -productVersion | sed 's/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\..*/\1.\2/'; } | sort | head -n 1` ; cd ..
+	cd xmlman ; make all CC=`if [ "$$DEVELOPER_BIN_DIR" != "" -a "$(building_ppc)" != "0" ] ; then echo "gcc-4.0" ; else echo "cc"; fi` ARCH=`uname` VERS=`{ echo "10.8"; sw_vers -productVersion | sed 's/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\..*/\1.\2/'; } | sort | head -n 1` ; cd ..
 
 clean:
 	cd xmlman ; make clean ; cd ..
@@ -124,7 +124,7 @@ installsub:
 	umask 022 && install -d $(DSTROOT)$(bindir)
 	umask 022 && install -d $(DSTROOT)$(confdir)
 	install -c -m 755 headerDoc2HTML.config-xcodecolors $(DSTROOT)$(confdir)$(conffile)
-	install -c -m 444 exampletoctemplate.html $(DSTROOT)$(confdir)$(templatefile)
+	install -c -m 444 $(templatefile) $(DSTROOT)$(confdir)$(templatefile)
 	if [ "$(SYMROOT)" != "" ] ; then \
 		install -c -m 755 xmlman/xml2man $(SYMROOT)$(bindir)/xml2man; \
 		dsymutil -o $(SYMROOT)$(bindir)/xml2man.dSYM $(SYMROOT)$(bindir)/xml2man; \

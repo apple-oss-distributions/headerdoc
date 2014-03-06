@@ -2,7 +2,7 @@
 #
 # Class name: 	ParseTree
 # Synopsis: 	Used by headerdoc2html to hold parse trees
-# Last Updated: $Date: 2013/05/14 15:29:11 $
+# Last Updated: $Date: 2014/03/06 11:20:09 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -177,7 +177,7 @@ use Carp qw(cluck);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::ParseTree::VERSION = '$Revision: 1368570551 $';
+$HeaderDoc::ParseTree::VERSION = '$Revision: 1394133609 $';
 ################ General Constants ###################################
 my $debugging = 0;
 
@@ -1002,12 +1002,15 @@ sub processEmbeddedTags
     my $localDebug = 0;
     # if ($apio->isAPIOwner()) { $localDebug = 1; }
 
-    print STDERR "PET: $apio\n" if ($localDebug);
+    print STDERR "IN PET\n" if ($localDebug);
+    print STDERR "API IS $apio\n" if ($localDebug);
     print STDERR $apio->name()."\n" if ($localDebug);
     print STDERR "APIOLIST IS $apiolist\n" if ($localDebug);;
-    # for my $tempapio (@{$apiolist}) {
-	# print STDERR "RETURNED APIOLIST INCLUDES $tempapio\n";
-    # }
+    if ($localDebug && $apiolist) {
+	for my $tempapio (@{$apiolist}) {
+		print STDERR "RETURNED APIOLIST INCLUDES $tempapio (".($tempapio->rawname()).")\n";
+	}
+    }
 
 
     ### Make the APIO owner list unique. ###
@@ -1086,11 +1089,18 @@ sub processEmbeddedTags
 	my $hashtreecur = undef;
 	my $hashtreeroot = undef;
 
+    print STDERR "BEFORE APIOprocessEmbeddedTagsRec for $apio (".$apio->name().")\n" if ($localDebug > 1);
+    print STDERR "PS: $parserState\n" if ($localDebug > 1);
+    cluck("bt\n") if ($localDebug > 1);
+    $self->dbprint() if ($localDebug > 1);
+    # $self->printTree() if ($localDebug > 1);
+
+
 	$self->APIOprocessEmbeddedTagsRec($apiOwner, $case_sensitive, \%parseTokens, $lastnode, 0, 1, $enable_javadoc_comments, $xmlmode, $apio->lang(), $apio->sublang(), $hashtreecur, $hashtreeroot);
     } else {
 	print STDERR "calling processEmbeddedTagsRec for $apio (".$apio->name().") for parse tree $self.\n" if ($localDebug);
 	$self->processEmbeddedTagsRec($xmlmode, $eoDeclaration, \%parseTokens, $case_sensitive, $keywordhashref, $lastDeclaration, $curDeclaration, $pendingHDcomment,
-		$apio, $apiolist, $sodec, $lastnode, $enable_javadoc_comments);
+		$apio, $apiolist, $sodec, $lastnode, $enable_javadoc_comments, undef);
     }
 
 print STDERR "PETDONE\n" if ($localDebug);
@@ -1425,7 +1435,7 @@ sub APIOprocessEmbeddedTagsRec($$$$$$$$)
 		print STDERR "NNTOKEN: $nntoken\n" if ($localDebug);
 		if ((($lang ne "tcl" && ($ntoken eq "!" || ($enable_javadoc_comments && $ntoken eq "*" && $nntoken !~ /^\*/))) ||
 		     ($lang eq "tcl" && ($ntoken eq "/*" && $nntoken eq "!" && $firstchild->next()->next()->next()))) &&
-		    !$self->hidden()) {
+		    ($lang eq "applescript" || (!$self->hidden()))) {
 			print STDERR "NODECHECK: $self\n" if ($localDebug);
 			# HDCOMMENT
 			$self->dbprint() if ($localDebug);
@@ -1652,6 +1662,7 @@ sub processEmbeddedTagsRec
     my $sodec = shift;
     my $lastTreeNode = shift;
     my $enable_javadoc_comments = shift;
+    my $ASterminator = shift;
 
     my %parseTokens = %{$parseTokensRef};
 
@@ -1677,7 +1688,7 @@ print STDERR "PETREC\n" if ($localDebug);
 print STDERR "PENDING COMMENT: $pendingHDcomment\n" if ($localDebug);
 print STDERR "LAST DECLARATION: $lastDeclaration\n" if ($localDebug);
 
-    if (!$self) { return ($eoDeclaration, $pendingHDcomment, $continue); }
+    if (!$self) { return ($eoDeclaration, $pendingHDcomment, $continue, $ASterminator); }
 
     my $apioclass = ref($apio) || $apio;
     if ($apioclass =~ /HeaderDoc::PDefine/) {
@@ -1689,6 +1700,14 @@ print STDERR "LAST DECLARATION: $lastDeclaration\n" if ($localDebug);
 	    if ($x) {
 		push(@{$apiolist}, $x);
 	    }
+	}
+    }
+
+    if ($apio->lang() eq "applescript") {
+	if (!$ASterminator) {
+		if ($self->token eq "(") {
+			$ASterminator = $self;
+		}
 	}
     }
 
@@ -1850,12 +1869,15 @@ print STDERR "LAST DECLARATION: $lastDeclaration\n" if ($localDebug);
 		      }
 		      if (!$HeaderDoc::dumb_as_dirt) {
 			# Drop this comment from the output.
-			if ($xmlmode) {
+			if ($xmlmode || ($apio->lang() eq "applescript")) {
 				# We were doing this for HTML when we needed to
 				# be able to reparse the tree after copying
 				# it to a cloned data type.  This is no longer
 				# needed, and the old method (above) is slightly
 				# faster.
+				#
+				# However, we still have to use this approach
+				# for AppleScript, for that reason.
 				$self->hidden(1); $skipchildren = 1;
 			} else {
 				$self->{TOKEN} = "";
@@ -1930,13 +1952,15 @@ print STDERR "LAST DECLARATION: $lastDeclaration\n" if ($localDebug);
     if ($firstchild && !$skipchildren) {
 	my $nestallowed = commentsNestedIn($token, $parseTokens{soc}, $parseTokens{eoc}, $parseTokens{ilc}, $parseTokens{ilc_b}, $parseTokens{lbrace}, $case_sensitive);
 	if ($nestallowed == 1) {
-		my $newcontinue;
-		($eoDeclaration, $pendingHDcomment, $newcontinue) = $firstchild->processEmbeddedTagsRec($xmlmode, $eoDeclaration, $parseTokensRef, $case_sensitive, $keywordhashref, "", "", "", $apio, $apiolist, $sodec, $lastTreeNode, $enable_javadoc_comments);
+		my $newcontinue; my $newASterminator;
+		($eoDeclaration, $pendingHDcomment, $newcontinue, $newASterminator) = $firstchild->processEmbeddedTagsRec($xmlmode, $eoDeclaration, $parseTokensRef, $case_sensitive, $keywordhashref, "", "", "", $apio, $apiolist, $sodec, $lastTreeNode, $enable_javadoc_comments, $ASterminator);
 		if ($continue) { $continue = $newcontinue; }
+		if (!$ASterminator) { $ASterminator = $newASterminator; }
 	} else {
-		my $newcontinue;
-		($eoDeclaration, $pendingHDcomment, $newcontinue) = $firstchild->processEmbeddedTagsRec($xmlmode, $eoDeclaration, $parseTokensRef, $case_sensitive, $keywordhashref, "", "$curDeclaration", "", $apio, $apiolist, $sodec, $lastTreeNode, $enable_javadoc_comments);
+		my $newcontinue; my $newASterminator;
+		($eoDeclaration, $pendingHDcomment, $newcontinue, $newASterminator) = $firstchild->processEmbeddedTagsRec($xmlmode, $eoDeclaration, $parseTokensRef, $case_sensitive, $keywordhashref, "", "$curDeclaration", "", $apio, $apiolist, $sodec, $lastTreeNode, $enable_javadoc_comments, $ASterminator);
 		if ($continue) { $continue = $newcontinue; }
+		if (!$ASterminator) { $ASterminator = $newASterminator; }
 	}
 	$curDeclaration .= textTree($firstchild);
     } elsif ($firstchild && !$skipchildren) {
@@ -2013,11 +2037,15 @@ print STDERR "LAST DECLARATION: $lastDeclaration\n" if ($localDebug);
 	}
     }
 			# $sodec = $oldsodec;
-    if ($next && $continue) {
-	($eoDeclaration, $pendingHDcomment, $continue) = $next->processEmbeddedTagsRec($xmlmode, $eoDeclaration, $parseTokensRef, $case_sensitive, $keywordhashref, $lastDeclaration, $curDeclaration, $pendingHDcomment, $apio, $apiolist, $sodec, $lastTreeNode, $enable_javadoc_comments);
+    if ($ASterminator == $self) {
+	$continue = 0;
     }
 
-    return ($eoDeclaration, $pendingHDcomment, $continue);
+    if ($next && $continue) {
+	($eoDeclaration, $pendingHDcomment, $continue) = $next->processEmbeddedTagsRec($xmlmode, $eoDeclaration, $parseTokensRef, $case_sensitive, $keywordhashref, $lastDeclaration, $curDeclaration, $pendingHDcomment, $apio, $apiolist, $sodec, $lastTreeNode, $enable_javadoc_comments, $ASterminator);
+    }
+
+    return ($eoDeclaration, $pendingHDcomment, $continue, $ASterminator);
 }
 
 # THIS CODE USED TO PROCESS COMMENTS WHENEVER IT IS TIME.
@@ -5289,4 +5317,37 @@ sub translateTreeRec {
     print STDERR "Returning.\n" if ($localDebug);
     return \%state;
 }
+
+# /*!
+#     @abstract Returns the first token inside the body of an AppleScript
+#               function.
+#  */
+sub ASFunctionBodyStart
+{
+    my $self = shift;
+
+    my $localDebug = 0;
+
+    while ($self &&
+	($self->token() ne "\n") &&
+	($self->token() ne "\r") &&
+	($self->token() ne "(")) {
+		print STDERR "SKIPPING ".$self->token()." (LOOP 1)\n" if ($localDebug);
+		$self = $self->next();
+    }
+    while ($self &&
+	($self->token() eq "\n") ||
+	($self->token() eq "\r") ||
+	($self->token() eq "(")) {
+		print STDERR "SKIPPING ".$self->token()." (LOOP 2)\n" if ($localDebug);
+		$self = $self->next();
+    }
+
+    print STDERR "RETURNING TREE.\n" if ($localDebug);
+    $self->dbprint() if ($localDebug);
+
+    return $self;
+}
+
+
 1;

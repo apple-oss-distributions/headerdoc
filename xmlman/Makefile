@@ -12,9 +12,9 @@ LOCALLDFLAGS=
 
 COMPATIBILITY_BITS=
 VSTR=
-ifneq ($(strip $(VERS)),)
-	VSTR=-mmacosx-version-min=${VERS}
-endif
+# ifneq ($(strip $(VERS)),)
+	# VSTR=-mmacosx-version-min=${VERS}
+# endif
 ifeq (${ARCH},Darwin)
 	DARWIN_CFLAGS=${VSTR}
 	# For older versions of Mac OS X compilers, remove -pie.

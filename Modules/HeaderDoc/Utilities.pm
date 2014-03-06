@@ -2,7 +2,7 @@
 # Utilities.pm
 # 
 # Common subroutines
-# Last Updated: $Date: 2013/03/26 21:31:55 $
+# Last Updated: $Date: 2014/02/26 10:58:03 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -75,7 +75,7 @@ my $depth = 0;
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::Utilities::VERSION = '$Revision: 1364358715 $';
+$HeaderDoc::Utilities::VERSION = '$Revision: 1393441083 $';
 @ISA = qw(Exporter);
 @EXPORT = qw(findRelativePath safeName safeNameNoCollide linesFromFile makeAbsolutePath
              printHash printArray fileNameFromPath folderPathForFile 
@@ -94,7 +94,7 @@ $HeaderDoc::Utilities::VERSION = '$Revision: 1364358715 $';
 	     byMethodType getLangAndSubLangFromFilename splitOnPara
 	     peek dumpCaches getDefaultEncoding stripLeading
 	     fixXHTMLAttributes html_fixup_links xml_fixup_links
-	     calcDepth);
+	     calcDepth isStandardAvailability);
 
 my %uid_list_by_uid = ();
 my %uid_list = ();
@@ -1672,9 +1672,12 @@ sub parseTokens
 	# These always start a block ending in "end"
 	# $parseTokens{lbraceunconditionalre} = "^(repeat|try)\$";
 
-	# These might, if they aren't followed by the corresponing simple token.
+	# These might, if they aren't followed by the corresponding simple token.
 	$parseTokens{lbraceprecursor} = "^(if|tell)\$";
 	$parseTokens{lbraceprecursorre} = "^(then|to)\$";
+	# If this is followed by an "if", ignore the "if".
+	$parseTokens{lbracepreventerre} = "^(else)\$";
+	# These do if they're after a newline.
 	$parseTokens{lbraceconditionalre} = "^(considering|ignoring|repeat|tell|try|using|with)\$";
 
 	# $parseTokens{rbrace} = "end";
@@ -5105,6 +5108,38 @@ sub getAvailabilityMacros
 	# print STDERR "Adding avail for $line\n";
 	addAvailabilityMacro($token, $description, $has_args);
     }
+}
+
+# /*!
+#     @abstract Returns whether the availability macro is one of the
+#               standard OS-version-based macros.
+#  */
+sub isStandardAvailability
+{
+    my $token = shift;
+
+    # e.g. AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8
+    # becomes "Introduced in Mac OS X v10.7, but later deprecated in Mac OS X v10.8."
+    if ($token =~ /AVAILABLE_MAC_OS_X_VERSION_(\d+)_(\d+)_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_(\d+)_(\d+)/) {
+	my ($majorintro, $minorintro, $majordep, $minordep) = ($1, $2, $3, $4);
+	return "Introduced in Mac OS X v$majorintro.$minorintro, but later deprecated in Mac OS X v$majordep.$minordep."
+    }
+
+    # e.g. AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
+    # becomes "Introduced in Mac OS X v10.8."
+    if ($token =~ /AVAILABLE_MAC_OS_X_VERSION_(\d+)_(\d+)_AND_LATER/) {
+	my ($major, $minor) = ($1, $2);
+	return "Introduced in Mac OS X v$major.$minor.";
+    }
+
+    # e.g. DEPRECATED_IN_MAC_OS_X_VERSION_10_8_AND_LATER
+    # becomes "Deprecated in Mac OS X v10.8."
+    if ($token =~ /DEPRECATED_IN_MAC_OS_X_VERSION_(\d+)_(\d+)_AND_LATER/) {
+	my ($major, $minor) = ($1, $2);
+	return "Deprecated in Mac OS X v$major.$minor.";
+    }
+
+    return "";
 }
 
 # /*! @group Debugging Functions */

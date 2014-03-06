@@ -10,7 +10,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $79|            (*! MyObject class
                doesn't do much.
              *)
-$0|$15820|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$14720|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -591,12 +591,7 @@ END OF OBJECT
 
 -=: HTML OUTPUT OF PARSE TREES :=-
 OBJECT: MyObject (HeaderDoc::CPPClass)
-	<span class="keyword">script</span> <!-- a logicalPath="//test_ref/applescript/econst/MyObject //test_ref/applescript/data/MyObject //test_ref/applescript/clconst/MyObject " machineGenerated="true" --><span class="var">MyObject</span><!-- /a --> <span class="comment">-- MyScript has a single property, myNumber</span> 
-	    <span class="comment">(*! Property myNumber with value 0 *)</span>
-	    <span class="keyword">property</span> <!-- a logicalPath="//test_ref/applescript/econst/myNumber //test_ref/applescript/data/myNumber //test_ref/applescript/clconst/myNumber " machineGenerated="true" --><span class="var">myNumber</span><!-- /a --> : <span class="number">0</span> <span class="comment">(*! Function ReportMyNumber *)</span>
-	    <span class="keyword">on</span> <!-- a logicalPath="//test_ref/applescript/instm/ReportMyNumber //test_ref/applescript/clm/ReportMyNumber //test_ref/applescript/intfcm/ReportMyNumber //test_ref/applescript/intfm/ReportMyNumber //test_ref/applescript/func/ReportMyNumber //test_ref/applescript/ftmplt/ReportMyNumber //test_ref/applescript/defn/ReportMyNumber //test_ref/applescript/macro/ReportMyNumber //test_ref/doc/anysymbol/ReportMyNumber" machineGenerated="true" --><span class="function">ReportMyNumber</span><!-- /a -->(
-	        <span class="param">x</span>,
-	        <span class="param">y</span>)
+	<span class="keyword">script</span> <!-- a logicalPath="//test_ref/applescript/econst/MyObject //test_ref/applescript/data/MyObject //test_ref/applescript/clconst/MyObject " machineGenerated="true" --><span class="var">MyObject</span><!-- /a --> 
 END OF OBJECT
 
 

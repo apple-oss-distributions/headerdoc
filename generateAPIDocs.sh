@@ -9,9 +9,9 @@ fi
 rm -rf Documentation/hdapi
 ./headerDoc2HTML.pl -H -O -j -Q -n -p -o Documentation/hdapi Documentation/HeaderDoc.hdoc
 if [ -d headerdoc_tp ] ; then
-	./headerDoc2HTML.pl -H -O -j -Q -n -p -o Documentation/hdapi headerwalk.pl headerDoc2HTML.pl gatherHeaderDoc.pl headerdoc_tp/*.pl headerdoc_tp/tp_webkit_tools/filtermacros.pl Modules/HeaderDoc/*.pm xmlman/*.c xmlman/*.h
+	./headerDoc2HTML.pl -H -O -j -Q -n -p -o Documentation/hdapi headerwalk.pl headerDoc2HTML.pl gatherHeaderDoc.pl perl2c.pl headerdoc_tp/*.pl headerdoc_tp/tp_webkit_tools/filtermacros.pl Modules/HeaderDoc/*.pm xmlman/*.c xmlman/*.h
 else
-	./headerDoc2HTML.pl -H -O -j -Q -n -p -o Documentation/hdapi headerwalk.pl headerDoc2HTML.pl gatherHeaderDoc.pl Modules/HeaderDoc/*.pm xmlman/*.c xmlman/*.h
+	./headerDoc2HTML.pl -H -O -j -Q -n -p -o Documentation/hdapi headerwalk.pl headerDoc2HTML.pl gatherHeaderDoc.pl perl2c.pl Modules/HeaderDoc/*.pm xmlman/*.c xmlman/*.h
 fi
 
 ./gatherHeaderDoc.pl -N Documentation/hdapi index.html

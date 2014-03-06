@@ -3,7 +3,7 @@
 # Module name: BlockParse
 # Synopsis: Block parser code
 #
-# Last Updated: $Date: 2013/05/14 15:02:12 $
+# Last Updated: $Date: 2014/03/05 14:20:14 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -101,7 +101,7 @@ $HeaderDoc::OptionalOrRequired = "";
 @EXPORT = qw(blockParse nspaces blockParseOutside getAndClearCPPHash cpp_remove buildCommentFromFields bracematching peekmatch cpp_add_cl pbs);
 @EXPORT_OK = qr(blockParseReturnState); # Used by Python parser.
 
-use HeaderDoc::Utilities qw(findRelativePath safeName printArray printHash parseTokens isKeyword warnHDComment classTypeFromFieldAndBPinfo casecmp addAvailabilityMacro printFields objectForUID peek);
+use HeaderDoc::Utilities qw(findRelativePath safeName printArray printHash parseTokens isKeyword warnHDComment classTypeFromFieldAndBPinfo casecmp addAvailabilityMacro printFields objectForUID peek isStandardAvailability);
 
 use HeaderDoc::HashObject;
 
@@ -122,7 +122,7 @@ use File::Basename qw(basename);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::BlockParse::VERSION = '$Revision: 1368568932 $';
+$HeaderDoc::BlockParse::VERSION = '$Revision: 1394058014 $';
 
 ################ Portability ###################################
 my $isMacOS;
@@ -796,7 +796,7 @@ sub blockParse
     my $treeDebug               = 0;
     my $ilcDebug                = 0;
     my $regexpDebug             = 0; # 0, 1, 2
-    my $parserStackDebug        = 0 || $HeaderDoc::fileDebug;
+    my $parserStackDebug        = 0 || $HeaderDoc::fileDebug; # 0, 1, 2
     my $braceDebug              = 0 || $HeaderDoc::fileDebug;
     my $hangDebug               = 0;
     my $offsetDebug             = 0;
@@ -813,6 +813,8 @@ sub blockParse
     my $rubyDebug               = 0;
     my $asDebug                 = 0;
     my $reMarkDebug             = 0;
+
+    if ($asDebug && (!$HeaderDoc::AppleScriptDebug)) { $HeaderDoc::AppleScriptDebug = 1; }
 
     $cppDebug = $cppDebugDefault ? $cppDebugDefault : $HeaderDoc::fileDebug;
 
@@ -1640,6 +1642,9 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 	    $treeSkip = 0;
 	    my $reMark = "";
 
+	    print "PARSER STATE COUNT: ".scalar(@parserStack)."\n" if ($parserStackDebug > 1);
+	    $parserState->print() if ($parserStackDebug > 1);
+
 	    print STDERR "INMACROLINE: ".$parserState->{inMacroLine}."\n" if ($localDebug || $parseDebug || $parmDebug);
 	    if ($part) { $leavingRegexp = 0; } # Reset to 0 at the top of the loop.
 
@@ -1700,6 +1705,7 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 			next;
 	    }
 	    print STDERR "PART IS \"$part\"\n" if ($localDebug || $parserStackDebug || $parseDebug || $liteDebug || $spaceDebug || $tokenDebug);
+	    print STDERR "SPS: ".scalar(@parserStack)." BSC: ".(scalar(@braceStack))." IBSC: ".$parserState->{initbsCount}."\n" if ($parserStackDebug);
 	    print STDERR "QUOTED: ".$parserState->isQuoted($lang, $sublang)."\n" if ($localDebug || $parserStackDebug || $parseDebug || $liteDebug || $spaceDebug);
 	    print STDERR "CURLINE IS \"$curline\"\n" if ($localDebug || $hangDebug || $liteDebug);
 	    # print STDERR "RETURNTYPE IS \"$parserState->{returntype}\"\n" if ($localDebug || $hangDebug || $liteDebug);
@@ -1725,7 +1731,7 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 		# if ($part !~ /(\s|<)/)
 		print STDERR "OCCParse Case 2\n" if ($liteDebug);
 
-		if (($part =~ /(\-|\+|\w|\@)/ || ($part eq "/*" && $nextpart eq "!")) && !$parserState->{inComment} && !$parserState->{inInlineComment}) {
+		if (($part =~ /(#|\-|\+|\w|\@)/ || ($part eq "/*" && $nextpart eq "!")) && !$parserState->{inComment} && !$parserState->{inInlineComment}) {
 			# die("PART: $part NP: $nextpart\n");
 			print STDERR "OCCParse Case 2a\n" if ($liteDebug);
 			print STDERR "Last tree node set to $treeCur [1]\n" if ($parserStateInsertDebug);
@@ -2469,7 +2475,7 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 		 !($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} ||
 		   $parserState->{inChar}) &&
 		 !$argparse && $labelregexp && ($part =~ /$labelregexp/) && ($parserState->{startOfDec} != 1)) && do {
-			print STDERR "APPLESCRIPT OF/IN: CASE AS_00C\n" if ($liteDebug);
+			print STDERR "APPLESCRIPT LABEL: CASE AS_00C\n" if ($liteDebug);
 			print STDERR "IN APPLESCRIPT LABEL: SET TO $part SOD=".$parserState->{startOfDec}."\n" if ($asDebug);
 			$parserState->{inLabel} = 1;
 			$parserState->{ASlabel} = $part;
@@ -2480,7 +2486,7 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 		 !($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} ||
 		   $parserState->{inChar}) &&
 		 $labelregexp && $parserState->{inLabel} && ($part =~ /\w/)) && do {
-			print STDERR "APPLESCRIPT OF/IN: CASE AS_00D\n" if ($liteDebug);
+			print STDERR "APPLESCRIPT LABEL: CASE AS_00D\n" if ($liteDebug);
 			print STDERR "IN APPLESCRIPT LABEL: ADDING $part\n" if ($asDebug);
 			$parserState->{ASlabel} .= " ".$part;
 			$parserState->{inLabel} = 0;
@@ -2491,7 +2497,7 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 		 !($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} ||
 		   $parserState->{inChar}) &&
 		 ($part eq "given")) && do {
-			print STDERR "APPLESCRIPT OF/IN: CASE AS_00E\n" if ($liteDebug);
+			print STDERR "APPLESCRIPT GIVEN: CASE AS_00E\n" if ($liteDebug);
 			print STDERR "IN APPLESCRIPT GIVEN ($part)\n" if ($asDebug);
 			$parserState->{inGiven} = 1;
 			$parserState->{inLabel} = 0;
@@ -2502,7 +2508,7 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 		 !($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} ||
 		   $parserState->{inChar}) &&
 		 ($part !~ /[\r\n]/)) && do {
-			print STDERR "APPLESCRIPT OF/IN: CASE AS_00F\n" if ($liteDebug);
+			print STDERR "APPLESCRIPT GIVEN: CASE AS_00F\n" if ($liteDebug);
 			print STDERR "IN APPLESCRIPT GIVEN\n" if ($asDebug);
 			if ($part eq ",") {
 				print STDERR "IN APPLESCRIPT GIVEN COMMA\n" if ($asDebug);
@@ -4467,7 +4473,7 @@ print STDERR "parserState: ENDOFSTATE\n" if ($parserStackDebug);
 						} elsif ($lang eq "applescript" && (scalar(@braceStack)-$parserState->{initbsCount}) == 1) {
 							# AppleScript allows nested classes and does not have a semicolon to
 							# indicate the point at which we should stop parsing a class.
-							print STDERR "Terminating nested class at newline.\n"; # @@@
+							print STDERR "Terminating nested class at newline.\n" if ($localDebug || $parseDebug || $asDebug); # @@@
 							$parserState->{declarationEndsAtNewLine} = 1;
 						}
 					}
@@ -5963,8 +5969,18 @@ if (0) {
 			$parserState->{lastTreeNode} = $treeCur;
 			if ($lang eq "applescript") {
 				# AppleScript needs a little help because functions can contain other things.
-				$parserState->{lastDisplayNode} = $treeCur;
-				$treeTop->{lastDisplayNode} = $treeCur;
+				if (!$parserState->{lastDisplayNode}) {
+					$parserState->{lastDisplayNode} = $treeCur;
+				}
+				if (!$treeTop->{lastDisplayNode}) {
+					$treeTop->{lastDisplayNode} = $treeCur;
+				}
+				if (!$parserState->{lastDisplayNode}) {
+					$parserState->{lastDisplayNode} = $treeCur;
+				}
+				if (!$treeTop->{lastDisplayNode}) {
+					$treeTop->{lastDisplayNode} = $treeCur;
+				}
 
 				# print STDERR "CUR: $treeCur\n";
 				# print STDERR "FOR PS: $parserState\n";
@@ -6318,6 +6334,7 @@ sub blockParseReturnState
     my $nameObjDumpDebug = 0;
 
 # $forcedebug = 1;
+    if ($forcedebug) { $parserState->dbprint(); }
     if ($forcedebug) { $treeTop->dbprint(); }
     $forcedebug = $forcedebug || $HeaderDoc::fileDebug;
 
@@ -7749,6 +7766,8 @@ sub ignore
 	}
 	return $def;
     }
+    my $isa = isStandardAvailability($part);
+    if ($isa) { return $isa; }
 
     if ($ignorelist{$part}) {
 	    print STDERR "IGNORING $part\n" if ($localDebug);
@@ -9246,6 +9265,18 @@ print STDERR "NC: $newcount\n" if ($localDebug);
 				warn("NL: \"$namelist\"\n");
 				warn("PT: \"$posstypes\"\n");
 			}
+		} elsif ($HeaderDoc::ignore_apiowner_names == 2 && length($outername) && !$curObj->isBlock) {
+			if ($localDebug || $nameDebug) {
+				print STDERR "CURNAME CHANGED FROM $curname -> $outername\n";
+				print STDERR "CURNAME_EXTENDED CHANGED FROM $curname_extended -> $outername\n";
+			}
+			$curname = $outername;
+			$curname_extended = $outername;
+		}
+		if ($localDebug || $nameDebug) {
+			print STDERR "CURNAME: $curname\n";
+			print STDERR "OUTERNAME: $outername\n";
+			print STDERR "IGNORE: ".$HeaderDoc::ignore_apiowner_names."\n";
 		}
 
 		if ($outername eq "") {
@@ -12200,11 +12231,13 @@ sub configureAccessControlStateForClass
     } elsif ($lang eq "java") {
 		$HeaderDoc::AccessControlState = "package-private";
     } elsif ($lang eq "C") {
-	if ($parserState->{classIsObjC} || ($parserState->{lang} eq "IDL" && $HeaderDoc::idl_language eq "occ")) {
+	if ($parserState->{classIsObjC} || ($parserState->{sublang} eq "IDL" && $HeaderDoc::idl_language eq "occ")) {
 		$HeaderDoc::AccessControlState = "private";
 		if ($parserState->{inProtocol}) {
 			$HeaderDoc::OptionalOrRequired = "\@required"; # The default in Objective C
 		}
+        } elsif ($parserState->{sublang} eq "IDL" && ($HeaderDoc::idl_language eq "idl" || $HeaderDoc::idl_language eq "javascript" || $HeaderDoc::idl_language eq "js")) {
+		$HeaderDoc::AccessControlState = "public";
 	} else {
 		$HeaderDoc::AccessControlState = "protected";
 	}

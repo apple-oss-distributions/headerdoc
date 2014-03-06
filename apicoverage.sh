@@ -8,7 +8,7 @@ EXITSTATUS=0
 echo "Checking function coverage:"
 echo
 
-for i in headerDoc2HTML.pl gatherHeaderDoc.pl headerwalk.pl headerdoc_tp/tp_webkit_tools/filtermacros.pl Modules/HeaderDoc/*.pm ; do
+for i in headerDoc2HTML.pl gatherHeaderDoc.pl headerwalk.pl perl2c.pl headerdoc_tp/tp_webkit_tools/filtermacros.pl Modules/HeaderDoc/*.pm ; do
     if [ -f "$i" ] ; then
 	COMMENTS="$(grep -B 1 '^[ 	]*sub[ 	]' "$i" | grep -v '^[ 	]*sub[ 	]' | grep -v '^--' | grep -c '[ 	]*#[^#]*\*\/')"
 	SUBS="$(grep -c '^[ 	]*sub[ 	]' "$i")";
@@ -139,7 +139,7 @@ scanforallmissingkeys()
     ALLKEYS_SCRIPT="$ALLKEYS_SCRIPT "'    }'
     ALLKEYS_SCRIPT="$ALLKEYS_SCRIPT "'}'
 
-    for i in headerDoc2HTML.pl gatherHeaderDoc.pl headerwalk.pl Modules/HeaderDoc/*.pm ; do
+    for i in headerDoc2HTML.pl gatherHeaderDoc.pl headerwalk.pl perl2c.pl Modules/HeaderDoc/*.pm ; do
 	KEYS="$KEYS $(cat "$i" | grep -v '^[[:space:]]*\#' | perl -e "$ALLKEYS_SCRIPT")"
     done
 
@@ -181,7 +181,7 @@ scanforallmissingkeys()
     DOCKEYS_SCRIPT="$DOCKEYS_SCRIPT "'    }'
     DOCKEYS_SCRIPT="$DOCKEYS_SCRIPT "'}'
 
-    for i in headerDoc2HTML.pl gatherHeaderDoc.pl headerwalk.pl Modules/HeaderDoc/*.pm ; do
+    for i in headerDoc2HTML.pl gatherHeaderDoc.pl headerwalk.pl perl2c.pl Modules/HeaderDoc/*.pm ; do
 	DOCUMENTED_KEYS="$DOCUMENTED_KEYS $(cat "$i" | perl -e "$DOCKEYS_SCRIPT")"
     done
 
@@ -242,7 +242,7 @@ scanformissingglobals()
 	CODE="$CODE"' }'
 
 	DATA="$(
-		for i in headerDoc2HTML.pl gatherHeaderDoc.pl headerwalk.pl Modules/HeaderDoc/*.pm ; do
+		for i in headerDoc2HTML.pl gatherHeaderDoc.pl headerwalk.pl perl2c.pl Modules/HeaderDoc/*.pm ; do
 			sed 's/#.*$//' "$i" | grep -v '^[[:space:]]*use' | grep -v '^[[:space:]]*require' | perl -e "$CODE" | grep '^HeaderDoc::'
 
 		done | sort -u

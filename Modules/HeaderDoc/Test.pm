@@ -3,7 +3,7 @@
 # Class name: Test
 # Synopsis: Test Harness
 #
-# Last Updated: $Date: 2013/05/14 15:10:37 $
+# Last Updated: $Date: 2014/02/26 11:18:59 $
 #
 # Copyright (c) 2008 Apple Computer, Inc.  All rights reserved.
 #
@@ -160,7 +160,7 @@ if ($HeaderDoc::FreezeThaw_available) {
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::Test::VERSION = '$Revision: 1368569437 $';
+$HeaderDoc::Test::VERSION = '$Revision: 1393442339 $';
 
 # /*!
 #     @abstract
@@ -564,6 +564,9 @@ print STDERR "ITEM NOW $item\n" if ($localDebug);
 	my $objcAccessControlState = "private:"; # the default in Objective C
 	my $functionGroup = "default_function_group";
 
+	if ($HeaderDoc::sublang eq "IDL") {
+		$cppAccessControlState = "public:"; # IDLs have no notion of protection, typically.
+	}
 
 	my @codeLines = split(/\n/, $self->{CODE});
 	map(s/$/\n/gm, @codeLines);
@@ -1562,6 +1565,11 @@ sub dumpObjNames
 			foreach my $copyobj (@newtrees) {
 				push(@parseTrees, $copyobj);
 			}
+			($newret, @newtrees) = $self->dumpEmbeddedClasses($obj, $nest + 1);
+			$retstring .= $newret;
+			foreach my $copyobj (@newtrees) {
+				push(@parseTrees, $copyobj);
+			}
 		}
 	}
 	if (@methods) {
@@ -1664,6 +1672,7 @@ sub dumpObjNames
 		}
 	}
     } else {
+
 	my @objects = $obj->parsedParameters();
 	if (@objects) {
 		$retstring .= $indent."PARSED PARAMETERS:\n";
@@ -1712,8 +1721,63 @@ sub dumpObjNames
 			}
 		}
 	}
+
+	my ($newret, @newtrees) = $self->dumpEmbeddedClasses($obj, $nest + 1);
+	$retstring .= $newret;
+	foreach my $copyobj (@newtrees) {
+		push(@parseTrees, $copyobj);
+	}
     }
 
+    return ($retstring, @parseTrees);
+}
+
+
+# /*!
+#     @abstract Dumps information about AppleScript scripts embedded
+#               within handlers.
+#  */
+sub dumpEmbeddedClasses
+{
+    my $self = shift;
+    my $obj = shift;
+    my $nest = shift;
+
+    my $class = ref($obj) || $obj;
+
+    my $retstring = "";
+    my @parseTrees = ();
+    my @embeddedClasses = ();
+
+    if ($self->{LANG} eq "applescript" && $class eq "HeaderDoc::Function") {
+	my $class_self = undef;
+	if (!$obj->{ASCONTENTSPROCESSED}) {
+		$class_self = $obj->processAppleScriptFunctionContents();
+	} else {
+		my $class_self_ref = $obj->{AS_CLASS_SELF};
+		if ($class_self_ref) {
+			$class_self = ${$class_self_ref};
+			bless($class_self, "HeaderDoc::HeaderElement");
+			bless($class_self, $class_self->class());
+		}
+	}
+	if ($class_self) {
+		my @tempClasses = $class_self->classes();
+		foreach my $obj (@tempClasses) {
+			push(@embeddedClasses, $obj);
+		}
+	}
+    }
+
+    if (@embeddedClasses) {
+	foreach my $obj (@embeddedClasses) {
+		my ($newret, @newtrees) = $self->dumpObjNames($obj, $nest + 1);
+		$retstring .= $newret;
+		foreach my $copyobj (@newtrees) {
+			push(@parseTrees, $copyobj);
+		}
+	}
+    }
     return ($retstring, @parseTrees);
 }
 

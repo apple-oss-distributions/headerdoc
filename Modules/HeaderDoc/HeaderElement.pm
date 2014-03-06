@@ -3,7 +3,7 @@
 # Class name: HeaderElement
 # Synopsis: Root class for Function, Typedef, Constant, etc. -- used by HeaderDoc.
 #
-# Last Updated: $Date: 2013/05/14 15:29:11 $
+# Last Updated: $Date: 2014/03/06 11:05:55 $
 #
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -340,6 +340,21 @@
 #         {@link //apple_ref/perl/cl/HeaderDoc::Var Var} objects.
 #     @var XMLTHROWS
 #         A copy of the value in <code>THROWS</code> with XML formatting.
+#     @var AS_CLASS_SELF
+#         A <code>CPPClass</code> object cloned from the current function object that holds
+#         any scripts that are nested within the function.  See
+#         {@link cloneAppleScriptFunctionContents} and {@link processAppleScriptFunctionContents}
+#         for more information.
+#     @var AS_FUNC_SELF
+#         The <code>Function</code> object that the current class object was cloned from.  See
+#         {@link cloneAppleScriptFunctionContents} and {@link processAppleScriptFunctionContents}
+#         for more information.
+#     @var ASCONTENTSPROCESSED
+#         Set to 1 after the {@link processAppleScriptFunctionContents} method runs.
+#         for more information.
+#     @var PARSEDPSEUDOCLASSNAME
+#         The name of the directory where the contents from any classes within the {@link AS_CLASS_SELF}
+#         container are written.
 #  */
 package HeaderDoc::HeaderElement;
 
@@ -356,6 +371,16 @@ use Encode qw(encode decode);
 
 use Devel::Peek;
 
+my $isMacOS;
+my $pathSeparator;
+if ($^O =~ /MacOS/io) {
+        $pathSeparator = ":";
+        $isMacOS = 1;
+} else {
+        $pathSeparator = "/";
+        $isMacOS = 0;
+}
+
 # /*!
 #     @abstract
 #         The revision control revision number for this module.
@@ -363,7 +388,7 @@ use Devel::Peek;
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::HeaderElement::VERSION = '$Revision: 1368570551 $';
+$HeaderDoc::HeaderElement::VERSION = '$Revision: 1394132755 $';
 
 # /*!
 #     @abstract
@@ -1116,7 +1141,7 @@ sub name {
 
     my($class) = ref($self) || $self;
 
-    print STDERR "$class\n" if ($localDebug);
+    print STDERR "IN NAME: $class\n" if ($localDebug);
 
     if (@_) {
         my $name = shift;
@@ -4242,6 +4267,7 @@ sub declarationInHTML {
 #  */
 sub parseTree {
     my $self = shift;
+    my $localDebug = 0;
 
     if (@_) {
 	my $parsetree = shift;
@@ -4249,6 +4275,18 @@ sub parseTree {
 		$self->addParseTree($parsetree);
 	}
         $self->{PARSETREE} = $parsetree;
+
+	my $class = ref($self) || $self;
+	if ($self->lang eq "applescript" && $class eq "HeaderDoc::Function") {
+		if (!$self->{AS_CLASS_SELF}) {
+			$self->cloneAppleScriptFunctionContents();
+		}
+		if ($localDebug) {
+			print STDERR "ADDING PARSE TREE FOR $self\n";
+			bless($parsetree, "HeaderDoc::ParseTree");
+			${$parsetree}->dbprint();
+		}
+	}
     }
     return $self->{PARSETREE};
 }
@@ -5155,6 +5193,20 @@ sub documentationBlock
 
     if ($self->isInternal() && !$HeaderDoc::document_internal) { return ""; }
 
+    my @embeddedClasses = ();
+    my $class_self = undef;
+    if ($self->lang eq "applescript" && $class eq "HeaderDoc::Function") {
+	if (!$self->{ASCONTENTSPROCESSED}) {
+		$class_self = $self->processAppleScriptFunctionContents();
+		if ($class_self) {
+			my @classes = $class_self->classes();
+			foreach my $obj (@classes) {
+				push(@embeddedClasses, $obj);
+			}
+		}
+	}
+    }
+
     # print STDERR "GOTHERE\n";
 
     # Only use this style for API Owners.
@@ -5517,6 +5569,48 @@ sub documentationBlock
             $contentString .= "</dl>\n";
 	    $contentString .= "</div>\n";
         }
+    }
+    if (@embeddedClasses) {
+	$showDiscussionHeading = 1;
+	$contentString .= "<h5 class=\"tight\"><font face=\"Lucida Grande,Helvetica,Arial\">Embedded Classes</font></h5>\n";
+        $contentString .= "<div class='param_indent'>\n";
+        $contentString .= "<dl>\n";
+        # $contentString .= "<table border=\"1\"  width=\"90%\">\n";
+        # $contentString .= "<thead><tr><th>Name</th><th>Description</th></tr></thead>\n";
+        foreach my $element (@embeddedClasses) {
+            my $cName = $element->name();
+
+		# print STDERR "EMBEDDED CLASS: $cName\n";
+
+            my $cDesc = $element->discussion();
+            # my $uid = "//$apiUIDPrefix/c/econst/$cName";
+            # registerUID($uid);
+            my $uid = $element->apiuid(); # "econst");
+
+	    my $safeName = $cName;
+	    $safeName = &safeName(filename => $cName);
+
+	    my $url = $class_self->{PARSEDPSEUDOCLASSNAME}.$pathSeparator."Classes".$pathSeparator.$safeName.$pathSeparator."index.html";
+
+	    my $target = "doc";
+	    my $classAsComposite = $HeaderDoc::ClassAsComposite;
+	    # if ($class eq "HeaderDoc::Header") { $classAsComposite = 0; }
+
+	    if ($composite && !$classAsComposite) { $classAsComposite = 1; $target = "_top"; }
+	    if ($element->isAPIOwner()) {
+		$target = "_top";
+		$classAsComposite = 0;
+	    }
+
+	    if ($HeaderDoc::use_iframes) {
+		$target = "_top";
+	    }
+
+            # $contentString .= "<tr><td align=\"center\"><a href=\"$url\" target=\"$target\"><code>$cName</code></a></td><td>$cDesc</td></tr>\n";
+            $contentString .= "<dt><a href=\"$url\" target=\"$target\"><code>$cName</code></a></dt><dd>$cDesc</dd>\n";
+        }
+        # $contentString .= "</table>\n</div>\n";
+        $contentString .= "</dl>\n</div>\n";
     }
     if (@constants) {
 	$showDiscussionHeading = 1;
@@ -6321,6 +6415,19 @@ sub XMLdocumentationBlock {
 	}
     }
 
+    my @embeddedClasses = ();
+    my $class_self = undef;
+    if ($self->lang eq "applescript" && $class eq "HeaderDoc::Function") {
+	if (!$self->{ASCONTENTSPROCESSED}) {
+		$class_self = $self->processAppleScriptFunctionContents();
+		# $class_self->dbprint();
+		my @classes = $class_self->classes();
+		foreach my $obj (@classes) {
+			push(@embeddedClasses, $obj);
+		}
+	}
+    }
+
     $langstring = $self->apiRefLanguage($sublang);
 
     # if ($sublang eq "cpp") {
@@ -6793,7 +6900,14 @@ sub XMLdocumentationBlock {
 		}
                 $compositePageString .= "</constantlist>\n";
 	}
-
+	if (@embeddedClasses) {
+		$contentString = $class_self->_getEmbeddedClassXMLDetailString(\@embeddedClasses);
+		if (length($contentString)) {
+			$compositePageString .= "<embeddedclasslist>\n";
+			$compositePageString .= $contentString;
+			$compositePageString .= "</embeddedclasslist>\n";
+		}
+	}
 	if (@local_variables) {
 		$compositePageString .= "<localvariablelist>\n";
                 foreach my $field (@local_variables) {
@@ -8460,6 +8574,25 @@ sub declaredIn
 	return "";
     }
 
+    # print STDERR "DI: $self APIO: $apio\n";
+
+    if ($apio->{AS_FUNC_SELF}) {
+	my $func_apio_ref = $apio->{AS_FUNC_SELF};
+	if (!$func_apio_ref) {
+		die("Bad AS_FUNC_SELF for $apio (".$apio->name().")\n");
+	}
+	my $func_apio = ${$func_apio_ref};
+	bless($func_apio, "HeaderDoc::HeaderElement");
+	bless($func_apio, $func_apio->class());
+
+	# print STDERR "CLASS IN FUNC\n";
+	my $name = $func_apio->name();
+	my $apiref = $func_apio->apiuid();
+	my $jumpTarget = $apiref;
+
+	return "<a href=\"../../../index.html#$jumpTarget\" logicalPath=\"$apiref\" target=\"_top\" machineGenerated=\"true\">$name</a>";
+    }
+
     if ($self->isAPIOwner()) {
 	if ($class =~ /HeaderDoc::Header/) {
 		# warn $self->name.": Header\n";
@@ -9362,5 +9495,152 @@ sub prepareDiscussionForTemporary
     $self->{ABSTRACT} = undef;
     $self->{DISCUSSION_SET} = undef;
 }
+
+# /*!
+#     @abstract
+#         Clones a function object for use as an API owner for any
+#         enclosing scripts.
+#  */
+sub cloneAppleScriptFunctionContents
+{
+    my $self = shift;
+
+    my $localDebug = 0;
+
+    if ($localDebug) {
+	print STDERR "Cloning $self for AppleScript function body parsing.\n";
+	$self->dbprint();
+    }
+
+    my $class_self = HeaderDoc::CPPClass->new();
+    $self->{AS_CLASS_SELF} = \$class_self;
+    $class_self->{AS_FUNC_SELF} = \$self;
+
+    my $orig_ptref = $self->{PARSETREE};
+    bless($orig_ptref, "HeaderDoc::ParseTree");
+    my $parseTree = ${$orig_ptref};
+
+    $parseTree = $parseTree->ASFunctionBodyStart();
+
+    my $tree = $parseTree->clone();
+    $tree->parserState($self->{PARSERSTATE});
+
+    # Don't copy the name here, because it hasn't been set yet, but copy
+    # the parse tree, because otherwise it gets stomped.
+    $class_self->{PARSETREE} = \$tree;
+    $class_self->{PARSERSTATE} = $self->{PARSERSTATE};
+    $class_self->{SUBLANG} = $self->{SUBLANG};
+    $class_self->{APIOWNER} = $self->{APIOWNER};
+    $class_self->{FILENAME} = $self->{FILENAME};
+    $class_self->{FULLPATH} = $self->{FULLPATH};
+    $class_self->{OUTPUTFORMAT} = $self->{OUTPUTFORMAT};
+
+    print STDERR "NAME: ".$class_self->name()."\n" if ($localDebug);
+    print STDERR "RAWNAME: ".$class_self->rawname()."\n" if ($localDebug);
+    print STDERR "TREE: $tree\n" if ($localDebug);
+
+    $tree->apiOwner($class_self);
+}
+
+# /*!
+#     @abstract
+#         Processes the cloned function/class object previously
+#         created by the {@link cloneAppleScriptFunctionContents}
+#         method.
+#  */
+sub processAppleScriptFunctionContents
+{
+    my $self = shift;
+    my $localDebug = 0;
+
+    print STDERR "IN processAppleScriptFunctionContents\n" if ($localDebug);
+    $self->dbprint() if ($localDebug);
+
+    # Grab the class object that contains the parsed contents of the function body.
+    my $class_self_ref = $self->{AS_CLASS_SELF};
+    if (!$class_self_ref) {
+	die("Missing AS_CLASS_SELF for $self (".$self->name().")\n");
+    }
+    my $class_self = ${$class_self_ref};
+    bless($class_self, "HeaderDoc::HeaderElement");
+    bless($class_self, $class_self->class());
+
+    # Copy the name and other info, now that it is known.
+    $class_self->{NAME} = $self->{NAME};
+    $class_self->{RAWNAME} = $self->{RAWNAME};
+    $class_self->{FORCENAME} = $self->{FORCENAME};
+    $class_self->{NAMEREFS} = $self->{NAMEREFS};
+    $class_self->{LANG} = $self->{LANG};
+    $class_self->{OUTPUTFORMAT} = $self->{OUTPUTFORMAT};
+
+    # Determine the output mode.
+    my $xml_output = 0;
+    my $apiOwner = $self->apiOwner();
+    if ($apiOwner->outputformat() eq "hdxml") { $xml_output = 1; }
+
+    my $apioclass = ref($apiOwner) || $apiOwner;
+
+    if ($apioclass =~ /HeaderDoc::Header/) {
+	$class_self->{HEADEROBJECT} = $apiOwner;
+    } else {
+	$class_self->{HEADEROBJECT} = $apiOwner->{HEADEROBJECT};
+    }
+
+
+    print STDERR "OF: ".$apiOwner->outputformat()."\n" if ($localDebug);
+
+    # Obtain the parse tree.
+    my $ptref = $class_self->{PARSETREE};
+    bless($ptref, "HeaderDoc::ParseTree");
+    my $parseTree = ${$ptref};
+
+    # Process the embedded tags and write out the contents.
+    $parseTree->processEmbeddedTags($xml_output, $class_self);
+
+    # print STDERR "PROCESSED ".$class_self->name()."\n";
+    my @has_classes = $class_self->classes();
+    # print STDERR "WRITING ".scalar(@has_classes)." CLASSES\n";
+    if (!scalar(@has_classes)) {
+	return undef;
+    }
+
+    # Compute the name of the directory where the contents should be written (in HTML mode)
+    if (!$xml_output) {
+	my $className = $class_self->name();
+	# for now, always shorten long names since some files may be moved to a Mac for browsing
+	if (1 || $isMacOS) {$className = &safeName(filename => $className);};
+	$className = "parsedFunctionContents_$className";
+
+	# my $classesDir = $self->apiOwner()->classesDir();
+
+	# if (!$HeaderDoc::running_test) {
+		# if (! -e $classesDir) {
+			# unless (mkdir ("$classesDir", 0777)) {die ("Can't create output folder $classesDir. \n$!");};
+		# }
+	# }
+
+	my $classRootDir = $self->apiOwner()->{OUTPUTDIR};
+	$class_self->outputDir("$classRootDir$pathSeparator$className");
+	$class_self->{PARSEDPSEUDOCLASSNAME} = $className;
+    }
+
+    # Write the output (in HTML mode)
+    if (!$xml_output) {
+	if ($class_self->classes()) {
+		print STDERR "CLASSES\n" if ($localDebug);
+		if (!$HeaderDoc::running_test) {
+			$class_self->writeHeaderElements();
+		}
+	} else {
+		print STDERR "NO CLASSES\n" if ($localDebug);
+	}
+    }
+    $self->{ASCONTENTSPROCESSED} = 1;
+
+    $parseTree->dbprint() if ($localDebug);
+
+    return $class_self;
+}
+
 
 1;

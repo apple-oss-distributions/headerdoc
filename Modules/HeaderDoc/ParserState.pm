@@ -2,7 +2,7 @@
 #
 # Class name: 	ParserState
 # Synopsis: 	Used by headerDoc2HTML.pl to hold parser state
-# Last Updated: $Date: 2013/05/14 15:29:11 $
+# Last Updated: $Date: 2014/03/05 14:20:15 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -490,6 +490,9 @@
 #             Set to the actual <code>of</code> or <code>in</code> token
 #             encountered when parsing AppleScript.  The word token after it is
 #             appended to this variable (delimited by a space).
+#         @var ASINELSE
+#             Set to 1 at an "else" statement.  If the next word token is "if",
+#             we don't treat it as opening a new brace.
 #         @var ASLBRACEPRECURSOR
 #             In an <code>if</code> or <code>tell</code> statement, stores
 #             the <code>if</code> or <code>tell</code> token.  Used to determine
@@ -1228,7 +1231,7 @@ use Carp qw(cluck);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::ParserState::VERSION = '$Revision: 1368570551 $';
+$HeaderDoc::ParserState::VERSION = '$Revision: 1394058015 $';
 ################ General Constants ###################################
 my $debugging = 0;
 
@@ -1617,7 +1620,7 @@ sub rollback
     my %clonehash = %{$clone};
 
     if ($localDebug) {
-	print STDERR "BEGIN PARSER STATE:\n";
+	print STDERR "BEGIN PARSER STATE ($self):\n";
 	foreach my $key (keys(%clonehash)) {
 		if ($self->{$key} ne $clone->{$key}) {
 			print STDERR "$key: ".$self->{$key}." != ".$clone->{$key}."\n";
@@ -1648,7 +1651,7 @@ sub rollbackSet
     my $clone = HeaderDoc::ParserState->new();
     my %selfhash = %{$self};
 
-    # print STDERR "BEGIN PARSER STATE:\n";
+    # print STDERR "BEGIN PARSER STATE ($self):\n";
     foreach my $key (keys(%selfhash)) {
 	# print STDERR "$key => $self->{$key}\n";
 	$clone->{$key} = $self->{$key};
@@ -1669,7 +1672,7 @@ sub print
     my $self = shift;
     my %selfhash = %{$self};
 
-    print STDERR "BEGIN PARSER STATE:\n";
+    print STDERR "BEGIN PARSER STATE ($self):\n";
     foreach my $key (keys(%selfhash)) {
 	print STDERR "$key => $self->{$key}\n";
     }
@@ -1897,12 +1900,15 @@ sub isLeftBrace
 	my %parseTokens = ();
 
 	my $lbrace;
+	my $lbracepreventerre;
 	my $lbraceunconditionalre;
 	my $lbraceconditionalre;
 	my $lbraceprecursorre;
 	my $classisbrace;
 	my $functionisbrace;
 	my $lbraceprecursor;
+
+	print STDERR "IN LEFT BRACE CHECK\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
 
 	# Backwards compatibility hack.
 	if (@_) {
@@ -1918,6 +1924,7 @@ sub isLeftBrace
 		$curBraceCount = shift;
 		$lbraceprecursor = "";
 		$lbraceprecursorre = "";
+		$lbracepreventerre = "";
 	} else {
 		# New-style calling: use the value as a reference.
 		%parseTokens = %{$parseTokensRef};
@@ -1925,6 +1932,7 @@ sub isLeftBrace
 		$lbrace = $parseTokens{lbrace};
 		$lbraceunconditionalre = $parseTokens{lbraceunconditionalre};
 		$lbraceconditionalre = $parseTokens{lbraceconditionalre};
+		$lbracepreventerre = $parseTokens{lbracepreventerre};
 		$lbraceprecursorre = $parseTokens{lbraceprecursorre};
 		$classisbrace = $parseTokens{classisbrace};
 		$functionisbrace = $parseTokens{functionisbrace};
@@ -1935,19 +1943,41 @@ sub isLeftBrace
 
 	if ($lang eq "perl" && $self->{inTemplate}) { return 0; }
 
-	if ($classisbrace && (($curBraceCount - $self->{initbsCount}) > 1)) {
-		# print STDERR "CBC: $curBraceCount INIT: ".$self->{initbsCount}."\n";
-		return 0;
+	if ($lang ne "applescript") {
+		if ($classisbrace && (($curBraceCount - $self->{initbsCount}) > 1)) {
+			print STDERR "CBC: $curBraceCount INIT: ".$self->{initbsCount}."\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+			return 0;
+		}
 	}
 
 	if (casecmp($part, $lbrace, $case_sensitive)) {
+		print STDERR "BARE LBRACE\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
 		if ($self->{pendingBracedParameters}) { return 0; }
 		return 1;
 	}
 
-	if ($lbraceunconditionalre && ($part =~ /$lbraceunconditionalre/)) { return 1; }
+	print STDERR "IN LEFT BRACE CHECK 2\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
 
-	if ($lang eq "applescript" && !($self->{inString} || $self->{inComment} || $self->{inInlineComment})) {
+	print STDERR "INRBR: ".$self->{inrbraceargument}."\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+
+	if ($lbraceunconditionalre && ($part =~ /$lbraceunconditionalre/)) {
+		print STDERR "UNCONDITIONALRE MATCH\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+		return 1;
+	}
+
+	if ($lbracepreventerre && ($part =~ /$lbracepreventerre/)) {
+		print STDERR "ASINELSE -> 1\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+		$self->{ASINELSE} = 1;
+	} elsif ($self->{ASINELSE} && $part =~ /\w/) {
+		print STDERR "ASINELSE -> 0\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+		$self->{ASINELSE} = 0;
+		if ($part eq "if") {
+			print STDERR "IGNORING IF\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+			return 0;
+		}
+	}
+
+	if ($lang eq "applescript" && !($self->{inString} || $self->{inComment} || $self->{inInlineComment} || $self->{inLabel} || $self->{inrbraceargument})) {
 		print STDERR "ASPART: \"$part\" PC: ".$self->{ASLBRACEPRECURSOR}." PCTAG: ".$self->{ASLBRACEPRECURSORTAG}."\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
 
 		# After an if/then or a tell/to, if we see a non-space, non-comment token,
@@ -1960,7 +1990,10 @@ sub isLeftBrace
 			$self->{ASLBRACEPRECURSORTAG} = "";
 		}
 
-		# If we see the "if" or "tell" token, store it away.
+		# If we see the "if" or "tell" token, store it away, but be prepared to reverse
+		# that decision later, if it's right after a newline and turns into a conditional
+		# regex match.
+		my $oldprecursor = $self->{ASLBRACEPRECURSOR};
 		if ($lbraceprecursor && $part =~ /$lbraceprecursor/) {
 			$self->{ASLBRACEPRECURSOR} = $part;
 			print STDERR "Set ASLBRACEPRECURSOR to \"$part\"\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
@@ -1978,9 +2011,15 @@ sub isLeftBrace
 				$self->{ASLBRACEPRECURSORTAG} = $part;
 			}
 			print STDERR "Nope.\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+			return 0;
 		} elsif ($self->{afterNL} && $lbraceconditionalre && $part =~ /$lbraceconditionalre/) {
+			print STDERR "CONDITIONALRE MATCH\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+			$self->{ASLBRACEPRECURSOR} = $oldprecursor;
 			return 1;
 		}
+	} elsif ($lang eq "applescript" && ($self->{inString} || $self->{inComment} || $self->{inInlineComment} || $self->{inLabel} || $self->{inrbraceargument})) {
+		print STDERR "RETURNING 0 BECAUSE IN RBRACE ARGUMENT (".$self->{inrbraceargument}.")\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+		return 0;
 	} else {
 		if ($lbraceconditionalre && (!$self->{followingrubyrbrace}) && ($part =~ /$lbraceconditionalre/)) { return 1; }
 	}
