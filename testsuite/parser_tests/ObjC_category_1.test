@@ -12,7 +12,7 @@ $274|/*!
         @discussion Methods declared in the BoatsCanFly category of the Boats class can only be u
 sed with properly equiped Boat objects.
 */
-$0|$13927|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$14035|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -40,8 +40,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/ObjC_category_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/ObjC_category_1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -477,7 +480,7 @@ END OF OBJECT
 
 
 
-$13927|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$14035|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -505,8 +508,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/ObjC_category_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/ObjC_category_1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

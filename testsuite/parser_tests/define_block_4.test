@@ -26,7 +26,7 @@ logged before being released and cleared.  This ensures errors don't slip throug
 ntracts with regards to logging behaviour, so it must be used carefully (and is thus not the 
  * default behaviour).
  *       @param error The CFErrorRef to reuse. */
-$0|$28755|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$28863|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -54,8 +54,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/define_block_4.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/define_block_4.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -608,7 +611,7 @@ END OF OBJECT
 
 
 
-$28755|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$28863|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -636,8 +639,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/define_block_4.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/define_block_4.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

@@ -4,7 +4,7 @@
 # Synopsis: Scans a file for headerDoc comments and generates an HTML
 #           file from the comments it finds.
 #
-# Last Updated: $Date: 2012/04/12 13:06:41 $
+# Last Updated: $Date: 2012/10/11 17:47:41 $
 #
 # ObjC additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -29,7 +29,7 @@
 #
 # @APPLE_LICENSE_HEADER_END@
 #
-# $Revision: 1334261201 $
+# $Revision: 1350002861 $
 #####################################################################
 
 
@@ -61,7 +61,7 @@ my $HeaderDoc_Version = "8.9";
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-my $VERSION = '$Revision: 1334261201 $';
+my $VERSION = '$Revision: 1350002861 $';
 
 # /*!
 #     @abstract
@@ -102,6 +102,22 @@ $HeaderDoc::parseIfElse = 0;
 #         disabled for all methods.
 #  */
 $HeaderDoc::nameFromAPIRefReturnsOnlyName = 0;
+
+# /*! @abstract
+#         The version of the test suite that matches this version
+#         of HeaderDoc.
+#     @discussion
+#         Do not change this value.  The actual value is automatically
+#         populated by the Makefile during installation based on the
+#         contents of the file
+#
+#         [source_directory]/testsuite/version
+#
+#         When the test suite changes in an incompatible way, the
+#         version number in that file should be bumped before the
+#         next version of HeaderDoc ships.
+#  */
+$HeaderDoc::testsuite_version="0";
 
 
 ################ General Constants ###################################
@@ -374,11 +390,11 @@ $HeaderDoc::idl_language = "idl";
 #     @abstract
 #         The default C compiler.
 #     @discussion
-#         By default, HeaderDoc uses <code>/usr/bin/gcc</code> to calculate
+#         By default, HeaderDoc uses <code>/usr/bin/cc</code> to calculate
 #         the values of complex #define macros.  This can be overridden with
 #         the <code>cCompiler</code> field in the HeaderDoc config file.
 #  */
-$HeaderDoc::c_compiler = "/usr/bin/gcc";
+$HeaderDoc::c_compiler = "/usr/bin/cc";
 
 # /*!
 #     @abstract
@@ -1657,7 +1673,16 @@ $HeaderDoc::modulesPath =~ s/ParseTree.pm$//so;
 #         <code>/usr/share/headerdoc/testsuite</code>
 #  */
 $HeaderDoc::testdir = $HeaderDoc::modulesPath."/../../testsuite";
+
+
+# /*! @abstract
+#         Tells whether the test suite is being run from a checked-out
+#         copy of the HeaderDoc sources or not.
+#  */
+$HeaderDoc::local_tests = 1;
+
 if ( ! -d $HeaderDoc::testdir ) {
+	$HeaderDoc::local_tests = 0;
 	$HeaderDoc::testdir = "/usr/share/headerdoc/testsuite";
 }
 
@@ -1782,7 +1807,7 @@ my %config = (
     introductionName => "Introduction",
     superclassName => "Superclass",
     IDLLanguage => "idl",
-    cCompiler => "/usr/bin/gcc"
+    cCompiler => "/usr/bin/cc"
 );
 
 # print "CONFIG FILES: @{[ @configFiles ]}\n";
@@ -4463,9 +4488,27 @@ sub runtests
 	$force = 1;
     }
 
+    my $testdir = $HeaderDoc::testdir;
+    my ($encoding, $linesref) = linesFromFile($testdir.$pathSeparator."version", 0);
+    my $installedversion = "";
+    if ($linesref) {
+	my @lines = @{$linesref};
+	$installedversion = $lines[0];
+    }
+    $installedversion =~ s/^\s*//sg;
+    $installedversion =~ s/\s*$//sg;
+    if (!$HeaderDoc::local_tests) {
+	if ($installedversion ne $HeaderDoc::testsuite_version) {
+		print STDERR "Test suite not up-to-date.  Please install the test suite that matches this\n".
+			"version of HeaderDoc by downloading the source tarball from opensource.apple.com\n".
+			"and running 'make realinstall' or 'make installsource'.\n";
+		$HeaderDoc::exitstatus = 1;
+		return (0, 1);
+	}
+    }
 
     my %config = (
-	cCompiler => "/usr/bin/gcc"
+	cCompiler => "/usr/bin/cc"
     );
 
     my $localConfigFileName = "headerDoc2HTML.config";
@@ -4558,7 +4601,7 @@ sub runtests
 
     print "\e[39m\n";
 
-    if ($fail_count) { $HeaderDoc::exitstatus = -1; }
+    if ($fail_count) { $HeaderDoc::exitstatus = 1; }
 }
 
 # /*!

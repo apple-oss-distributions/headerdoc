@@ -1,7 +1,7 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$177|int available_mac_os_x_version_10_1_and_later_but_deprecated_in_mac_os_x_version_10_3(int a) AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_3;
 
 $17|/*! test case */
-$0|$9000|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$9108|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -29,8 +29,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/avmacros_016.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/avmacros_016.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => Introduced in Mac OS X v10.1, but later deprecated in Mac OS X v10.3.
 
 $parserState->{backslashcount} => 0
@@ -292,7 +295,7 @@ END OF OBJECT
 
 
 
-$9000|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$9108|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -320,8 +323,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/avmacros_016.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/avmacros_016.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => Introduced in Mac OS X v10.1, but later deprecated in Mac OS X v10.3.
 
 $parserState->{backslashcount} => 0

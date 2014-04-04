@@ -1,5 +1,5 @@
 # Configuration file for HeaderDoc
-# $Revision: 1.5 $
+# $Revision: 1348608411 $
 ###########################################################
 copyrightOwner =>
 defaultFrameName => index.html
@@ -33,5 +33,5 @@ typeStyle =>
 paramStyle => 
 varStyle => 
 templateStyle => 
-cCompiler => /usr/bin/gcc
+cCompiler => /usr/bin/cc
 

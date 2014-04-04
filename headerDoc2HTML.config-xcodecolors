@@ -1,5 +1,5 @@
 # Configuration file for HeaderDoc
-# $Revision: 1328743283 $
+# $Revision: 1348608411 $
 ###########################################################
 
 # These options set various parameters used in content generation.
@@ -81,7 +81,7 @@ templateStyle => background:#ffffff; color:#761550;
 groupHierLimit => 100
 groupHierSubgroupLimit => 30
 
-# To use a different C compiler other than GCC for calculating values
+# To use a different C compiler other than the stock cc for calculating values
 # of #define macro chains, specify the alternative compiler here.
-cCompiler => /usr/bin/gcc
+cCompiler => /usr/bin/cc
 

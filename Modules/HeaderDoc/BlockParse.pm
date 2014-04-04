@@ -3,7 +3,7 @@
 # Module name: BlockParse
 # Synopsis: Block parser code
 #
-# Last Updated: $Date: 2012/04/06 15:56:50 $
+# Last Updated: $Date: 2013/05/14 15:02:12 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -122,7 +122,7 @@ use File::Basename qw(basename);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::BlockParse::VERSION = '$Revision: 1333753010 $';
+$HeaderDoc::BlockParse::VERSION = '$Revision: 1368568932 $';
 
 ################ Portability ###################################
 my $isMacOS;
@@ -366,6 +366,9 @@ sub bracematching
 		};
 	    ($tos eq "\@protocol") && do {
 			return "\@end";
+		};
+	    (($lang eq "applescript") && $tos =~ /(if|repeat|try|tell)/) && do {
+			return "end";
 		};
 	    (($lang eq "ruby") && $tos =~ /(for|while|if|until|begin)/) && do {
 			return "end";
@@ -1881,13 +1884,15 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 
 	print "IC: $parserState->{inClass} TOK: $part\n" if ($parseDebug || $classDebug);
 
-	    my $externCDebug = 0;
+	my $externCDebug = 0;
+	my $iskw = isKeyword($part, $keywordhashref, $case_sensitive);
+
+	if ($HeaderDoc::includeFunctionContents || !$parserState->{seenBraces}) {
 
 	    # Handle the GCC "__attribute__" extension outside the context of
 	    # the parser because it isn't part of the language and massively
 	    # breaks the syntax.
 	    # Same for asm
-	    my $iskw = isKeyword($part, $keywordhashref, $case_sensitive);
 	    if (($iskw == 8) && !$parserState->{attributeState} &&
 		!$parserState->{parsedParamParse} &&
 		!$parserState->{inBrackets} &&
@@ -2006,6 +2011,8 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 			$parserState->{externC} = 0;
 		}
 	    }
+
+	}
 
 	    # Here be the parser.  Abandon all hope, ye who enter here.
 	    $treepart = "";
@@ -2177,8 +2184,7 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 			} else {
 				$parserState->{implementsClass} = "";
 			}
-		} elsif ($parserState->isLeftBrace($part, $lang, $parseTokens{lbrace}, $parseTokens{lbraceunconditionalre}, $parseTokens{lbraceconditionalre},
-		         $parseTokens{classisbrace}, $parseTokens{functionisbrace}, $case_sensitive, scalar(@braceStack)) || $part eq ";") {
+		} elsif ($parserState->isLeftBrace($part, $lang, \%parseTokens, $case_sensitive, scalar(@braceStack)) || $part eq ";") {
 
 			# $part eq "{"
 			print STDERR "INCLASS BRCSEMI\n" if ($parseDebug || $classDebug);
@@ -2392,21 +2398,21 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 	    };
 
 
-	    if ($lang eq "tcl") {
-		if ($part =~ /[\n\r]/) {
-			# 2 until first non-space token.
-			$parserState->{afterNL} = 2;
+	    if ($part =~ /[\n\r]/) {
+		# 2 until first non-space token.
+		$parserState->{afterNL} = 2;
 
+		if ($lang eq "tcl") {
 			if ($parserState->{inTCLRegExpCommand}) {
 				$parserState->{inTCLRegExpCommand} = 0;
 			}
-		} elsif ($parserState->{afterNL} == 1) {
+		}
+	    } elsif ($parserState->{afterNL} == 1) {
 			# 0 after first non-space token.
 			$parserState->{afterNL} = 0;
-		} elsif ($parserState->{afterNL} == 2 && $part =~ /\S/) {
+	    } elsif ($parserState->{afterNL} == 2 && $part =~ /\S/) {
 			# 1 during first non-space token.
 			$parserState->{afterNL} = 1;
-		}
 	    }
 
 
@@ -2448,7 +2454,10 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 			last SWITCH;
 		};
 
-		(($lang eq "applescript") && $parserState->{inOfIn} && ($part =~ /\w/)) && do  {
+		(($lang eq "applescript") &&
+		 !($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} ||
+		   $parserState->{inChar}) &&
+		 $parserState->{inOfIn} && ($part =~ /\w/)) && do  {
 			print STDERR "APPLESCRIPT OF/IN: CASE AS_00B\n" if ($liteDebug);
 			print STDERR "IN APPLESCRIPT OF/IN: ADDING $part\n" if ($asDebug);
 			$parserState->{OfIn} .= " ".$part;
@@ -2456,7 +2465,10 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 			last SWITCH;
 		};
 		
-		(($lang eq "applescript") && !$argparse && $labelregexp && ($part =~ /$labelregexp/) && ($parserState->{startOfDec} != 1)) && do {
+		(($lang eq "applescript") &&
+		 !($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} ||
+		   $parserState->{inChar}) &&
+		 !$argparse && $labelregexp && ($part =~ /$labelregexp/) && ($parserState->{startOfDec} != 1)) && do {
 			print STDERR "APPLESCRIPT OF/IN: CASE AS_00C\n" if ($liteDebug);
 			print STDERR "IN APPLESCRIPT LABEL: SET TO $part SOD=".$parserState->{startOfDec}."\n" if ($asDebug);
 			$parserState->{inLabel} = 1;
@@ -2464,7 +2476,10 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 			last SWITCH;
 		};
 
-		(($lang eq "applescript") && $labelregexp && $parserState->{inLabel} && ($part =~ /\w/)) && do {
+		(($lang eq "applescript") &&
+		 !($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} ||
+		   $parserState->{inChar}) &&
+		 $labelregexp && $parserState->{inLabel} && ($part =~ /\w/)) && do {
 			print STDERR "APPLESCRIPT OF/IN: CASE AS_00D\n" if ($liteDebug);
 			print STDERR "IN APPLESCRIPT LABEL: ADDING $part\n" if ($asDebug);
 			$parserState->{ASlabel} .= " ".$part;
@@ -2472,14 +2487,21 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 			last SWITCH;
 		};
 
-		(($lang eq "applescript") && ($part eq "given")) && do {
+		(($lang eq "applescript") &&
+		 !($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} ||
+		   $parserState->{inChar}) &&
+		 ($part eq "given")) && do {
 			print STDERR "APPLESCRIPT OF/IN: CASE AS_00E\n" if ($liteDebug);
 			print STDERR "IN APPLESCRIPT GIVEN ($part)\n" if ($asDebug);
 			$parserState->{inGiven} = 1;
 			$parserState->{inLabel} = 0;
 			last SWITCH;
 		};
-		(($lang eq "applescript") && $parserState->{inGiven} && ($part !~ /[\r\n]/)) && do {
+
+		(($lang eq "applescript") && $parserState->{inGiven} &&
+		 !($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} ||
+		   $parserState->{inChar}) &&
+		 ($part !~ /[\r\n]/)) && do {
 			print STDERR "APPLESCRIPT OF/IN: CASE AS_00F\n" if ($liteDebug);
 			print STDERR "IN APPLESCRIPT GIVEN\n" if ($asDebug);
 			if ($part eq ",") {
@@ -3002,8 +3024,13 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 		# Pascal and PHP)
 
 		(($part eq $parseTokens{sofunction} || $part eq $parseTokens{soprocedure} || $part eq $parseTokens{soconstructor}) &&
+		  (($lang ne "applescript") || $parserState->appleScriptFunctionLegalHere(\@braceStack)) &&
 		  !($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} || $parserState->{inChar}) &&
 		  !(scalar(@braceStack)-$parserState->{initbsCount}) && !$parserState->{seenBraces}) && do {
+
+			# print STDERR "(($part eq $parseTokens{sofunction} || $part eq $parseTokens{soprocedure} || $part eq $parseTokens{soconstructor}) &&".
+		  # "!($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} || $parserState->{inChar})\n";
+			# print STDERR "AFTERNL: ".$parserState->{afterNL}."\n";
 			print STDERR "SOFUNC: CASE 10\n" if ($liteDebug);
 				if ($part eq $parseTokens{soconstructor}) {
 					$parserState->{isConstructor} = 1;
@@ -3039,6 +3066,9 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 				}
 				if ($parseTokens{parmswithcurlybraces}) {
 					$parserState->{pendingBracedParameters} = 1;
+				}
+				if ($parseTokens{functionisapiowner}) {
+					$pushParserStateAtBrace = 1;
 				}
 				last SWITCH;
 			};
@@ -3086,6 +3116,13 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 		 (!($parseTokens{classisbrace} && $parserState->{sodclass} eq "class" && (!$parserState->{inRubyClass}))) &&
 		 (!($parseTokens{functionisbrace} && $parserState->{pushedfuncbrace} == 1)) &&
 		 ($parserState->isQuoted($lang, $sublang) || (!$parserState->{newlineIsSemi}))) && do {
+
+			my $precursor = $parserState->clearLeftBracePrecursor();
+			if ($precursor) {
+				push(@braceStack, $precursor);
+				print STDERR "Pushing $precursor onto the brace stack [clearLeftBracePrecursor]\n" if ($HeaderDoc::AppleScriptDebug || $braceDebug || $parseDebug);
+			}
+
 			if ($lang eq "shell") {
 				if ($part eq ";;") {
 					$parserState->{afterSemi} = 2;
@@ -3733,7 +3770,7 @@ if ($localDebug || $cppDebug) {foreach my $partlist (@parts) {print STDERR "POST
 			      last SWITCH;
 			    }
 			};
-		($part eq "'") && do {
+		($part eq "'" && $lang ne "applescript") && do {
 			print STDERR "SINGLE QUOTE: CASE 24\n" if ($liteDebug);
 				print STDERR "squo\n" if ($localDebug);
 
@@ -4113,7 +4150,7 @@ print STDERR "SCARYCASE\n" if ($localDebug);
 			    print STDERR "OUTGOING CURLINE: \"$curline\"\n" if ($localDebug);
 			    last SWITCH;
 			};
-		((($part eq ")" && (!$parserState->{inCase})) || (casecmp($part, $parseTokens{rbrace}, $case_sensitive) && ($parserState->{pendingBracedParameters} == 2)))) && do {
+		((($part eq ")" && (!$parserState->{inCase})) || ($parserState->isRightBrace($part, $lang, \%parseTokens, $case_sensitive) && ($parserState->{pendingBracedParameters} == 2)))) && do {
 			print STDERR "CLOSE PAREN: CASE 29\n" if ($liteDebug);
 			# print STDERR "TOBS: \"".peek(\@braceStack)."\"\n";
 			    print STDERR "TOP OF RE STACK IS: \"".peek(\@regexpStack)."\"\n" if ($localDebug || $parseDebug);
@@ -4217,8 +4254,7 @@ print STDERR "SCARYCASE\n" if ($localDebug);
 			      }
 			    }
 			};
-		(($lang ne "perl" || !($parserState->{inTemplate} || $inRegexp || $leavingRegexp)) && $parserState->isLeftBrace($part, $lang, $parseTokens{lbrace}, $parseTokens{lbraceunconditionalre}, $parseTokens{lbraceconditionalre},
-			$parseTokens{classisbrace}, $parseTokens{functionisbrace}, $case_sensitive, scalar(@braceStack))) && do {
+		(($lang ne "perl" || !($parserState->{inTemplate} || $inRegexp || $leavingRegexp)) && $parserState->isLeftBrace($part, $lang, \%parseTokens, $case_sensitive, scalar(@braceStack))) && do {
 
 			my $brctoken = $part;
 			print STDERR "IRC ".$parserState->{inRubyClass}."\n" if ($rubyDebug || $parseDebug);
@@ -4233,7 +4269,11 @@ print STDERR "SCARYCASE\n" if ($localDebug);
 
 			my $oldParsedParamParse = $parserState->{parsedParamParse};
 			print STDERR "LEFT BRACE: CASE 30\n" if ($liteDebug);
-			    if ($parserState->{onlyComments} && !$parserState->{inComment} && !$parserState->{inInlineComment} && !$parserState->{inChar} && !$inRegexp && !scalar(@parserStack) && !$parserState->{INIF} && !$tempInIf) {
+			    if ($lang eq "applescript" && $pushParserStateAtBrace) {
+				$pushParserStateAtBrace = 0;
+				$pushParserStateAfterToken = 1;
+			    }
+			    if ($parserState->{onlyComments} && !$parserState->{inComment} && !$parserState->{inInlineComment} && !$parserState->{inChar} && !$inRegexp && !scalar(@parserStack) && !$parserState->{INIF} && !$tempInIf && ($lang ne "applescript")) {
 				print STDERR "BAILING NOW\n" if ($externCDebug);
 				$continue_no_return = 1;
 				print STDERR "CONTINUE -> 0 [NORETURN]\n" if ($parseDebug || $cppDebug || $macroDebug || $localDebug || $continueDebug);
@@ -4244,7 +4284,7 @@ print STDERR "SCARYCASE\n" if ($localDebug);
 				print STDERR "PUSHING \"$parsedParam\" onto parsed parameters list ()\n" if ($parseDebug || $asDebug);
 				$parsedParam = "";
 			    }
-			    if ($parserState->{onlyComments} && !$parserState->{inComment} && !$parserState->{inInlineComment} && !$parserState->{inChar} && !$inRegexp && scalar(@parserStack)) {
+			    if ($parserState->{onlyComments} && !$parserState->{inComment} && !$parserState->{inInlineComment} && !$parserState->{inChar} && !$inRegexp && scalar(@parserStack) && $lang ne "applescript") {
 				# Somebody put in a brace in the middle of
 				# a class or else we're seeing ObjC private
 				# class bits.  Either way, throw away the
@@ -4342,7 +4382,7 @@ print STDERR "SCARYCASE\n" if ($localDebug);
 			    }
 			    last SWITCH;
 			};
-		((casecmp($part, $parseTokens{rbrace}, $case_sensitive) || $parserState->{inrbraceargument}) && ($parserState->{pendingBracedParameters} != 2) && ($lang ne "perl" || !($parserState->{inTemplate} || $inRegexp || $leavingRegexp))) && do {
+		(($parserState->isRightBrace($part, $lang, \%parseTokens, $case_sensitive) || $parserState->{inrbraceargument}) && ($parserState->{pendingBracedParameters} != 2) && ($lang ne "perl" || !($parserState->{inTemplate} || $inRegexp || $leavingRegexp))) && do {
 			# {Treat } within <> as ordinary character in Perl.
 			print STDERR "RIGHT BRACE: CASE 31\n" if ($liteDebug);
 			print STDERR "INBRACEARGUMENT: ".$parserState->{inrbraceargument}."\n" if ($parserStateInsertDebug);
@@ -4424,6 +4464,11 @@ print STDERR "parserState: ENDOFSTATE\n" if ($parserStackDebug);
 							# the brace.
 							print STDERR "CONTINUE -> 0 [1aOutOfBraces]\n" if ($parseDebug || $cppDebug || $macroDebug || $localDebug || $continueDebug);
 							$continue = 0;
+						} elsif ($lang eq "applescript" && (scalar(@braceStack)-$parserState->{initbsCount}) == 1) {
+							# AppleScript allows nested classes and does not have a semicolon to
+							# indicate the point at which we should stop parsing a class.
+							print STDERR "Terminating nested class at newline.\n"; # @@@
+							$parserState->{declarationEndsAtNewLine} = 1;
 						}
 					}
 					if ($parserState->{noInsert} && scalar(@parserStack)) {
@@ -4672,11 +4717,13 @@ print STDERR "parserState: ENDOFSTATE\n" if ($parserStackDebug);
 				$parserState->{pendingBracedParameters} = 1;
 			}
 
+			print STDERR "INCLASSCHECK AFTERNL: ".$parserState->{afterNL}."\n" if ($parseDebug);
+
 			my $localclasstype = $1;
 			if ($part =~ /^\@/) { $part =~ s/^\@//s; }
-			if (!(scalar(@braceStack)-$parserState->{initbsCount})) {
-			    if (!($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} || $parserState->{inChar})) {
-				print STDERR "ITISACLASS\n" if ($localDebug);
+			if ((($lang eq "applescript") && $parserState->{afterNL}) || (($lang ne "applescript") && !(scalar(@braceStack)-$parserState->{initbsCount}))) {
+			    if (!($parserState->{inString} || $parserState->{inComment} || $parserState->{inInlineComment} || ($parserState->{inChar} && $lang ne "applescript"))) {
+				print STDERR "ITISACLASS\n" if ($localDebug || $classDebug);
 				if (!length($parserState->{sodclass}) && !$parserState->{inTypedef}) {
 					print STDERR "GOOD.\n" if ($localDebug);
 					$parserState->{inClass} = 1;
@@ -4766,6 +4813,8 @@ print STDERR "parserState: ENDOFSTATE\n" if ($parserStackDebug);
 					$HeaderDoc::lang = $lang;
 					$HeaderDoc::sublang = $sublang;
 
+					# print STDERR "ELSE CASE: $lang $sublang\n";
+
 					# ($parseTokens{sotemplate}, $parseTokens{eotemplate}, $parseTokens{operator}, $parseTokens{soc}, $parseTokens{eoc}, $parseTokens{ilc}, $parseTokens{ilc_b}, $parseTokens{sofunction},
 						# $parseTokens{soprocedure}, $parseTokens{sopreproc}, $parseTokens{lbrace}, $parseTokens{rbrace}, $parseTokens{unionname}, $parseTokens{structname},
 						# $parseTokens{enumname},
@@ -4797,6 +4846,8 @@ print STDERR "parserState: ENDOFSTATE\n" if ($parserStackDebug);
 
 			    		last SWITCH;
 				}
+			    } else {
+				print STDERR "STR: ".$parserState->{inString}." COM: ".$parserState->{inComment}." ILC: ".$parserState->{inInlineComment}." CHAR: ".$parserState->{inChar}." LANG: ".$lang."\n";
 			    }
 			}
 		};
@@ -5910,6 +5961,19 @@ if (0) {
 			print STDERR "parserState pushed onto stack[token]\n" if ($parserStackDebug);
 			print STDERR "Last tree node set to $treeCur [11]\n" if ($parserStateInsertDebug);
 			$parserState->{lastTreeNode} = $treeCur;
+			if ($lang eq "applescript") {
+				# AppleScript needs a little help because functions can contain other things.
+				$parserState->{lastDisplayNode} = $treeCur;
+				$treeTop->{lastDisplayNode} = $treeCur;
+
+				# print STDERR "CUR: $treeCur\n";
+				# print STDERR "FOR PS: $parserState\n";
+				# $treeCur->dbprint();
+				# print STDERR "TOP:\n";
+				# $treeTop->dbprint();
+				# print STDERR "SET TN: $treeTop\n";
+				# print STDERR "TTLDN: ".$treeTop->{lastDisplayNode}."\n";
+			}
 			$curline = "";
 			$parserState->{storeDec} = $declaration;
 			$parserState->{freezereturn} = 1;
@@ -5948,10 +6012,9 @@ if (0) {
 
 		# if (casecmp($part, $parseTokens{lbrace}, $case_sensitive)) 
 
-		print STDERR "check: ".$parserState->isLeftBrace($part, $lang, $parseTokens{lbrace}, $parseTokens{lbraceunconditionalre}, $parseTokens{lbraceconditionalre}, $parseTokens{classisbrace}, $parseTokens{functionisbrace}, $case_sensitive, scalar(@braceStack))."\n" if ($rubyDebug || $parseDebug);
+		print STDERR "check: ".$parserState->isLeftBrace($part, $lang, \%parseTokens, $case_sensitive, scalar(@braceStack))."\n" if ($rubyDebug || $parseDebug || $HeaderDoc::AppleScriptDebug);
 
-		if ($parserState->isLeftBrace($part, $lang, $parseTokens{lbrace}, $parseTokens{lbraceunconditionalre}, $parseTokens{lbraceconditionalre},
-		    $parseTokens{classisbrace}, $parseTokens{functionisbrace}, $case_sensitive, scalar(@braceStack))) {
+		if ($parserState->isLeftBrace($part, $lang, \%parseTokens, $case_sensitive, scalar(@braceStack))) {
 			if ($part =~ /[\n\r]/) { $parserState->{inRubyClass} = 2; }
 			$parserState->{ISFORWARDDECLARATION} = 0;
 
@@ -5995,7 +6058,7 @@ if (0) {
 			if ($tok =~ /\S/) {
 				print STDERR "parserState: PS IS $parserState\n" if ($parserStackDebug);
 				print STDERR "parserState: NOT WHITESPACE : ".$parserState->{hollow}." -> $treeCur\n" if ($parserStackDebug);
-				if (!casecmp($tok, $parseTokens{rbrace}, $case_sensitive) && $part !~ /\)/) {
+				if (!$parserState->isRightBrace($tok, $lang, \%parseTokens, $case_sensitive) && $part !~ /\)/) {
 					# $parserState->{hollow} = $treeCur;
 					$parserState->setHollowWithLineNumbers($treeCur, $fileoffset, $inputCounter);
 					# $HeaderDoc::curParserState = $parserState;
@@ -6017,7 +6080,7 @@ if (0) {
 			if ($tok =~ /\S/) {
 				print STDERR "parserState: PS IS $parserState\n" if ($parserStackDebug);
 				print STDERR "parserState: NOT WHITESPACE : ".$parserState->{hollow}." -> $treeCur\n" if ($parserStackDebug);
-				if (!casecmp($tok, $parseTokens{rbrace}, $case_sensitive) && $part !~ /\)/) {
+				if (!$parserState->isRightBrace($tok, $lang, \%parseTokens, $case_sensitive) && $part !~ /\)/) {
 					$parserState->setHollowWithLineNumbers($treeCur, $fileoffset, $inputCounter);
 					# $HeaderDoc::curParserState = $parserState;
 					print STDERR "parserState: WILL INSERT STATE $parserState (HOLLOW-AUTO-2) AT TOKEN \"$part\"/\"".$treeCur->token()."\"\n" if ($parserStackDebug);
@@ -6329,6 +6392,10 @@ if ($forcedebug) { print STDERR "FD\n"; }
 	$sodtype = join(",", @{$parserState->{pplStack}});
 	$parserState->{classtype} = "class";
 	print "SETTING sodtype TO $sodtype\n" if ($forcedebug);
+    }
+    if ($lang eq "applescript" && $parserState->{sodclass} eq "class") {
+	$sodclass = "script";
+	$parserState->{sodclass} = "script";
     }
 
     # AppleScript supports multi-word names, but does not support
@@ -7233,9 +7300,30 @@ print STDERR "SN: \"$sodname\"\nST: \"$sodtype\"\nSC: \"$sodclass\"\n" if ($loca
 	
     }
 
+    # print STDERR "SODCLASS: $sodclass SODNAME: $sodname SODTYPE: $sodtype LANG: $sublang\n";
+
     my $memberOfClass = "";
+    my $origsodname = $sodname;
     if ($sodclass eq "function" && $parserState->{isConstructor} && $lang eq "tcl") {
 	$memberOfClass = $sodname;
+	print STDERR "MEMBER OF CLASS: $memberOfClass\n" if ($localDebug || $forcedebug);
+    } elsif ($sublang eq "javascript" && $sodclass eq "variable" && $sodname =~ s/^(\w+(?:\.\w+)*)\s*\.\s*prototype\s*\.\s*//s) {
+	my $headerobj = $HeaderDoc::headerObject;
+	my $possible_class = $1;
+	my $temp = $headerobj->findClass($possible_class);
+
+    print STDERR "Checking for class \"$possible_class\"\n" if ($localDebug || $forcedebug);
+
+	# Don't throw away the class part unless we've actually seen this class.
+	if ($temp) {
+		$memberOfClass = $possible_class;
+		print STDERR "MEMBER OF CLASS: $memberOfClass\n" if ($localDebug || $forcedebug);
+		changeAllMatching(\@nameObjects, "NAME", "$origsodname", "NAME", "$sodname", 0);
+		changeAllMatching(\@nameObjects, "TYPE", "variable", "TYPE", "function", 0);
+		changeAllMatching(\@nameObjects, "TYPE", "variable", "POSSTYPES", "function constant variable", 0);
+	} else {
+		$sodname = $origsodname;
+	}
     } elsif ($sodclass eq "function" && $sodtype =~ /(\w+)\s*::\s*$/) {
 	$memberOfClass = $1;
 	print STDERR "MEMBER OF CLASS: $memberOfClass\n" if ($localDebug || $forcedebug);
@@ -7254,6 +7342,14 @@ print STDERR "SN: \"$sodname\"\nST: \"$sodtype\"\nSC: \"$sodclass\"\n" if ($loca
 
     changeAllMatching(\@nameObjects, "TYPE", "constant", "POSSTYPES", "constant variable", 0);
     changeAllMatching(\@nameObjects, "TYPE", "variable", "POSSTYPES", "constant variable", 0);
+
+    if ($sublang eq "javascript" && $sodclass eq "function") {
+        $posstypes = "function method class";
+	    changeAll(\@nameObjects, "POSSTYPES", $posstypes, 0); # may be no-op.
+    } elsif ($lang eq "applescript" && $sodclass eq "function") {
+        $posstypes = "function method ".$parserState->{classtype};
+	    changeAll(\@nameObjects, "POSSTYPES", $posstypes, 0); # may be no-op.
+    }
 
 	# print STDERR "ATEND PS $parserState HAS ARGS: ".$parserState->{cppMacroHasArgs}."\n";
 

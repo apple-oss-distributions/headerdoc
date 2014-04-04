@@ -12,7 +12,7 @@ $220|/*!
         @discussion All validator objects validate--in fact, they can't
         help themselves. That's what they do.
 */
-$0|$14756|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$14864|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -40,8 +40,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/ObjC_protocol_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/ObjC_protocol_1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -479,7 +482,7 @@ END OF OBJECT
 
 
 
-$14756|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$14864|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -507,8 +510,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/ObjC_protocol_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/ObjC_protocol_1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

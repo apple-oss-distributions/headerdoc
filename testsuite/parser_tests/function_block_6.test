@@ -26,7 +26,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
         char *another_hidden_function(char *this_function_also_should_not_appear);
 };
 $24|/*! This is a class. */
-$0|$31488|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$31596|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -54,9 +54,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/function_block_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/function_block_6.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -997,7 +1000,7 @@ END OF OBJECT
 
 
 
-$57903|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$58011|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -1025,9 +1028,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/function_block_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/function_block_6.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -2937,4 +2943,4 @@ END OF OBJECT
 
 
 
-_$21|function_block_6.test$1|C$16|function block 6$1|C$6|parser
+_$98|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/function_block_6.test$1|C$16|function block 6$1|C$6|parser

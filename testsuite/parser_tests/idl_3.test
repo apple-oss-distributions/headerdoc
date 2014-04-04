@@ -16,7 +16,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 		bar.baz q;
 	};
 $21|/*! bar.baz class */
-$0|$24171|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$24279|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -44,9 +44,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/idl_3.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/idl_3.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -993,7 +996,7 @@ END OF OBJECT
 
 
 
-$24171|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$24279|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -1021,9 +1024,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/idl_3.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/idl_3.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

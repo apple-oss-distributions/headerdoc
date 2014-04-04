@@ -10,7 +10,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $79|            (*! MyObject class
                doesn't do much.
              *)
-$0|$15174|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$15820|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -38,9 +38,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/AppleScript_class_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/AppleScript_class_1.test
-$parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -66,7 +68,7 @@ $parserState->{inMacro} => 0
 $parserState->{inMacroLine} => 0
 $parserState->{inOperator} => 0
 $parserState->{inPrivateParamTypes} => 0
-$parserState->{inRubyClass} => 2
+$parserState->{inRubyClass} => 1
 $parserState->{inString} => 0
 $parserState->{inTemplate} => 0
 $parserState->{initbsCount} => 0
@@ -74,6 +76,7 @@ $parserState->{inputCounter} => 9
 $parserState->{kr_c_function} => 0
 $parserState->{kr_c_name} => 
 $parserState->{lang} => applescript
+$parserState->{lastDisplayNode} => HeaderDoc::ParseTree=HASH(OBJID)
 $parserState->{lastTreeNode} => HeaderDoc::ParseTree=HASH(OBJID)
 $parserState->{lastsymbol} => 
 $parserState->{macroNoTrunc} => 1
@@ -100,7 +103,7 @@ $parserState->{seenMacroPart} => 0
 $parserState->{seenTilde} => 0
 $parserState->{simpleTDcontents} => 
 $parserState->{simpleTypedef} => 0
-$parserState->{sodclass} => class
+$parserState->{sodclass} => script
 $parserState->{sodname} => MyObject
 $parserState->{sodtype} => 
 $parserState->{sodtypeclasstoken} => script
@@ -168,6 +171,16 @@ implementsClass:
 |   |   +--- 
 |   |   +---y
 |   |   +---)
+|   +---                    
+|   +-*-display (HAS STATE)
+|   +--- 
+|   +---dialog
+|   +--- 
+|   +---myNumber
+|   +---[ NEWLINE ]
+|   +---                
+|   +---end
+|   +--- 
 |   +---[ NEWLINE ]
 |   +---            
 |   +---end
@@ -480,6 +493,16 @@ OBJECT: MyObject (HeaderDoc::CPPClass)
 |   |   +--- 
 |   |   +---y
 |   |   +---)
+|   +---                    
+|   +-*-display (HAS STATE)
+|   +--- 
+|   +---dialog
+|   +--- 
+|   +---myNumber
+|   +---[ NEWLINE ]
+|   +---                
+|   +---end
+|   +--- 
 |   +---[ NEWLINE ]
 |   +---            
 |   +---end
@@ -503,6 +526,16 @@ OBJECT: ReportMyNumber (HeaderDoc::Function)
 |   +--- 
 |   +---y
 |   +---)
++---                    
++-*-display (HAS STATE)
++--- 
++---dialog
++--- 
++---myNumber
++---[ NEWLINE ]
++---                
++---end
++--- 
 -=-=-=-=-=-=- EODEC -=-=-=-=-=-=-
 +---[ NEWLINE ]
 +---            
@@ -537,6 +570,16 @@ OBJECT: myNumber (HeaderDoc::Var)
 |   +--- 
 |   +---y
 |   +---)
++---                    
++-*-display (HAS STATE)
++--- 
++---dialog
++--- 
++---myNumber
++---[ NEWLINE ]
++---                
++---end
++--- 
 +---[ NEWLINE ]
 +---            
 +---end
@@ -553,8 +596,7 @@ OBJECT: MyObject (HeaderDoc::CPPClass)
 	    <span class="keyword">property</span> <!-- a logicalPath="//test_ref/applescript/econst/myNumber //test_ref/applescript/data/myNumber //test_ref/applescript/clconst/myNumber " machineGenerated="true" --><span class="var">myNumber</span><!-- /a --> : <span class="number">0</span> <span class="comment">(*! Function ReportMyNumber *)</span>
 	    <span class="keyword">on</span> <!-- a logicalPath="//test_ref/applescript/instm/ReportMyNumber //test_ref/applescript/clm/ReportMyNumber //test_ref/applescript/intfcm/ReportMyNumber //test_ref/applescript/intfm/ReportMyNumber //test_ref/applescript/func/ReportMyNumber //test_ref/applescript/ftmplt/ReportMyNumber //test_ref/applescript/defn/ReportMyNumber //test_ref/applescript/macro/ReportMyNumber //test_ref/doc/anysymbol/ReportMyNumber" machineGenerated="true" --><span class="function">ReportMyNumber</span><!-- /a -->(
 	        <span class="param">x</span>,
-	        <span class="param">y</span>) 
-	<span class="keyword">end</span> <span class="keyword">script</span> <span class="comment">-- MyObject</span> 
+	        <span class="param">y</span>)
 END OF OBJECT
 
 

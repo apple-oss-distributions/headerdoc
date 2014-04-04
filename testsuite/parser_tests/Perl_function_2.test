@@ -3660,7 +3660,7 @@ $1202|# /*! The blockParse function is the core of HeaderDoc's parse engine.
 #     @param case_sensitive boolean: controls whether keywords should be processed in a case-sensitive fashion.
 #     @result Returns ($inputCounter, $declaration, $typelist, $namelist, $posstypes, $value, \@pplStack, $returntype, $privateDeclaration, $treeTop, $simpleTDcontents, $availability).
 # */
-$0|$496969|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$497077|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -3688,8 +3688,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/Perl_function_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/Perl_function_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -11601,7 +11604,7 @@ END OF OBJECT
 
 
 
-$496969|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$497077|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -11629,8 +11632,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/Perl_function_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/Perl_function_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

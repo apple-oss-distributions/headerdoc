@@ -4,7 +4,7 @@
 # Synopsis: 	Finds all HeaderDoc generated docs in an input
 #		folder and creates a top-level HTML page to them
 #
-# Last Updated: $Date: 2012/05/14 11:32:11 $
+# Last Updated: $Date: 2012/10/11 16:16:46 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -27,7 +27,7 @@
 #
 # @APPLE_LICENSE_HEADER_END@
 #
-# $Revision: 1337020331 $
+# $Revision: 1349997406 $
 ######################################################################
 
 # /*!
@@ -322,6 +322,18 @@ my $classAsComposite = 0;
 my $externalAPIUIDPrefixes = "";
 my %usedInTemplate = ();
 
+# /*!
+#     @abstract
+#         Controls whether to add the [Top] link above the TOC
+#         when in frame-style or iframe-style TOC mode.
+#     @discussion
+#         This value is set based on the <code>addTopLink</code>
+#         line in the configuration file, or 1 by default.
+#  */
+$HeaderDoc::addTopLink = 1;
+if (defined $config{"addTopLink"}) {
+	$HeaderDoc::addTopLink = $config{"addTopLink"};
+}
 if (defined $config{"dateFormat"}) {
     $HeaderDoc::datefmt = $config{"dateFormat"};
     if ($HeaderDoc::datefmt !~ /\S/) {
@@ -493,7 +505,7 @@ foreach my $file (@filelist) {
 		$TOCTemplate = default_template();
 	} else {
 		print STDERR "Searching for $file\n";
-		my @templateFiles = ($devtoolsPreferencesPath.$pathSeparator.$file, $usrPreferencesPath, $systemPreferencesPath.$pathSeparator.$file, $usersPreferencesPath.$pathSeparator.$file, $Bin.$pathSeparator.$file, $file);
+		my @templateFiles = ($devtoolsPreferencesPath.$pathSeparator.$file, $usrPreferencesPath.$pathSeparator.$file, $systemPreferencesPath.$pathSeparator.$file, $usersPreferencesPath.$pathSeparator.$file, $Bin.$pathSeparator.$file, $file);
 
 		foreach my $filename (@templateFiles) {
 			if (open(TOCFILE, "<$filename")) {
@@ -1018,6 +1030,10 @@ foreach my $file (@inputFiles) {
 		print STDERR "Header Path: $frameworkpath\n";
 		print STDERR "Related: $frameworkrelated\n";
 	    }
+	} elsif ($tmpType eq "abstract") {
+		print STDERR "Ignored abstract\n" if ($localDebug);
+	} elsif ($tmpType eq "discussion") {
+		print STDERR "Ignored discussion\n" if ($localDebug);
 	} elsif ($tmpType eq "inheritedContent") {
 		print STDERR "Inherited content: ".$docRef->name()."\n" if ($localDebug);
         } elsif ($tmpType eq "econst") {
@@ -2234,36 +2250,40 @@ sub addTopLinkToFramesetTOCs {
 	    $HeaderDoc::newTOC = $newTOC;
 
             my $relPathToMasterTOC = &findRelativePath($tocFile, $masterTOC);
+	    my $breadcrumb_added = 0;
 	    if ($fileString =~ /<!-- HeaderDoc TOC framework link begin -->.*<!-- HeaderDoc TOC framework link end -->/s) {
                 my $breadcrumb = "";
+		$breadcrumb_added = 1;
 
 		if ($newTOC) {
 			# In a class, so the heading is already there.
 			# $breadcrumb .= HeaderDoc::APIOwner->tocSeparator("Other Reference", $newTOC);
-			$breadcrumb .= HeaderDoc::APIOwner->tocEntry("$relPathToMasterTOC", "$framework", "$linktarget");
+			$breadcrumb .= HeaderDoc::APIOwner->tocEntry("$relPathToMasterTOC", "$framework", "_top");
 		} else {
 			# In a class, so the heading is already there.
 			# $breadcrumb .= "<br><h4>Other Reference</h4><hr class=\"TOCSeparator\">\n";
-			$breadcrumb .= "<nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"$relPathToMasterTOC\" target=\"$linktarget\">$framework</a></nobr><br>\n";
+			$breadcrumb .= "<nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"$relPathToMasterTOC\" target=\"_top\">$framework</a></nobr><br>\n";
 		}
 
 		$fileString =~ s/<!-- HeaderDoc TOC framework link begin -->.*<!-- HeaderDoc TOC framework link end -->/<!-- HeaderDoc TOC framework link begin -->$breadcrumb<!-- HeaderDoc TOC framework link end -->/s;
 	    } elsif ($fileString =~ /<!-- HeaderDoc TOC framework link block begin -->.*<!-- HeaderDoc TOC framework link block end -->/s) {
                 my $breadcrumb = "";
+		$breadcrumb_added = 1;
 
 		if ($newTOC) {
 			$breadcrumb .= HeaderDoc::APIOwner->tocSeparator("Other Reference", $newTOC);
-			$breadcrumb .= HeaderDoc::APIOwner->tocEntry("$relPathToMasterTOC", "$framework", "$linktarget");
+			$breadcrumb .= HeaderDoc::APIOwner->tocEntry("$relPathToMasterTOC", "$framework", "_top");
 		} else {
 			$breadcrumb .= "<br><h4>Other Reference</h4><hr class=\"TOCSeparator\">\n";
-			$breadcrumb .= "<nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"$relPathToMasterTOC\" target=\"$linktarget\">$framework</a></nobr><br>\n";
+			$breadcrumb .= "<nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"$relPathToMasterTOC\" target=\"_top\">$framework</a></nobr><br>\n";
 		}
 
 		$fileString =~ s/<!-- HeaderDoc TOC framework link block begin -->.*<!-- HeaderDoc TOC framework link block end -->/<!-- HeaderDoc TOC framework link block begin -->$breadcrumb<!-- HeaderDoc TOC framework link block end -->/s;
-	    } elsif (!$useBreadcrumbs) {
+	    }
+	    if ((($HeaderDoc::addTopLink && !$newTOC) || (!$breadcrumb_added)) && (!$useBreadcrumbs)) {
 		if ($fileString !~ /$uniqueMarker/) { # we haven't been here before
                     my $relPathToMasterTOC = &findRelativePath($tocFile, $masterTOC);
-                    my $topLink = "\n<font size=\"-2\"><a href=\"$relPathToMasterTOC\" $linktarget $uniqueMarker>[Top]</a></font><br/>\n";
+                    my $topLink = "\n<font size=\"-2\"><a href=\"$relPathToMasterTOC\" target=\"_top\" $uniqueMarker>[Top]</a></font><br/>\n";
                     
                     $fileString =~ s/(<body[^>]*>)/$1$topLink/i;
                 }

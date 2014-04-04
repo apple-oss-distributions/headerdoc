@@ -9,7 +9,7 @@ extern "C" {
 }
 #endif
 $11|/*! foo */
-$0|$6399|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$6507|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -37,8 +37,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/block_4.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/block_4.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -258,7 +261,7 @@ END OF OBJECT
 
 
 
-$6399|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$6507|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -286,8 +289,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/block_4.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/block_4.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

@@ -6,7 +6,7 @@ $218|/*! @function reverseorder
     Should be called reverseorder.  The apple_ref should be
     //apple_ref/c/func/reverseorder
  */
-$0|$7621|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$7729|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -34,8 +34,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/nametest_14.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/nametest_14.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -297,7 +300,7 @@ END OF OBJECT
 
 
 
-$7621|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$7729|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -325,8 +328,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/nametest_14.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/nametest_14.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

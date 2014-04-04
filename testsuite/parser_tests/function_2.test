@@ -4,7 +4,7 @@ $145|/*! @function varargs_test
     @param foo Format string.
     @param ... additional parameters.
 */
-$0|$11293|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$11401|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -32,8 +32,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/function_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/function_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -439,7 +442,7 @@ END OF OBJECT
 
 
 
-$11293|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$11401|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -467,8 +470,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/function_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/function_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

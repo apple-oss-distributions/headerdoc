@@ -2,7 +2,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $59|/*! @function foo
 This is a test, this is only a test.
  */
-_$7236|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+_$7344|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -30,8 +30,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/basic_function.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/basic_function.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -286,7 +289,7 @@ END OF OBJECT
 
 
 
-$7236|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$7344|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -314,8 +317,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/basic_function.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/basic_function.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

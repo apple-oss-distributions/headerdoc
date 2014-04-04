@@ -2,7 +2,7 @@
 # Utilities.pm
 # 
 # Common subroutines
-# Last Updated: $Date: 2012/04/12 13:06:41 $
+# Last Updated: $Date: 2013/03/26 21:31:55 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -75,12 +75,12 @@ my $depth = 0;
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::Utilities::VERSION = '$Revision: 1334261201 $';
+$HeaderDoc::Utilities::VERSION = '$Revision: 1364358715 $';
 @ISA = qw(Exporter);
 @EXPORT = qw(findRelativePath safeName safeNameNoCollide linesFromFile makeAbsolutePath
              printHash printArray fileNameFromPath folderPathForFile 
              updateHashFromConfigFiles getHashFromConfigFile getVarNameAndDisc
-             getAPINameAndDisc 
+             getAPINameAndDisc doxyTagFilter
              registerUID resolveLink parseTokens isKeyword html2xhtml
              resolveLinks stringToFields sanitize warnHDComment
              classTypeFromFieldAndBPinfo casecmp unregisterUID
@@ -1345,6 +1345,9 @@ sub printHash {
 #         Set to 1 if a class declaration is treated as an
 #         open brace.  (This is <b>not</b> used for ObjC clases;
 #         they are special.)
+#     @var functionisapiowner
+#         Set to 1 if a function can usefully contain classes and other
+#         API elements.
 #     @var structisbrace
 #         Set to 1 if a struct declaration is treated as an
 #         open brace.
@@ -1665,12 +1668,22 @@ sub parseTokens
 	$parseTokens{ilc} = "--";
 	$parseTokens{ilc_b} = "#";
 	# $parseTokens{lbrace} = "{";
-	$parseTokens{lbraceunconditionalre} = "^(tell)";
-	$parseTokens{rbrace} = "end";
+
+	# These always start a block ending in "end"
+	# $parseTokens{lbraceunconditionalre} = "^(repeat|try)\$";
+
+	# These might, if they aren't followed by the corresponing simple token.
+	$parseTokens{lbraceprecursor} = "^(if|tell)\$";
+	$parseTokens{lbraceprecursorre} = "^(then|to)\$";
+	$parseTokens{lbraceconditionalre} = "^(considering|ignoring|repeat|tell|try|using|with)\$";
+
+	# $parseTokens{rbrace} = "end";
+	$parseTokens{rbraceconditionalre} = "^(end)\$";
 	$parseTokens{rbracetakesargument} = 1;
 	$parseTokens{varname} = "property";
 	# $parseTokens{constname} = "const";
 	$parseTokens{structisbrace} = 0;
+	$parseTokens{functionisapiowner} = 1;
 	$parseTokens{functionisbrace} = 1;
 	$parseTokens{classisbrace} = 1;
 	$parseTokens{assignmentwithcolon} = 1;
@@ -2234,7 +2247,7 @@ sub validTag
             ($field =~ s/^meta(\s+|$)//sio) && do { return $include_second_tier; };
             ($field =~ s/^method(\s+|$)//sio) && do { return $include_first_tier; };
             ($field =~ s/^methodgroup(\s+|$)//sio) && do { return $include_first_tier; };
-            ($field =~ s/^name(\s+|$)//sio) && do { return $include_second_tier; };
+            ($field =~ s/^name(\s+|$)//sio) && do { return $include_first_tier; };
             ($field =~ s/^namespace(\s+|$)//sio) && do { return $include_second_tier; };
             ($field =~ s/^note(\s+|$)//sio) && do { return -$include_second_tier; }; 
             ($field =~ s/^noParse(\s+|$)//sio) && do { return $include_second_tier; };
@@ -4781,14 +4794,15 @@ sub getLineArrays {
 				    }
 				    # print "LINKLINE: $line\n";
 				    # if ($lang eq "java" || $HeaderDoc::parse_javadoc) {
-					$line =~ s/\@ref\s+(\w+)\s*(\(\))?/<code>\@link $1\@\/link<\/code>/sgio;
-					$line =~ s/\{\s*\@linkdoc\s+(.*?)\}/<i>\@link $1\@\/link<\/i>/sgio;
-					$line =~ s/\{\s*\@linkplain\s+(.*?)\}/\@link $1\@\/link/sgio;
-					$line =~ s/\{\s*\@link\s+(.*?)\}/<code>\@link $1\@\/link<\/code>/sgio;
-					$line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/sgio;
-					# if ($line =~ /value/o) { warn "line was: $line\n"; }
-					$line =~ s/\{\@value\}/\@value/sgio;
-					$line =~ s/\{\@inheritDoc\}/\@inheritDoc/sgio;
+					### $line =~ s/\@ref\s+(\w+)\s*(\(\))?/<code>\@link $1\@\/link<\/code>/sgio;
+					### $line =~ s/\{\s*\@linkdoc\s+(.*?)\}/<i>\@link $1\@\/link<\/i>/sgio;
+					### $line =~ s/\{\s*\@linkplain\s+(.*?)\}/\@link $1\@\/link/sgio;
+					### $line =~ s/\{\s*\@link\s+(.*?)\}/<code>\@link $1\@\/link<\/code>/sgio;
+					### $line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/sgio;
+					### # if ($line =~ /value/o) { warn "line was: $line\n"; }
+					### $line =~ s/\{\@value\}/\@value/sgio;
+					### $line =~ s/\{\@inheritDoc\}/\@inheritDoc/sgio;
+					$line = doxyTagFilter($line);
 					# if ($line =~ /value/o) { warn "line now: $line\n"; }
 				    # }
 				    $line =~ s/([^\\])\@docroot/$1\\\@\\\@docroot/sgi;
@@ -4824,14 +4838,15 @@ sub getLineArrays {
 				    $line =~ s/^[ \t]*#//s;
 				}
 				# print "LINKLINE2: $line\n";
-				$line =~ s/\{\s*\@linkdoc\s+(.*?)\}/<i>\@link $1\@\/link<\/i>/sgio;
-				$line =~ s/\{\s*\@linkplain\s+(.*?)\}/\@link $1\@\/link/sgio;
-				$line =~ s/\{\s*\@link\s+(.*?)\}/<code>\@link $1\@\/link<\/code>/sgio;
-				# $line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/sgio;
-				# if ($line =~ /value/so) { warn "line was: $line\n"; }
-				$line =~ s/\{\@value\}/\@value/sgio;
-				$line =~ s/\{\@inheritDoc\}/\@inheritDoc/sgio;
-				$line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/sgo;
+				### $line =~ s/\{\s*\@linkdoc\s+(.*?)\}/<i>\@link $1\@\/link<\/i>/sgio;
+				### $line =~ s/\{\s*\@linkplain\s+(.*?)\}/\@link $1\@\/link/sgio;
+				### $line =~ s/\{\s*\@link\s+(.*?)\}/<code>\@link $1\@\/link<\/code>/sgio;
+				### # $line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/sgio;
+				### # if ($line =~ /value/so) { warn "line was: $line\n"; }
+				### $line =~ s/\{\@value\}/\@value/sgio;
+				### $line =~ s/\{\@inheritDoc\}/\@inheritDoc/sgio;
+				### $line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/sgo;
+				$line = doxyTagFilter($line);
 
 				my %lineentry = ();
 				$lineentry{INTEXTBLOCK} = $in_textblock;
@@ -5833,6 +5848,26 @@ sub calcDepth
     warn("Filename: $origfilename; Depth: $depth\n") if ($localDebug);
 
     return $depth;
+}
+
+# /*! @abstract
+#         Performs conversion of certain Doxygen and JavaDoc tags.
+#  */
+sub doxyTagFilter
+{
+    my $line = shift;
+
+    $line =~ s/\@ref\s+(\w+)\s*(\(\))?/<code>\@link $1\@\/link<\/code>/sgio;
+    $line =~ s/\{\s*\@linkdoc\s+(.*?)\}/<i>\@link $1\@\/link<\/i>/sgio;
+    $line =~ s/\{\s*\@linkplain\s+(.*?)\}/\@link $1\@\/link/sgio;
+    $line =~ s/\{\s*\@link\s+(.*?)\}/<code>\@link $1\@\/link<\/code>/sgio;
+    # $line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/sgio;
+    # if ($line =~ /value/so) { warn "line was: $line\n"; }
+    $line =~ s/\{\@value\}/\@value/sgio;
+    $line =~ s/\{\@inheritDoc\}/\@inheritDoc/sgio;
+    $line =~ s/\{\s*\@docroot\s*\}/\\\@\\\@docroot/sgo;
+
+    return $line;
 }
 
 

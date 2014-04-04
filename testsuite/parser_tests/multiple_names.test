@@ -11,7 +11,7 @@ $187|/*!
 @param multi_name_e E
 @param multi_name_f F
  */
-$0|$38509|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$38617|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -39,8 +39,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/multiple_names.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/multiple_names.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct
@@ -1426,7 +1429,7 @@ END OF OBJECT
 
 
 
-$38509|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$38617|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -1454,8 +1457,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/multiple_names.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/multiple_names.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct

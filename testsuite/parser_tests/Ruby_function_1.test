@@ -4,7 +4,7 @@ end
 a = "\nThis is a double quoted string\n"
 $53|    This is a function that
     takes one parameter.
-$0|$7338|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$7446|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -32,8 +32,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/Ruby_function_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/Ruby_function_1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

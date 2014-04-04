@@ -1,13 +1,16 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$22|void *FOO(BAZ(x, y));
 $0|$49|#define FOO bar
 #define BAZ(a, b) int a, char *b
-$3294|-=: CPP MACROS PARSED :=-
+$3402|-=: CPP MACROS PARSED :=-
 PARSED: FOO
 PARSED: BAZ
 
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/cpp_test1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -121,13 +124,16 @@ VALUE: 0
 $CPP_HASH{BAZ} => int a, char *b
 $CPP_HASH{FOO} => bar
 $CPP_ARG_HASH{BAZ} => a, b
-$3294|-=: CPP MACROS PARSED :=-
+$3402|-=: CPP MACROS PARSED :=-
 PARSED: FOO
 PARSED: BAZ
 
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/cpp_test1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

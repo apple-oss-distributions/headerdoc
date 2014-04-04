@@ -5,7 +5,7 @@ uint64_t mylongfunction_64(uint64_t mylongfunctionvalue);
 int mylongfunction(int mylongfunctionvalue);
 #endif
 $37|/*! This is a block of functions. */
-$0|$28476|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$28584|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -33,8 +33,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/function_block_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/function_block_1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -869,7 +872,7 @@ END OF OBJECT
 
 
 
-$28476|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$28584|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -897,8 +900,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/function_block_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/function_block_1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

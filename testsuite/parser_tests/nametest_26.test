@@ -17,7 +17,7 @@ $589|/*!
         @constant       kDRBlockSizeMode2Form2Data      Mode 2 Form 2 data.
         @constant       kDRBlockSizeDVDData                     DVD data.
 */
-$0|$15882|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$15990|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -45,8 +45,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/nametest_26.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/nametest_26.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => enum
@@ -618,7 +621,7 @@ END OF OBJECT
 
 
 
-$15882|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$15990|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -646,8 +649,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/nametest_26.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/nametest_26.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => enum

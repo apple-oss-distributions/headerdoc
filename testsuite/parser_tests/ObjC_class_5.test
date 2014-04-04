@@ -40,7 +40,7 @@ $254|/*!
         @discussion An NSBox object is a simple NSView that can do two things:
         It can draw a border around itself, and it can title itself.
 */
-$0|$20633|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$20741|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -68,9 +68,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/ObjC_class_5.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/ObjC_class_5.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -709,7 +712,7 @@ END OF OBJECT
 
 
 
-$32731|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$32839|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -737,9 +740,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/ObjC_class_5.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/ObjC_class_5.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

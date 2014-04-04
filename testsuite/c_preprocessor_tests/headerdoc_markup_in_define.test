@@ -7,12 +7,15 @@ $0|$56|#define GUTS \
 	int bar; \
 	/*! @var foo */ \
 	int foo;
-$3746|-=: CPP MACROS PARSED :=-
+$3854|-=: CPP MACROS PARSED :=-
 PARSED: GUTS
 
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/headerdoc_markup_in_define.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct
@@ -150,12 +153,15 @@ $CPP_HASH{GUTS} =>
         int bar; 
 /*! @var foo */ 
         int foo;
-$3746|-=: CPP MACROS PARSED :=-
+$3854|-=: CPP MACROS PARSED :=-
 PARSED: GUTS
 
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/headerdoc_markup_in_define.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct

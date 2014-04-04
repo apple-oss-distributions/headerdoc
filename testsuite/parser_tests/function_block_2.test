@@ -6,7 +6,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $64|/*! @function
         This is a function with two variants.
  */
-$0|$10637|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$10745|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -34,8 +34,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/function_block_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/function_block_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -381,7 +384,7 @@ END OF OBJECT
 
 
 
-$10637|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$10745|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -409,8 +412,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/function_block_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/function_block_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

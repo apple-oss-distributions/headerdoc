@@ -3,7 +3,7 @@ begin
         WriteLn('Function 2');
 end;
 $44|{! A function with arguments a, b, and j. }
-$0|$10727|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$10835|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -31,8 +31,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/Pascal_function_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/Pascal_function_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -402,7 +405,7 @@ END OF OBJECT
 
 
 
-$10727|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$10835|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -430,8 +433,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/Pascal_function_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/Pascal_function_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

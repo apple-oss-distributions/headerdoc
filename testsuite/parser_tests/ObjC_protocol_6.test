@@ -35,7 +35,7 @@ $186|/*! @protocol Test_Of_optional_and_required
                 ObjC keywords.
     @discussion tests \@optional and \@required.
  */
-$0|$64135|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$64243|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -63,8 +63,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/ObjC_protocol_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/ObjC_protocol_6.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -2043,7 +2046,7 @@ END OF OBJECT
 
 
 
-$66350|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$66458|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -2071,8 +2074,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/ObjC_protocol_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/ObjC_protocol_6.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

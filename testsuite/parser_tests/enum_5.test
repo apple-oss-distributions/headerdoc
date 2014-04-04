@@ -23,7 +23,7 @@ $203|/*! Last symbol before curly brace was disappearing in one mostly unimporta
     parse, causing some constant values to not get picked up correctly in
     code that really shouldn't care, but does.
  */
-$0|$11397|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$11505|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -51,8 +51,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/enum_5.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/enum_5.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => enum
@@ -435,7 +438,7 @@ END OF OBJECT
 
 
 
-$11397|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$11505|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -463,8 +466,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/enum_5.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/enum_5.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => enum

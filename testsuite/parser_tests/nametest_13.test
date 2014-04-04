@@ -6,7 +6,7 @@ $252|/*! @function reverseorder
         //apple_ref/doc/title:func/reverseorder and eventually
         //apple_ref/c func/not_the_right_function
  */ 
-$0|$11218|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$11326|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -34,8 +34,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/nametest_13.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/nametest_13.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -407,7 +410,7 @@ END OF OBJECT
 
 
 
-$11218|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$11326|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -435,8 +438,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/nametest_13.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/nametest_13.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

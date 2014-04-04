@@ -10,7 +10,7 @@ $254|/*!
  *      Like port_allocate_name, but the kernel picks a name.
  *      It can use any name not associated with a right.
  */
-$0|$13203|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$13311|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -38,8 +38,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/MIG_routine_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/MIG_routine_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -495,7 +498,7 @@ END OF OBJECT
 
 
 
-$13203|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$13311|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -523,8 +526,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/MIG_routine_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/MIG_routine_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

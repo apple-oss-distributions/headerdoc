@@ -6,7 +6,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $22|/**
         Class
  */
-$0|$6243|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$6357|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -34,8 +34,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/JavaScript_not_a_regexp.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/JavaScript_not_a_regexp.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -115,7 +118,7 @@ $parserState->{variableNameConcat} => 0
 newcount: 5
 typelist: function
 namelist: not_a_regexp.nare_Class
-posstypes: function method
+posstypes: function method class
 value: 
 returntype: 
 pridec: 
@@ -250,4 +253,4 @@ END OF OBJECT
 
 _$65|This should be parsed as a comment, not
 as a regular expression.
-$28|JavaScript_not_a_regexp.test$4|java$23|JavaScript not a regexp$10|javascript$6|parser
+$105|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/JavaScript_not_a_regexp.test$4|java$23|JavaScript not a regexp$10|javascript$6|parser

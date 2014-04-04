@@ -6,7 +6,7 @@ $284|/*! Block as return type.  Named block_test_29342384_myfunction_with_block_
         Returns a block that takes two arguments, one of type
         size_t and one of type int.
  */
-$0|$11816|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$11924|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -34,8 +34,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/block_3.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/block_3.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -439,7 +442,7 @@ END OF OBJECT
 
 
 
-$11816|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$11924|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -467,8 +470,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/block_3.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/block_3.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

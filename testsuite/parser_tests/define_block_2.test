@@ -13,7 +13,7 @@ $314|/*!
 @define DEFINE_BLOCK_2_MEM_FOO Assume Foo.
 @discussion All these bits are optional.
 */
-$0|$42385|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$42493|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -41,8 +41,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/define_block_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/define_block_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -1089,7 +1092,7 @@ END OF OBJECT
 
 
 
-$42385|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$42493|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -1117,8 +1120,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/define_block_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/define_block_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

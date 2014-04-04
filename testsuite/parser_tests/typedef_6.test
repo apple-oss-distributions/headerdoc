@@ -59,7 +59,7 @@ $2541|/*! @typedef This is a TypedefdStructWithCallbacks
 
     @field lastField Description of the struct's last field.
 */
-$0|$66215|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$66323|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -87,8 +87,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/typedef_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/typedef_6.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct
@@ -2033,7 +2036,7 @@ END OF OBJECT
 
 
 
-$66215|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$66323|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -2061,8 +2064,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/typedef_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/typedef_6.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct

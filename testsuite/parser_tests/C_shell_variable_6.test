@@ -2,7 +2,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 Last"
 C_SHELL_VAR_ACROSS_NL_NOT_PART="blah"
 $40|# /*! This extends across a newline. */
-$0|$5770|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$5878|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -30,8 +30,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/C_shell_variable_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/C_shell_variable_6.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{afterSemi} => 1
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0

@@ -13,7 +13,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 @end
 $34|/*! @class avmacros_071_class
  */
-$0|$19446|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$19554|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -41,9 +41,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/avmacros_071.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/avmacros_071.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{attributeState} => 0
 $parserState->{availability} => 
 $parserState->{availabilityNodesArray} => ARRAY(OBJID)
@@ -615,7 +618,7 @@ END OF OBJECT
 
 
 
-$21505|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$21613|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -643,9 +646,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/avmacros_071.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/avmacros_071.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{attributeState} => 0
 $parserState->{availability} => 
 $parserState->{availabilityNodesArray} => ARRAY(OBJID)

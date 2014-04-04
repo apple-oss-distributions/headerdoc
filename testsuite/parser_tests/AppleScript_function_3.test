@@ -1,7 +1,7 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$30|on preposition_in_name(x)
 end
 $18|(*! A handler. *)
-$0|$7360|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$7458|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -31,6 +31,7 @@ fullpath: /test_suite_bogus_path/AppleScript_function_3.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
 $parserState->{FULLPATH} => /test_suite_bogus_path/AppleScript_function_3.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -44,8 +45,6 @@ $parserState->{freezeStack} => ARRAY(OBJID)
 $parserState->{freezereturn} => 1
 $parserState->{frozensodname} => preposition_in_name
 $parserState->{functionContents} => 
-end
-
 
 $parserState->{functionReturnsCallback} => 0
 $parserState->{hollow} => HeaderDoc::ParseTree=HASH(OBJID)
@@ -53,22 +52,19 @@ $parserState->{inBrackets} => 0
 $parserState->{inChar} => 0
 $parserState->{inClass} => 0
 $parserState->{inComment} => 0
-$parserState->{inGiven} => 0
 $parserState->{inInlineComment} => 0
-$parserState->{inLabel} => 0
 $parserState->{inMacro} => 0
 $parserState->{inMacroLine} => 0
-$parserState->{inOfIn} => 0
 $parserState->{inOperator} => 0
 $parserState->{inPrivateParamTypes} => 0
 $parserState->{inString} => 0
 $parserState->{inTemplate} => 0
 $parserState->{initbsCount} => 0
 $parserState->{inputCounter} => 3
-$parserState->{inrbraceargument} => 1
 $parserState->{kr_c_function} => 0
 $parserState->{kr_c_name} => 
 $parserState->{lang} => applescript
+$parserState->{lastDisplayNode} => HeaderDoc::ParseTree=HASH(OBJID)
 $parserState->{lastTreeNode} => HeaderDoc::ParseTree=HASH(OBJID)
 $parserState->{lastsymbol} => 
 $parserState->{macroNoTrunc} => 1
@@ -102,6 +98,8 @@ $parserState->{sodname} => preposition_in_name
 $parserState->{sodtype} => 
 $parserState->{stackFrozen} => 1
 $parserState->{startOfDec} => 0
+$parserState->{storeDec} =>  on preposition_in_name(
+
 $parserState->{sublang} => applescript
 $parserState->{typestring} => function
 $parserState->{value} => 
@@ -110,7 +108,7 @@ $parserState->{valuepending} => 0
 newcount: 3
 typelist: function
 namelist: preposition_in_name
-posstypes: function method
+posstypes: function method 
 value: 
 returntype: 
 pridec: 
@@ -119,8 +117,6 @@ bpavail:
 blockOffset: 0
 conformsToList: 
 functionContents: 
-end
-
 
 extendsClass: 
 implementsClass: 
@@ -133,6 +129,9 @@ Parsed Param 0 => x
 +---(
 |   +---x
 |   +---)
++---end
++---[ NEWLINE ]
++---[ NEWLINE ]
 -=: COMPUTED VALUE :=-
 SUCCESS: 0
 VALUE: 0
@@ -274,6 +273,9 @@ OBJECT: preposition_in_name (HeaderDoc::Function)
 +---(
 |   +---x
 |   +---)
++---end
++---[ NEWLINE ]
++---[ NEWLINE ]
 END OF OBJECT
 
 
@@ -286,4 +288,4 @@ END OF OBJECT
 
 
 
-__$50|testsuite/parser_tests/AppleScript_function_3.test$11|applescript$22|AppleScript function 3$11|applescript$6|parser
+__$104|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/AppleScript_function_3.test$11|applescript$22|AppleScript function 3$11|applescript$6|parser

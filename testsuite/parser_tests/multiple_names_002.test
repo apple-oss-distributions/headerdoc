@@ -18,7 +18,7 @@ $77|/*!
     @param manynames_fromseed
 	From seed?
  */
-$0|$58532|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$58640|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -46,8 +46,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/multiple_names_002.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/multiple_names_002.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct
@@ -1941,7 +1944,7 @@ END OF OBJECT
 
 
 
-$58532|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$58640|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -1969,8 +1972,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/multiple_names_002.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/multiple_names_002.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct

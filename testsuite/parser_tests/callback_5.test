@@ -1,6 +1,6 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$77|typedef void (*funcptr_test_29384789234_std_callback)(dispatch_item_t item);
 $25|/*! Standard callback */
-$0|$8297|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$8405|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -28,8 +28,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/callback_5.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/callback_5.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -297,7 +300,7 @@ END OF OBJECT
 
 
 
-$8297|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$8405|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -325,8 +328,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/callback_5.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/callback_5.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

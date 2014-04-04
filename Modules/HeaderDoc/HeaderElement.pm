@@ -3,7 +3,7 @@
 # Class name: HeaderElement
 # Synopsis: Root class for Function, Typedef, Constant, etc. -- used by HeaderDoc.
 #
-# Last Updated: $Date: 2012/06/29 16:13:19 $
+# Last Updated: $Date: 2013/05/14 15:29:11 $
 #
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -157,6 +157,8 @@
 #     @var FIRSTCONSTNAME
 #         The first constant name within an enumeration.  Used as the name of
 #         an anonymous enumeration if no name is specified in the comment.
+#     @var FORCENAME
+#         The contents of an \@name tag, which overrides any name obtained in any other way.
 #     @var FULLPATH
 #         The filename containing this declaration (with leading parts left intact).
 #     @var FUNCORMETHOD
@@ -361,7 +363,7 @@ use Devel::Peek;
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::HeaderElement::VERSION = '$Revision: 1341011599 $';
+$HeaderDoc::HeaderElement::VERSION = '$Revision: 1368570551 $';
 
 # /*!
 #     @abstract
@@ -1129,7 +1131,7 @@ sub name {
 
 	print STDERR "NAMESET: $self -> $name\n" if ($localDebug);
 
-	if (!($class eq "HeaderDoc::Header") && ($oldname && length($oldname))) {
+	if (!($class eq "HeaderDoc::Header") && ($oldname && length($oldname)) && !length($self->{FORCENAME})) {
 		# Don't warn for headers, as they always change if you add
 		# text after @header.  Also, don't warn if the new name
 		# contains the entire old name, to avoid warnings for
@@ -1156,7 +1158,9 @@ sub name {
 		} elsif (($class eq "HeaderDoc::CPPClass" || $class =~ /^HeaderDoc::ObjC/o) && $name =~ /:/o) {
 			warn("$fullpath:$linenum: warning: Class name contains colon, which is probably not what you want.\n");
 		}
-	}
+	} elsif (length($self->{FORCENAME})) {
+        $name = $self->{FORCENAME};
+    }
 
 	$name =~ s/\n$//sgo;
 	$name =~ s/\s$//sgo;
@@ -4981,6 +4985,7 @@ sub styleSheet
 
     if ($stdstyles) {
 	# Most stuff is 10 pt.
+	$css .= "body {border: 0px; margin: 0px;}";
 	$css .= "div {font-size: 10pt; text-decoration: none; font-family: lucida grande, geneva, helvetica, arial, sans-serif; color: #000000;}";
 	$css .= "td {font-size: 10pt; text-decoration: none; font-family: lucida grande, geneva, helvetica, arial, sans-serif; color: #000000;}";
 
@@ -7650,7 +7655,7 @@ sub processComment
 		$top_level_field = validTag($fieldname, 1);
 
 		if ($top_level_field && $seen_top_level_field && ($fieldname !~ /const(ant)?/) &&
-		    ($fieldname !~ /var/) && (!$self->isBlock() || $fieldname ne "define")) {
+		    ($fieldname !~ /var/) && (!$self->isBlock() || $fieldname ne "define") && $fieldname ne "name") {
 			# We've seen more than one top level field.
 
 			$field =~ s/^(\w+)(\s)//s;
@@ -8130,6 +8135,7 @@ field);
 				print STDERR "TLF: $field\n" if ($localDebug);
 
 				my $pattern = "";
+
 				if ($class =~ /HeaderDoc\:\:PDefine/ && $field =~ s/^(availabilitymacro)(\s+|$)/$2/sio) {
 					$self->isAvailabilityMacro(1);
 					$keepname = 1;
@@ -8169,6 +8175,7 @@ field);
 
 				my ($name, $abstract_or_disc, $namedisc) = getAPINameAndDisc($field, $self->lang(), $pattern);
 				print STDERR "FIELD: $field\nNAME: $name AOD: $abstract_or_disc ND: $namedisc" if ($localDebug);
+				if ($fieldname eq "name") {$self->{FORCENAME} = $name; print STDERR "FORCED NAME TO \"$name\"\n"};
 
 				print STDERR "KEEPNAME: $keepname\n" if ($localDebug);
 

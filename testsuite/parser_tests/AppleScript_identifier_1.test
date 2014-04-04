@@ -3,7 +3,7 @@ try
 end try
 end
 $18|(*! A handler. *)
-$0|$6744|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$6940|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -33,6 +33,7 @@ fullpath: /test_suite_bogus_path/AppleScript_identifier_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
 $parserState->{FULLPATH} => /test_suite_bogus_path/AppleScript_identifier_1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -46,8 +47,6 @@ $parserState->{freezeStack} => ARRAY(OBJID)
 $parserState->{freezereturn} => 1
 $parserState->{frozensodname} => |#foo|
 $parserState->{functionContents} => 
-try
-end try
 
 $parserState->{functionReturnsCallback} => 0
 $parserState->{hollow} => HeaderDoc::ParseTree=HASH(OBJID)
@@ -55,22 +54,19 @@ $parserState->{inBrackets} => 0
 $parserState->{inChar} => 0
 $parserState->{inClass} => 0
 $parserState->{inComment} => 0
-$parserState->{inGiven} => 0
 $parserState->{inInlineComment} => 0
-$parserState->{inLabel} => 0
 $parserState->{inMacro} => 0
 $parserState->{inMacroLine} => 0
-$parserState->{inOfIn} => 0
 $parserState->{inOperator} => 0
 $parserState->{inPrivateParamTypes} => 0
 $parserState->{inString} => 0
 $parserState->{inTemplate} => 0
 $parserState->{initbsCount} => 0
-$parserState->{inputCounter} => 3
-$parserState->{inrbraceargument} => 0
+$parserState->{inputCounter} => 5
 $parserState->{kr_c_function} => 0
 $parserState->{kr_c_name} => 
 $parserState->{lang} => applescript
+$parserState->{lastDisplayNode} => HeaderDoc::ParseTree=HASH(OBJID)
 $parserState->{lastTreeNode} => HeaderDoc::ParseTree=HASH(OBJID)
 $parserState->{lastsymbol} => 
 $parserState->{macroNoTrunc} => 1
@@ -79,11 +75,11 @@ $parserState->{namePending} => 0
 $parserState->{noInsert} => 0
 $parserState->{occmethod} => 0
 $parserState->{occmethodname} => 
-$parserState->{occparmlabelfound} => 3
+$parserState->{occparmlabelfound} => 2
 $parserState->{onlyComments} => 0
 $parserState->{parsedParamAtBrace} => ARRAY(OBJID)
 $parserState->{parsedParamList} => ARRAY(OBJID)
-$parserState->{parsedParamParse} => 0
+$parserState->{parsedParamParse} => 1
 $parserState->{parsedParamStateAtBrace} => ARRAY(OBJID)
 $parserState->{posstypes} => 
 $parserState->{posstypesPending} => 0
@@ -104,16 +100,17 @@ $parserState->{sodname} => |#foo|
 $parserState->{sodtype} => 
 $parserState->{stackFrozen} => 1
 $parserState->{startOfDec} => 0
+$parserState->{storeDec} =>  on |#foo| (
+
 $parserState->{sublang} => applescript
-$parserState->{treePopTwo} => 0
 $parserState->{typestring} => function
 $parserState->{value} => 
 $parserState->{valuepending} => 0
 -=: BLOCKPARSE RETURN VALUES :=-
-newcount: 3
+newcount: 5
 typelist: function
 namelist: |#foo|
-posstypes: function method
+posstypes: function method 
 value: 
 returntype: 
 pridec: 
@@ -122,8 +119,6 @@ bpavail:
 blockOffset: 0
 conformsToList: 
 functionContents: 
-try
-end try
 
 extendsClass: 
 implementsClass: 
@@ -136,6 +131,15 @@ Parsed Param 0 => x
 +---(
 |   +---x
 |   +---)
++---try
+|   +---[ NEWLINE ]
+|   +---end
+|   +--- 
+|   +---try
++---[ NEWLINE ]
++---end
++---[ NEWLINE ]
++---[ NEWLINE ]
 -=: COMPUTED VALUE :=-
 SUCCESS: 0
 VALUE: 0
@@ -277,6 +281,15 @@ OBJECT: |#foo| (HeaderDoc::Function)
 +---(
 |   +---x
 |   +---)
++---try
+|   +---[ NEWLINE ]
+|   +---end
+|   +--- 
+|   +---try
++---[ NEWLINE ]
++---end
++---[ NEWLINE ]
++---[ NEWLINE ]
 END OF OBJECT
 
 
@@ -289,4 +302,4 @@ END OF OBJECT
 
 
 
-__$52|testsuite/parser_tests/AppleScript_identifier_1.test$11|applescript$24|AppleScript identifier 1$11|applescript$6|parser
+__$106|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/AppleScript_identifier_1.test$11|applescript$24|AppleScript identifier 1$11|applescript$6|parser

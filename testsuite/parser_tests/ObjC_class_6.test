@@ -63,7 +63,7 @@ $258|/*!
         @abstract ObjCClassBeta provides a visual grouping element.
         @discussion An NSBox object is a simple NSView that can do two things: It can draw a border around itself, and it can title itself.
 */
-$0|$65008|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$65116|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -91,9 +91,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/ObjC_class_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/ObjC_class_6.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -2117,7 +2120,7 @@ END OF OBJECT
 
 
 
-$90360|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$90468|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -2145,9 +2148,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/ObjC_class_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/ObjC_class_6.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -4900,4 +4906,4 @@ END OF OBJECT
 
 
 
-_$17|ObjC_class_6.test$1|C$12|ObjC class 6$1|C$6|parser
+_$94|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/ObjC_class_6.test$1|C$12|ObjC class 6$1|C$6|parser

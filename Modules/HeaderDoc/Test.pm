@@ -3,7 +3,7 @@
 # Class name: Test
 # Synopsis: Test Harness
 #
-# Last Updated: $Date: 2012/04/12 13:06:41 $
+# Last Updated: $Date: 2013/05/14 15:10:37 $
 #
 # Copyright (c) 2008 Apple Computer, Inc.  All rights reserved.
 #
@@ -160,7 +160,7 @@ if ($HeaderDoc::FreezeThaw_available) {
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::Test::VERSION = '$Revision: 1334261201 $';
+$HeaderDoc::Test::VERSION = '$Revision: 1368569437 $';
 
 # /*!
 #     @abstract
@@ -615,7 +615,7 @@ print STDERR "ITEM NOW $item\n" if ($localDebug);
 	$results .= "-=: BLOCKPARSE PARSER STATE KEYS :=-\n";
 	my @pskeys = sort keys %{$parserState};
 	foreach my $key (@pskeys) {
-		if ($key !~ /(pplStack|hollow|lastTreeNode|freezeStack|parsedParamList|braceStack|treeStack|endOfTripleQuoteToken|rollbackState|availabilityNodesArray|parsedParamAtBrace|parsedParamStateAtBrace)/) {
+		if ($key !~ /(pplStack|hollow|lastDisplayNode|lastTreeNode|freezeStack|parsedParamList|braceStack|treeStack|endOfTripleQuoteToken|rollbackState|availabilityNodesArray|parsedParamAtBrace|parsedParamStateAtBrace)/) {
 			$results .= "\$parserState->{$key} => ".$parserState->{$key}."\n";
 		} else {
 			my $temp = $parserState->{$key};

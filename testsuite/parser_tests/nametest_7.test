@@ -11,7 +11,7 @@ $352|/*! @typedef foo_td
         a foo_td entry under typedefs.
         @abstract foo typedef abstract here.
  */
-$0|$9889|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$9997|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -39,8 +39,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/nametest_7.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/nametest_7.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct
@@ -385,7 +388,7 @@ END OF OBJECT
 
 
 
-$9889|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$9997|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -413,8 +416,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/nametest_7.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/nametest_7.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct

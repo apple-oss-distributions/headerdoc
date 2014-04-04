@@ -27,7 +27,7 @@ $420|/*! @struct _CPClass
 
         @field name Desc for name
 */
-$0|$54493|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$54601|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -55,8 +55,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/typedef_10.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/typedef_10.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct
@@ -1925,7 +1928,7 @@ END OF OBJECT
 
 
 
-$54493|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$54601|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -1953,8 +1956,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/typedef_10.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/typedef_10.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct

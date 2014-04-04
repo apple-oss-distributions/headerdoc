@@ -8,7 +8,7 @@ $128|/*! A new-style typedef comment.
     @constant constant2
 	This is constant 2.
  */
-$0|$8882|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$8990|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -36,8 +36,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/typedef_11.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/typedef_11.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => enum
@@ -374,7 +377,7 @@ END OF OBJECT
 
 
 
-$8882|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$8990|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -402,8 +405,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/typedef_11.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/typedef_11.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => enum

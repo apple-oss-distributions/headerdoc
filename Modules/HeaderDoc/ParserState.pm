@@ -2,7 +2,7 @@
 #
 # Class name: 	ParserState
 # Synopsis: 	Used by headerDoc2HTML.pl to hold parser state
-# Last Updated: $Date: 2012/04/06 15:56:50 $
+# Last Updated: $Date: 2013/05/14 15:29:11 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -490,6 +490,14 @@
 #             Set to the actual <code>of</code> or <code>in</code> token
 #             encountered when parsing AppleScript.  The word token after it is
 #             appended to this variable (delimited by a space).
+#         @var ASLBRACEPRECURSOR
+#             In an <code>if</code> or <code>tell</code> statement, stores
+#             the <code>if</code> or <code>tell</code> token.  Used to determine
+#             whether to treat the following newline as a brace.
+#         @var ASLBRACEPRECURSORTAG
+#             In an <code>if</code> or <code>tell</code> statement, stores
+#             the <code>then</code> or <code>to</code> token.  Used to determine
+#             whether to treat the following newline as a brace.
 #         @var inUnion
 #             Set to 1 when the union keyword is encountered.  Remains high
 #             until the end of this declaration.
@@ -665,7 +673,7 @@
 #             A nondestructive variant of {@link firstpastnl} that is available to
 #             any programming language (and currently used in TCL).
 #             Set to 2 after a newline, 1 during the first non-space
-#             token, 0 after.
+#             token, 0 after.  Also set to 2 initially.
 #
 #         @var inrbraceargument
 #             Some languages take an additional argument for their equivalent of
@@ -823,6 +831,13 @@
 #         @var functionContents
 #             The contents of a function (or, when parsing a switch
 #             statement, the contents of the struct body).
+#
+#         @var lastDisplayNode
+#             The last node in the parse tree rooted at this node that
+#             should be displayed.  Used only in AppleScript, to hide
+#             content nested inside functions while still parsing them
+#             fully.  Unlike lastTreeNode, this node's children
+#             <b>should</b> be included in the output.
 #
 #         @var lastTreeNode
 #             The last node in the parse tree rooted at this node.
@@ -1213,7 +1228,7 @@ use Carp qw(cluck);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::ParserState::VERSION = '$Revision: 1333753010 $';
+$HeaderDoc::ParserState::VERSION = '$Revision: 1368570551 $';
 ################ General Constants ###################################
 my $debugging = 0;
 
@@ -1344,6 +1359,8 @@ my %defaults = (
 				# from being a struct/enum/union/typedef
 				# to a variable.
 	backslashcount => 0,
+
+	afterNL => 2,
 
 	functionReturnsCallback => 0
 
@@ -1799,6 +1816,28 @@ sub isRubyCloseQuote
 }
 
 # /*!
+#     @abstract Enables some extra debugging for AppleScript.
+#  */
+$HeaderDoc::AppleScriptDebug = 0;
+
+# /*!
+#     @abstract Clears the left brace precursor token.
+#     @result Returns whether to treat the newline as a brace.
+#  */
+sub clearLeftBracePrecursor
+{
+	my $self = shift;
+
+	my $retval = $self->{ASLBRACEPRECURSOR};
+
+	$self->{ASLBRACEPRECURSOR} = "";
+	$self->{ASLBRACEPRECURSORTAG} = "";
+	print STDERR "Cleared ASLBRACEPRECURSOR\n" if ($HeaderDoc::AppleScriptDebug);
+
+	return $retval;
+}
+
+# /*!
 #     @abstract
 #         Returns whether or not this token should be
 #         treated as a left brace.
@@ -1808,25 +1847,8 @@ sub isRubyCloseQuote
 #         The token to check.
 #     @param lang
 #         The programming language.
-#     @param lbrace
-#         The primary left brace character.
-#     @param lbraceunconditionalre
-#         A regular expression containing other patterns that
-#         are always considered left braces.  Currently used
-#         for for/if in Python and Ruby, and tell in AppleScript.
-#     @param lbraceconditionalre
-#         In Ruby/Python, a set of tokens that are treated as
-#         left braces unless they are immediately after a
-#         right brace.  Basically, this handles
-#         begin/while/until when used at the end of a line
-#         in Ruby/Python.
-#     @param classisbrace
-#         Set to 1 if a class declaration is treated as an
-#         open brace.  (This is <b>not</b> used for ObjC clases;
-#         they are special.)
-#     @param functionisbrace
-#         Set to 1 if a function declaration is treated as an
-#         open brace.
+#     @param parseTokensRef
+#         A parse token hash obtained from a call to {@link parseTokens}.
 #     @param case_sensitive
 #         Set to 1 for most languages.  Set to 0 if the
 #         language uses case-insensitive token matching
@@ -1834,19 +1856,80 @@ sub isRubyCloseQuote
 #     @param curBraceCount
 #         The current brace count.  This is used to prevent
 #         nesting of braces in languages that don't work that way.
+#     @var lbrace
+#         The primary left brace character.
+#     @var lbraceunconditionalre
+#         A regular expression containing other patterns that
+#         are always considered left braces.  Currently used
+#         for for/if in Python and Ruby, and tell in AppleScript.
+#     @var lbraceconditionalre
+#         In Ruby/Python, a set of tokens that are treated as
+#         left braces unless they are immediately after a
+#         right brace.  Basically, this handles
+#         begin/while/until when used at the end of a line
+#         in Ruby/Python.
+#
+#         In AppleScript, this handles tokens that are treated as
+#         braces only if they are at the beginning of a line.
+#     @var lbraceprecursorre
+#         In AppleScript, this handles "then" after an "if"
+#         on the same line or "to" after a "tell" on the
+#         same line.
+#     @var classisbrace
+#         Set to 1 if a class declaration is treated as an
+#         open brace.  (This is <b>not</b> used for ObjC clases;
+#         they are special.)
+#     @var functionisbrace
+#         Set to 1 if a function declaration is treated as an
+#         open brace.
 #  */
 sub isLeftBrace
 {
 	my $self = shift;
 	my $part = shift;
 	my $lang = shift;
-	my $lbrace = shift;
-	my $lbraceunconditionalre = shift;
-	my $lbraceconditionalre = shift;
-	my $classisbrace = shift;
-	my $functionisbrace = shift;
+	my $parseTokensRef = shift;
 	my $case_sensitive = shift;
 	my $curBraceCount = shift;
+
+	my $localDebug = 0;
+
+	my %parseTokens = ();
+
+	my $lbrace;
+	my $lbraceunconditionalre;
+	my $lbraceconditionalre;
+	my $lbraceprecursorre;
+	my $classisbrace;
+	my $functionisbrace;
+	my $lbraceprecursor;
+
+	# Backwards compatibility hack.
+	if (@_) {
+		warn("The calling pattern for isLeftBrace has changed.  Please update your code.\n");
+
+		$lbrace = $parseTokensRef;
+		$parseTokensRef = undef;
+		$lbraceunconditionalre = $case_sensitive;
+		$lbraceconditionalre = $curBraceCount;
+		$classisbrace = shift;
+		$classisbrace = shift;
+		$case_sensitive = shift;
+		$curBraceCount = shift;
+		$lbraceprecursor = "";
+		$lbraceprecursorre = "";
+	} else {
+		# New-style calling: use the value as a reference.
+		%parseTokens = %{$parseTokensRef};
+
+		$lbrace = $parseTokens{lbrace};
+		$lbraceunconditionalre = $parseTokens{lbraceunconditionalre};
+		$lbraceconditionalre = $parseTokens{lbraceconditionalre};
+		$lbraceprecursorre = $parseTokens{lbraceprecursorre};
+		$classisbrace = $parseTokens{classisbrace};
+		$functionisbrace = $parseTokens{functionisbrace};
+		$lbraceprecursor = $parseTokens{lbraceprecursor};
+	}
 
 	# print STDERR "\$self: $self \$part: $part \$lbrace: $lbrace \$lbraceunconditionalre: $lbraceunconditionalre \$lbraceconditionalre: $lbraceconditionalre \$classisbrace: $classisbrace \$functionisbrace: $functionisbrace \$case_sensitive: $case_sensitive\n";
 
@@ -1863,16 +1946,133 @@ sub isLeftBrace
 	}
 
 	if ($lbraceunconditionalre && ($part =~ /$lbraceunconditionalre/)) { return 1; }
-	if ($lbraceconditionalre && (!$self->{followingrubyrbrace}) && ($part =~ /$lbraceconditionalre/)) { return 1; }
+
+	if ($lang eq "applescript" && !($self->{inString} || $self->{inComment} || $self->{inInlineComment})) {
+		print STDERR "ASPART: \"$part\" PC: ".$self->{ASLBRACEPRECURSOR}." PCTAG: ".$self->{ASLBRACEPRECURSORTAG}."\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+
+		# After an if/then or a tell/to, if we see a non-space, non-comment token,
+		# then it is a simple-style "if" or "tell" statement.  Clear the precursor data
+		# so that a subsequent call to {@link clearLeftBracePrecursor} will return
+		# an empty string.
+		if (($self->{ASLBRACEPRECURSORTAG}) && $part =~ /\S/) {
+			print STDERR "Cleared ASLBRACEPRECURSOR (simple statement)\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+			$self->{ASLBRACEPRECURSOR} = "";
+			$self->{ASLBRACEPRECURSORTAG} = "";
+		}
+
+		# If we see the "if" or "tell" token, store it away.
+		if ($lbraceprecursor && $part =~ /$lbraceprecursor/) {
+			$self->{ASLBRACEPRECURSOR} = $part;
+			print STDERR "Set ASLBRACEPRECURSOR to \"$part\"\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+		}
+
+		# If we see the "then" or "to" token, store it away.
+		if ($lbraceprecursorre && $part =~ /$lbraceprecursorre/) {
+			print STDERR "AS conditional lbrace: \"$part\"\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+			if ($part eq "then" && $self->{ASLBRACEPRECURSOR} eq "if") {
+				print STDERR "IF THEN\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+				$self->{ASLBRACEPRECURSORTAG} = $part;
+			}
+			if ($part eq "to" && $self->{ASLBRACEPRECURSOR} eq "tell") {
+				print STDERR "TELL TO\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+				$self->{ASLBRACEPRECURSORTAG} = $part;
+			}
+			print STDERR "Nope.\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+		} elsif ($self->{afterNL} && $lbraceconditionalre && $part =~ /$lbraceconditionalre/) {
+			return 1;
+		}
+	} else {
+		if ($lbraceconditionalre && (!$self->{followingrubyrbrace}) && ($part =~ /$lbraceconditionalre/)) { return 1; }
+	}
 
 	if (!$self->{newlineIsSemi}) {
 		if ($classisbrace && $self->{sodclass} eq "class" && ($self->{inRubyClass} != 2) && $part =~ /[\n\r]/) {
+			print STDERR "Class is a brace.  Returning 1 at newline.\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
 			return 1;
 		}
-		if ($functionisbrace && $self->{pushedfuncbrace} == 1 && $part =~ /[\n\r]/) { return 1; }
+		if ($functionisbrace && $self->{pushedfuncbrace} == 1 && $part =~ /[\n\r]/) {
+			print STDERR "Function is a brace.  Returning 1 at newline.\n" if ($localDebug || $HeaderDoc::AppleScriptDebug);
+			return 1;
+		}
 	}
 
 	return 0;
+}
+
+# /*!
+#     @abstract
+#         Returns whether or not this token should be
+#         treated as a right brace.
+#     @param self
+#         This object.
+#     @param part
+#         The token to check.
+#     @param lang
+#         The programming language.
+#     @param parseTokensRef
+#         A parse token hash obtained from a call to {@link parseTokens}.
+#     @param case_sensitive
+#         Set to 1 for most languages.  Set to 0 if the
+#         language uses case-insensitive token matching
+#         (e.g. Pascal).
+#     @var rbrace
+#         The primary left brace character.
+#     @var rbraceconditionalre
+#         In AppleScript, this handles "end".
+#  */
+sub isRightBrace
+{
+    my $self = shift;
+
+    my $part = shift;
+    my $lang = shift;
+    my $parseTokensRef = shift;
+    my $case_sensitive = shift;
+
+    my %parseTokens = %{$parseTokensRef};
+
+    my $localDebug = 0;
+
+    if ($lang eq "applescript") {
+	print STDERR "Checking token \"$part\" for rbrace\n" if ($HeaderDoc::AppleScriptDebug || $localDebug);
+
+	print STDERR "afterNL: ".$self->{afterNL}."\n" if ($HeaderDoc::AppleScriptDebug || $localDebug);
+
+	my $rbraceconditionalre = $parseTokens{rbraceconditionalre};
+	if ($self->{afterNL} && $rbraceconditionalre && $part =~ /$rbraceconditionalre/) {
+		print STDERR "Yes.\n" if ($HeaderDoc::AppleScriptDebug || $localDebug);
+		return 1;
+	} else {
+		print STDERR "No.\n" if ($HeaderDoc::AppleScriptDebug || $localDebug);
+		return 0;
+	}
+    }
+    print STDERR "Checking token \"$part\" for non-AppleScript rbrace\n" if ($HeaderDoc::AppleScriptDebug || $localDebug);
+
+    my $retval = casecmp($part, $parseTokens{rbrace}, $case_sensitive);
+
+    print STDERR ($retval ? "Yes\n" : "No\n") if ($HeaderDoc::AppleScriptDebug || $localDebug);
+
+    return $retval;
+}
+
+# /*!
+#     @abstract Returns whether an AppleScript on/to should be treated as a handler or just a normal token.
+#  */
+sub appleScriptFunctionLegalHere
+{
+    my $self = shift;
+    my $braceStackRef = shift;
+
+    my @braceStack = @{$braceStackRef};
+
+    # It's only a handler if it is the first on a line.
+    if (!$self->{afterNL}) { return 0; }
+
+    # It isn't legal inside other stuff, e.g. a try block.
+    if (scalar(@braceStack)-$self->{initbsCount}) { return 0; }
+
+    return 1;
 }
 
 # /*!

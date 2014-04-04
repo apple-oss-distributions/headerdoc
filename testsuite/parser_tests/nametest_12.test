@@ -1,6 +1,6 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$18|#define def_3 baz
 $75|/*! @define def_3_altname This should be called def_3 and def_3_altname */
-$0|$9112|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$9220|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -28,8 +28,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/nametest_12.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/nametest_12.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -292,7 +295,7 @@ END OF OBJECT
 
 
 
-$9112|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$9220|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -320,8 +323,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/nametest_12.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/nametest_12.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

@@ -13,7 +13,7 @@ $220|#/*! @function formatmessage_ksh
 #    @param $2 The next-to-last word of the message
 #    @param $3+ The rest of the message
 #*/
-$0|$9522|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$9630|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -41,8 +41,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/Shell_function_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/Shell_function_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{afterSemi} => 1
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0

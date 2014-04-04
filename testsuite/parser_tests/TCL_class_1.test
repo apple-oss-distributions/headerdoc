@@ -41,7 +41,7 @@ method tclClass1::cm2 { arg_1 arg_2 } {
 $33|# /*!
 #     Class number 1
 #  */
-$0|$17723|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$17802|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -69,6 +69,8 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/TCL_class_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/TCL_class_1.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
@@ -682,7 +684,7 @@ END OF OBJECT
 
 
 
-$37814|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$37893|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -710,6 +712,8 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/TCL_class_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/TCL_class_1.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0

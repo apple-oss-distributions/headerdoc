@@ -2076,16 +2076,23 @@ void resolveLinks(xmlNode * node, htmlDocPtr dp, char *filename, char *filename_
 				pos = target;
 				while (*pos && *pos != '?' && *pos != '#')
 				    pos++;
-				if (pos < target + 10) {
-				    index = 0;
-				} else {
-				    pos -= 10;
-				    if (strncmp(pos, "index.html", 10))
+
+				char *endpos = pos;
+				while ((pos > target) && *pos != '/')
+				    pos--;
+				if (*pos == '/') pos++;
+
+				char *temp = malloc(endpos - pos + 1);
+				strncpy(temp, pos, endpos - pos);
+				temp[endpos - pos] = '\0';
+
+				if (strcmp(temp, "index.html") && strcmp(temp, "CompositePage.html")) {
 					index = 0;
 				}
 				if (index) {
 				    addAttribute(node, "target", "_top");
 				}
+				free(temp);
 			    }
 			    if (node->content) free(node->content);
 			    node->content = NULL;	/* @@@ LEAK? @@@ */

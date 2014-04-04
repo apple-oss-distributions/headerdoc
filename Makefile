@@ -22,12 +22,13 @@ perl_libdir := $(subst Perl,Perl/Extras,$(perl_libdir))
 endif
 endif
 startperl   := $(shell perl -e 'require Config; print "$$Config::Config{'startperl'}\n";')
+testsuite_version := $(shell cat testsuite/version)
 
 all: all_internal test apidoc
 
 # Override the default compiler to GCC 4.0 if building for Snow Leopard internally.
 all_internal:
-	cd xmlman ; make all CC=`if [ "$$DEVELOPER_BIN_DIR" != "" -a "$(building_ppc)" != "0" ] ; then echo "gcc-4.0" ; else echo "cc"; fi` ARCH=`uname` VERS=`{ echo "10.6"; sw_vers -productVersion | sed 's/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\..*/\1.\2/'; } | sort | head -n 1` ; cd ..
+	cd xmlman ; make all CC=`if [ "$$DEVELOPER_BIN_DIR" != "" -a "$(building_ppc)" != "0" ] ; then echo "gcc-4.0" ; else echo "cc"; fi` ARCH=`uname` VERS=`{ echo "10.7"; sw_vers -productVersion | sed 's/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\..*/\1.\2/'; } | sort | head -n 1` ; cd ..
 
 clean:
 	cd xmlman ; make clean ; cd ..
@@ -78,6 +79,7 @@ test:
 
 realinstall: all_internal
 	DSTROOT="" make installsub
+	DSTROOT="" make installtests
 
 install: all_internal
 	@echo ; \
@@ -136,6 +138,7 @@ installsub:
 	install -s -c -m 755 xmlman/resolveLinks $(DSTROOT)$(bindir)/resolveLinks
 	install -c -m 755 headerDoc2HTML.pl $(DSTROOT)$(bindir)/$(program1)
 	perl -i -pe 's|^#!/usr/bin/perl.*$$|$(startperl)|;' $(DSTROOT)$(bindir)/$(program1)
+	perl -i -pe 's|^\$$HeaderDoc::testsuite_version="\d+";|\$$HeaderDoc::testsuite_version="$(testsuite_version)";|;' $(DSTROOT)$(bindir)/$(program1)
 	chmod 555 $(DSTROOT)$(bindir)/$(program1)
 	umask 022 && install -d $(DSTROOT)$(bindir)
 	install -c -m 755 gatherHeaderDoc.pl $(DSTROOT)$(bindir)/$(program2)
@@ -149,6 +152,7 @@ installsub:
 	install -c -m 444 Documentation/man/*.5 $(DSTROOT)$(DEVELOPER_DIR)/usr/share/man/man5
 	cd xmlman ; make clean ; cd ..
 
+installtests:
 	# Install test suite
 	umask 022 && install -d $(DSTROOT)$(DEVELOPER_DIR)/usr/share/headerdoc/testsuite
 	umask 022 && install -d $(DSTROOT)$(DEVELOPER_DIR)/usr/share/headerdoc/testsuite/parser_tests
@@ -157,6 +161,8 @@ installsub:
 	umask 022 && install -d $(DSTROOT)$(DEVELOPER_DIR)/usr/share/headerdoc/testsuite/resolvelinks/tests
 	umask 022 && install -d $(DSTROOT)$(DEVELOPER_DIR)/usr/share/headerdoc/testsuite/c_preprocessor_tests
 	install -c -m 444 testsuite/parser_tests/*.test $(DSTROOT)$(DEVELOPER_DIR)/usr/share/headerdoc/testsuite/parser_tests
+
+	install -c -m 755 testsuite/version $(DSTROOT)$(DEVELOPER_DIR)/usr/share/headerdoc/testsuite
 
 	# Install resolvelinks test tools
 	install -c -m 755 testsuite/resolvelinks/update.sh $(DSTROOT)$(DEVELOPER_DIR)/usr/share/headerdoc/testsuite/resolvelinks

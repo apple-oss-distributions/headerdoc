@@ -4,7 +4,7 @@ $155|# /*! Instance variable test
 #     @var ivar_test_in_perl
 #          Description of ivar_test_in_perl goes here.
 #  */
-$0|$8024|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$8132|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -32,9 +32,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/Perl_simulated_instance_variables.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/Perl_simulated_instance_variables.test
 $parserState->{ISFORWARDDECLARATION} => 1
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -285,7 +288,7 @@ END OF OBJECT
 
 
 
-$8024|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$8132|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -313,9 +316,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/Perl_simulated_instance_variables.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/Perl_simulated_instance_variables.test
 $parserState->{ISFORWARDDECLARATION} => 1
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

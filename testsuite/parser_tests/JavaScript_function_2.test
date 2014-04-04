@@ -9,7 +9,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 $96|/*! Passes clicks through the "Do not save" image to the link of
     the image behind it. 
  */ 
-$0|$7504|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$7618|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -37,8 +37,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/JavaScript_function_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/JavaScript_function_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -119,7 +122,7 @@ $parserState->{variableNameConcat} => 2
 newcount: 8
 typelist: function
 namelist: clickthru
-posstypes: function method
+posstypes: function method class
 value: 
 returntype:  function
 pridec: 

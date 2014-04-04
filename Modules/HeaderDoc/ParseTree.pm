@@ -2,7 +2,7 @@
 #
 # Class name: 	ParseTree
 # Synopsis: 	Used by headerdoc2html to hold parse trees
-# Last Updated: $Date: 2012/04/05 16:29:36 $
+# Last Updated: $Date: 2013/05/14 15:29:11 $
 # 
 # Copyright (c) 1999-2004 Apple Computer, Inc.  All rights reserved.
 #
@@ -64,6 +64,14 @@
 #         The first child (descendant) node of this node.
 #     @var PARENT
 #         The parent node in the parse tree.
+#     @var lastDisplayNode
+#             The last node in the parse tree rooted at this node that
+#             should be displayed.  Used only in AppleScript, to hide
+#             content nested inside functions while still parsing them
+#             fully.  This is used for functions that are not inside
+#             scripts.  For functions that are inside a script statement,
+#             the <code>lastDisplayNode</code> in the parser state object
+#             is used instead.
 #
 #  @vargroup File information
 #     @var FILENAME
@@ -156,7 +164,7 @@ package HeaderDoc::ParseTree;
 
 use strict;
 use vars qw($VERSION @ISA);
-use HeaderDoc::Utilities qw(isKeyword parseTokens stringToFields casecmp emptyHDok complexAvailabilityToArray printHash validTag);
+use HeaderDoc::Utilities qw(isKeyword parseTokens stringToFields doxyTagFilter casecmp emptyHDok complexAvailabilityToArray printHash validTag);
 use HeaderDoc::BlockParse qw(blockParse nspaces);
 use Carp qw(cluck);
 
@@ -169,7 +177,7 @@ use Carp qw(cluck);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::ParseTree::VERSION = '$Revision: 1333668576 $';
+$HeaderDoc::ParseTree::VERSION = '$Revision: 1368570551 $';
 ################ General Constants ###################################
 my $debugging = 0;
 
@@ -1476,7 +1484,7 @@ sub APIOprocessEmbeddedTagsRec($$$$$$$$)
 
 			# @@@ DAG CHECK ME
 			# $string =~ s/^\s*\*\s*//mg;
-			my $fieldref = stringToFields($string, $self->fullpath, $self->linenum, $xmlmode, $lang, $sublang);
+			my $fieldref = stringToFields(doxyTagFilter($string), $self->fullpath, $self->linenum, $xmlmode, $lang, $sublang);
 			# print STDERR "APIOLIST AT INSERT IS $apiolist\n" if ($localDebug);
 			# foreach my $owner (@{$apiolist}) {
 			    # print STDERR "X POSSOWNER of $self: $owner\n" if ($localDebug);
@@ -1492,7 +1500,9 @@ sub APIOprocessEmbeddedTagsRec($$$$$$$$)
 				# nested deeper than this is bogus (unless we hit a curly brace).
 				print STDERR "skipochildren -> 1 [1]" if ($localDebug);
 				$skipchildren = 1;
-				$next = $next->skipcurly($parseTokens{lbrace}, $ncurly); # nextTokenNoComments($parseTokens{soc}, $parseTokens{ilc}, $parseTokens{ilc_b}, 0, $enable_javadoc_comments);
+				if ($next) {
+					$next = $next->skipcurly($parseTokens{lbrace}, $ncurly); # nextTokenNoComments($parseTokens{soc}, $parseTokens{ilc}, $parseTokens{ilc_b}, 0, $enable_javadoc_comments);
+				}
 				if ($localDebug) {
 					print STDERR "NEXT IS $next (";
 					if ($next) {print STDERR $next->token(); }
@@ -1530,7 +1540,7 @@ sub APIOprocessEmbeddedTagsRec($$$$$$$$)
 					}
 					# @@@ DAG CHECKME LEADING STARS
 					# $string =~ s/^\s*\*\s*//mg;
-					my $fieldref = stringToFields($string, $self->fullpath, $self->linenum, $xmlmode, $lang, $sublang);
+					my $fieldref = stringToFields(doxyTagFilter($string), $self->fullpath, $self->linenum, $xmlmode, $lang, $sublang);
 					# foreach my $owner (@{$apiolist}) {
 					    print STDERR "POSSOWNER of $self: $apiOwner\n" if ($localDebug);
 					    if ($apiOwner && $apiOwner->isAPIOwner()) {
@@ -1808,7 +1818,7 @@ print STDERR "LAST DECLARATION: $lastDeclaration\n" if ($localDebug);
 		      if ($string =~ /^\s*\@/o && validTag($tagstring, 0)) { # $string =~ /^\s*\@/o
 			print STDERR "COMMENTSTRING: $string\n" if ($localDebug);
 	
-			my $fieldref = stringToFields($string, $fullpath, $linenum, $xmlmode, $apio->lang(), $apio->sublang());
+			my $fieldref = stringToFields(doxyTagFilter($string), $fullpath, $linenum, $xmlmode, $apio->lang(), $apio->sublang());
 		# print STDERR "APIO: $apio\n";
 			foreach my $owner (@{$apiolist}) {
 			    my $copy = $fieldref;
@@ -1877,7 +1887,7 @@ print STDERR "LAST DECLARATION: $lastDeclaration\n" if ($localDebug);
 			my $fullpath = $apio->fullpath();
 			my $linenum = $apio->linenum();
 
-			my $fieldref = stringToFields($string, $fullpath, $linenum, $xmlmode, $apio->lang(), $apio->sublang());
+			my $fieldref = stringToFields(doxyTagFilter($string), $fullpath, $linenum, $xmlmode, $apio->lang(), $apio->sublang());
 			print STDERR "COMMENTSTRING: $string\n" if ($localDebug);
 			print STDERR "OWNERSTART\n" if ($localDebug);
 			foreach my $owner (@{$apiolist}) {
@@ -1979,7 +1989,7 @@ print STDERR "LAST DECLARATION: $lastDeclaration\n" if ($localDebug);
 			my $fullpath = $apio->fullpath();
 			my $linenum = $apio->linenum();
 
-			my $fieldref = stringToFields($string, $fullpath, $linenum, $xmlmode, $apio->lang(), $apio->sublang());
+			my $fieldref = stringToFields(doxyTagFilter($string), $fullpath, $linenum, $xmlmode, $apio->lang(), $apio->sublang());
 			print STDERR "COMMENTSTRING: $string\n" if ($localDebug);
 			foreach my $owner (@{$apiolist}) {
 				my $copy = $fieldref;
@@ -2011,7 +2021,7 @@ print STDERR "LAST DECLARATION: $lastDeclaration\n" if ($localDebug);
 }
 
 # THIS CODE USED TO PROCESS COMMENTS WHENEVER IT IS TIME.
-	      # my $fieldref = stringToFields($string, $fullpath, $linenum, $xmlmode, $lang, $sublang);
+	      # my $fieldref = stringToFields(doxyTagFilter($string), $fullpath, $linenum, $xmlmode, $lang, $sublang);
 	      # $apio->processComment($fieldref, 1, $self, $parseTokens{soc}, $parseTokens{ilc}, $parseTokens{ilc_b}, $self, $hashtreecur, $hashtreeroot);
 		# $apio->{APIREFSETUPDONE} = 0;
 
@@ -2326,9 +2336,14 @@ sub xmlTree {
         # $typedefname, $varname, $constname, $structisbrace, $parseTokens{macronames});
 
     my $lastnode = undef;
+    my $lastDisplayNode = undef;
     my $parserState = $self->parserState();
     if ($parserState) {
 	$lastnode = $parserState->{lastTreeNode};
+	$lastDisplayNode = $parserState->{lastDisplayNode};
+    }
+    if ((!$lastDisplayNode) && $self->{lastDisplayNode}) {
+	$lastDisplayNode = $self->{lastDisplayNode};
     }
 
     # my ($sotemplate, $eotemplate, $operator, $parseTokens{soc}, $parseTokens{eoc}, $parseTokens{ilc}, $parseTokens{ilc_b}, $sofunction,
@@ -2351,9 +2366,10 @@ sub xmlTree {
 	xmlmode => 1, newlen => 0, breakable => 0, inMacro => 0, inEnum => 0, seenEquals => 0,
 	lastKeyword => "", lastnstoken => "", lastTreeNode => $lastnode, lastTokenType => "",
 	spaceSinceLastToken => 0, inAttribute => 0, inRaises => 0, inTypeOf => 0,
-	drop_pdefine_contents => $drop_pdefine_contents, ASinName => 0);
+	drop_pdefine_contents => $drop_pdefine_contents, ASinName => 0, afteradvisoryspace => 0,
+	lastDisplayNode => $lastDisplayNode);
 
-    my ($retvalref, $junka, $junkb, $junkc, $junkd, $junke, $lastTokenType, $spaceSinceLastToken) = $self->colorTreeSub($ctstate);
+    my ($retvalref, $junka, $junkb, $junkc, $junkd, $junke, $lastTokenType, $spaceSinceLastToken, $junk_afteradvisoryspace) = $self->colorTreeSub($ctstate);
     my $retval = ${$retvalref};
 
     # my $retval = "";
@@ -2439,10 +2455,16 @@ sub htmlTree {
     # colorizer goes here
 
     my $lastnode = undef;
+    my $lastDisplayNode = undef;
     my $parserState = $self->parserState();
     if ($parserState) {
 	$lastnode = $parserState->{lastTreeNode};
+	$lastDisplayNode = $parserState->{lastDisplayNode};
     }
+    if ((!$lastDisplayNode) && $self->{lastDisplayNode}) {
+	$lastDisplayNode = $self->{lastDisplayNode};
+    }
+    # print STDERR "TN: $self LTN: $lastnode LDN: $lastDisplayNode\n";
 
     # if ($lang eq "shell") {
 	# $keep_whitespace = 1;
@@ -2474,9 +2496,10 @@ sub htmlTree {
 	xmlmode => 0, newlen => 0, breakable => 0, inMacro => 0, inEnum => 0, seenEquals => 0,
 	lastKeyword => "", lastnstoken => "", lastTreeNode => $lastnode, lastTokenType => "",
 	spaceSinceLastToken => 0, inAttribute => 0, inRaises => 0, inTypeOf => 0,
-	drop_pdefine_contents => $drop_pdefine_contents, ASinName => 0);
+	drop_pdefine_contents => $drop_pdefine_contents, ASinName => 0, afteradvisoryspace => 0,
+	lastDisplayNode => $lastDisplayNode);
 
-    my ($retvalref, $junka, $junkb, $junkc, $junkd, $junke, $lastTokenType, $spaceSinceLastToken) = $self->colorTreeSub($ctstate);
+    my ($retvalref, $junka, $junkb, $junkc, $junkd, $junke, $lastTokenType, $spaceSinceLastToken, $junk_afteradvisoryspace) = $self->colorTreeSub($ctstate);
     my $retval = ${$retvalref};
 
     # my $retval = "";
@@ -2831,6 +2854,21 @@ sub isMacro
 }
 
 # /*!
+#     @abstract Prints the contents of a colorTreeSub state object.
+#  */
+sub dumpCTState
+{
+    my $ctstateref = shift;
+    my %ctstate = %{$ctstateref};
+
+    print STDERR "DUMPING CTSTATE:\n\n";
+    foreach my $key (keys %ctstate) {
+	print "        $key => ".$ctstate{$key}."\n";
+    }
+    print "\n\n";
+}
+
+# /*!
 #     @abstract
 #         Returns an HTML or XML representation of a parse tree/subtree.
 #     @param self
@@ -3013,18 +3051,49 @@ sub colorTreeSub
     my $tokenDebug = 0;
     my $codePathDebug = 0;
     my $rubyDebug = 0;
-
-    print STDERR "***** TOKEN: ".$self->{TOKEN}." *****\n" if ($codePathDebug || $localDebug);
-
-# print STDERR "IN COLORTREESUB\n";
+    my $tokenPrintDebug = 0;
+    my $advisorySpaceDebug = 0;
 
     my $continue = 1;
     my %ctstate = %{$ctstateref};
+
+    my $token = $self->{TOKEN};
+    my $ntoken = $self->nextpeek();
+
+    my $tokenname = $token;
+    if ($token eq "\n") { $tokenname = "[NEWLINE]"; }
+    elsif ($token eq "\r") { $tokenname = "[CARRIAGE RETURN]"; }
+    elsif (!length($token)) { $tokenname = "[EMPTY STRING]"; }
+    else { $tokenname = "\"".$tokenname."\""; }
+
+    my $ntokenname = $ntoken;
+    if ($ntoken eq "\n") { $ntokenname = "[NEWLINE]"; }
+    elsif ($ntoken eq "\r") { $ntokenname = "[CARRIAGE RETURN]"; }
+    elsif (!length($ntoken)) { $ntokenname = "[EMPTY STRING]"; }
+    else { $ntokenname = "\"".$ntokenname."\""; }
+
+    my $lastnstokenname = $ctstate{lastnstoken};
+    if ($ctstate{lastnstoken} eq "\n") { $lastnstokenname = "[NEWLINE]"; }
+    elsif ($ctstate{lastnstoken} eq "\r") { $lastnstokenname = "[CARRIAGE RETURN]"; }
+    elsif (!length($ctstate{lastnstoken})) { $lastnstokenname = "[EMPTY STRING]"; }
+    else { $lastnstokenname = "\"".$lastnstokenname."\""; }
+
+    print STDERR "***** TOKEN: ".$tokenname." *****\n" if ($codePathDebug || $localDebug || $tokenDebug || $tokenPrintDebug);
+
+
+
+
+
+# print STDERR "IN COLORTREESUB\n";
 
     if ($self == $ctstate{lastTreeNode}) {
 	print STDERR "Node is last node in tree.  Ending after this node.\n" if ($localDebug || $codePathDebug);
 	$continue = 0;
     }
+
+    dumpCTState(\%ctstate) if ($localDebug);
+
+    print STDERR "NEWLEN: ".$ctstate{newlen}."\n" if ($localDebug);
 
     my %parseTokens = %{$ctstate{parseTokensRef}};
     my %macroList = %{$parseTokens{macronames}};
@@ -3067,11 +3136,11 @@ sub colorTreeSub
     my $nextprespace = "";
     my $string = "";
     my $tailstring = "";
-    my $token = $self->{TOKEN};
     my $escapetoken = "";
     my ($case_sensitive, $keywordhashref) = $ctstate{apio}->keywords();
     my $tokennl = 0;
     if ($token =~ /^[\r\n]/o) { $tokennl = 1; }
+
     if (($token eq "\t" || $token =~ /^ +$/) && (!$ctstate{keep_whitespace})) { $token = " "; }
     if ($ctstate{inQuote} == 3) {
 	$keep_all_newlines = 1;
@@ -3081,6 +3150,21 @@ sub colorTreeSub
 	$ctstate{prespace} = "";
 	$nextprespace = "";
     }
+
+    if (length($token) && (!$tokennl)) {
+	if ($ctstate{afteradvisoryspace}) {
+		#  Remove a single space if we're after a newline that
+		#  got converted into a space
+		print STDERR "OLD AASTOKEN: \"$token\"\n" if ($localDebug || $advisorySpaceDebug || $codePathDebug);
+		$token =~ s/^ //;
+		$ctstate{afteradvisoryspace} = 0;
+		print STDERR "AASTOKEN NOW: \"$token\"\n" if ($localDebug || $advisorySpaceDebug || $codePathDebug);
+		print STDERR "AAS -> 0\n" if ($localDebug || $advisorySpaceDebug || $codePathDebug);
+	}
+    }
+
+    print "keep_all_newlines: $keep_all_newlines\n" if ($localDebug);
+
     my $tokenIsKeyword = isKeyword($token, $keywordhashref, $case_sensitive);
 
 print STDERR "TIK: $tokenIsKeyword\n" if ($localDebug);
@@ -3092,7 +3176,6 @@ print STDERR "TIK: $tokenIsKeyword\n" if ($localDebug);
     print STDERR "IQ is ".$ctstate{inQuote}."\n" if ($rubyDebug || $colorDebug);
 
     my $ctoken = $self->childpeeknc($parseTokens{soc}, $parseTokens{ilc}, $parseTokens{ilc_b});
-    my $ntoken = $self->nextpeek();
     my $ntokennc = $self->nextpeeknc($parseTokens{soc}, $parseTokens{ilc}, $parseTokens{ilc_b});
     my $nntokennc = $self->nextnextpeeknc($parseTokens{soc}, $parseTokens{ilc}, $parseTokens{ilc_b});
     my $tokenType = undef;
@@ -3122,21 +3205,7 @@ print STDERR "TIK: $tokenIsKeyword\n" if ($localDebug);
 	$ctstate{tokenAccum} = "";
     }
 
-    if ($treeDebug || $localDebug || $codePathDebug) {
-    	my $tokenname = $token;
-    	if ($token eq "\n") { $tokenname = "[NEWLINE]"; }
-    	elsif ($token eq "\r") { $tokenname = "[CARRIAGE RETURN]"; }
-
-    	my $ntokenname = $ntoken;
-    	if ($ntoken eq "\n") { $ntokenname = "[NEWLINE]"; }
-    	elsif ($ntoken eq "\r") { $ntokenname = "[CARRIAGE RETURN]"; }
-
-    	my $lastnstokenname = $ctstate{lastnstoken};
-    	if ($ctstate{lastnstoken} eq "\n") { $lastnstokenname = "[NEWLINE]"; }
-    	elsif ($ctstate{lastnstoken} eq "\r") { $lastnstokenname = "[CARRIAGE RETURN]"; }
-
-	print STDERR "TOKEN: $tokenname NTOKEN: $ntokenname LASTNSTOKEN: $lastnstokenname IC: ".$ctstate{inComment}."\n" if ($treeDebug || $localDebug || $codePathDebug);
-    }
+    print STDERR "TOKEN: $tokenname NTOKEN: $ntokenname LASTNSTOKEN: $lastnstokenname IC: ".$ctstate{inComment}."\n" if ($treeDebug || $localDebug || $codePathDebug);
     print STDERR "OCC: ".$ctstate{inObjCMethod}."\n" if ($colorDebug || $localDebug);
     print STDERR "HIDDEN: $hidden\n" if ($localDebug);
 
@@ -3212,7 +3281,7 @@ print STDERR "inQuote: ".$ctstate{inQuote}."\noldInQuote: $oldInQuote\ninComment
 print STDERR "oldInMacro: $oldInMacro\noldInComment: $oldInComment\n" if ($localDebug);
 
     # print STDERR "TOKEN: $token\n" if ($localDebug);
-    print STDERR "TOKEN: $token ASINNAME: ".$ctstate{ASinName}."\n" if ($localDebug);
+    print STDERR "TOKEN: $tokenname ASINNAME: ".$ctstate{ASinName}."\n" if ($localDebug);
 
     if ($ctstate{inEnum}) {
 	# If we see this, anything nested below here is clearly not a union.
@@ -3329,9 +3398,14 @@ print STDERR "oldInMacro: $oldInMacro\noldInComment: $oldInComment\n" if ($local
 		$leavingComment = 1;
 		$ctstate{inComment} = 0;
 	} elsif ($tokennl && ($ntoken !~ /^[\r\n]/o || $ctstate{keep_whitespace} || $keep_all_newlines)) {
+		my $ignored_newline = 1;
+
+		print STDERR "    TOKENNL (KW: ".$ctstate{keep_whitespace}.", KAN: $keep_all_newlines)\n" if ($localDebug || $codePathDebug);
+
 		if ($ctstate{ASinName}) {
 			$ctstate{ASinName} = 0;
 			print STDERR "ASinName -> 0 [4]\n" if ($localDebug);
+			$ignored_newline = 0;
 		}
 		if ($ctstate{inComment} == 2) {
 			print STDERR "    EOL INCOMMENT: END ILCOMMENT [1]\n" if ($localDebug || $codePathDebug);
@@ -3346,21 +3420,27 @@ print STDERR "oldInMacro: $oldInMacro\noldInComment: $oldInComment\n" if ($local
 			$mustbreak = 1;
 			# $token = "";
 			$drop = 1;
+			$ignored_newline = 0;
 		} elsif ($ctstate{inMacro} || $keep_all_newlines) {
 			print STDERR "    EOL INMACRO\n" if ($localDebug || $codePathDebug);
 			$mustbreak = 1;
 			$ctstate{newlen} = 0;
+			$ignored_newline = 0;
 		} elsif ($ctstate{inComment}) {
 			print STDERR "    EOL INCOMMENT\n" if ($localDebug || $codePathDebug);
 			$mustbreak = 1;
 			$ctstate{newlen} = 0;
 			# $token = "";
 			$drop = 1;
+			$ignored_newline = 0;
 		}
-		$ctstate{breakable} = 0;
-		$nextbreakable = 0;
-		# $nextprespace = nspaces(4 * $ctstate{depth});
-		$ctstate{newlen} = 0;
+
+		if (!$ignored_newline) {
+			$ctstate{breakable} = 0;
+			$nextbreakable = 0;
+			# $nextprespace = nspaces(4 * $ctstate{depth});
+			$ctstate{newlen} = 0;
+		}
 	# } elsif ($ntoken =~ /^[\r\n]/o) {
 		# print STDERR "    NEXT TOKEN IS NLCR\n" if ($localDebug || $codePathDebug);
 		# $ctstate{breakable} = 0;
@@ -3521,6 +3601,7 @@ print STDERR "oldInMacro: $oldInMacro\noldInComment: $oldInComment\n" if ($local
 		$tokenType = "function";
 	} elsif ($token eq ":" && $ctoken) {
 		# Don't indent Objective-C method parts so far.
+		print STDERR "    COLON AND CTOKEN\n" if ($localDebug || $codePathDebug);
 		$ctstate{depth} = $ctstate{depth} - 1; # We'll change it back before the next token.
 	} elsif ($ntokennc eq "(" && !$ctstate{seenEquals} && !$ctstate{inAttribute} && !$ctstate{inRaises} && !$ctstate{inTypeOf}) {
 		# Upcoming parenthesis handling
@@ -3575,17 +3656,22 @@ print STDERR "oldInMacro: $oldInMacro\noldInComment: $oldInComment\n" if ($local
 			$nextbreakable = 3;
 		}
 	} elsif (($ctstate{lang} eq "python") && ($token eq "\"\"\"")) {
+		print STDERR "    IRQ STARTEND\n" if ($localDebug || $codePathDebug);
 		if ($ctstate{inQuote}) { $ctstate{inQuote} = 0; }
 		else { $ctstate{inQuote} = 3; }
 	} elsif ($ruby && ($token eq "%{" || $token eq "%Q{")) {
+		print STDERR "    IRQ START[1]\n" if ($localDebug || $codePathDebug);
 		$ctstate{inQuote} = 3; $ctstate{inRubyQuote} = 1;
 	} elsif ($ruby && ($token eq "%/")) {
+		print STDERR "    IRQ PERCENTSLASH\n" if ($localDebug || $codePathDebug);
 		$ctstate{inQuote} = 3; $ctstate{inRubyQuote} = 1;
 	} elsif ($ruby && ($token eq "<<")) {
+		print STDERR "    IRQ START[2]\n" if ($localDebug || $codePathDebug);
 		$ctstate{inQuote} = 3;
 		$ctstate{inRubyQuote} = 2; # quote coloring starts after next token.
 		print STDERR "IRQ -> 2\n" if ($rubyDebug || $colorDebug);
 	} elsif ($ruby && ($ctstate{inRubyQuote} == 2)) {
+		print STDERR "    IRQ\n" if ($localDebug || $codePathDebug);
 		$ctstate{inRubyQuote} = 1;
 		print STDERR "IRQ 2 -> 1\n" if ($rubyDebug || $colorDebug);
 	} elsif ($token =~ /^\"/o && !$ctstate{inRubyQuote}) {
@@ -3642,11 +3728,13 @@ print STDERR "oldInMacro: $oldInMacro\noldInComment: $oldInComment\n" if ($local
 			}
 		}
 	} elsif ($ctstate{prespace} ne "" && ($token =~ /^\)/o || casecmp($token, $parseTokens{rbrace}, $case_sensitive))) {
+		print "    CPAREN OR RBRACE\n" if ($codePathDebug);
 		print STDERR "PS: ".length($ctstate{prespace})." -> " if ($psDebug);
 		if (!$ctstate{keep_whitespace}) { $ctstate{prespace} = nspaces(4 * ($ctstate{depth}-1)); }
 		print STDERR length($ctstate{prespace})."\n" if ($psDebug);
 		$mustbreak = 2;
 	} elsif (casecmp($token, $parseTokens{rbrace}, $case_sensitive)) {
+		print "    RBRACE\n" if ($codePathDebug);
 		if (!$ctstate{keep_whitespace}) { $ctstate{prespace} = nspaces(4 * ($ctstate{depth}-1)); }
 		print STDERR length($ctstate{prespace})."\n" if ($psDebug);
 		$mustbreak = 2;
@@ -3762,11 +3850,15 @@ print STDERR "NB: $nextbreakable\n" if ($localDebug);
 print STDERR "TESTTYPE: $tokenType\n" if ($localDebug);
 
     if ($ctstate{inObjCMethod}) {
+	print STDERR "OCC METHOD OVERRIDE: " if ($localDebug);
 	$nextbreakable = 0;
 	$ctstate{breakable} = 0;
 	$mustbreak = 0;
 	if ($ntoken eq ":" && $tokenType eq "function") {
 		$ctstate{breakable} = 1;
+		print STDERR "BREAKABLE\n" if ($localDebug);
+	} else {
+		print STDERR "NOT BREAKABLE\n" if ($localDebug);
 	}
     }
 
@@ -3790,6 +3882,8 @@ print STDERR "TESTTYPE: $tokenType\n" if ($localDebug);
 		print STDERR "dropping newline\n" if ($localDebug);
 		$drop = 1;
 		$string .= " ";
+		$ctstate{afteradvisoryspace} = 1;
+		print STDERR "AAS -> 1 [drop]\n" if ($localDebug || $advisorySpaceDebug || $codePathDebug);
 	} else {
 		$mustbreak = 1;
 	}
@@ -3935,6 +4029,7 @@ print STDERR "TESTTYPE: $tokenType\n" if ($localDebug);
     my $newstring = "";
     my $node = $self->{FIRSTCHILD};
     my $newstringref = undef;
+
     if ($node && $continue) {
 	if ($nospaceafter == 1) { $nospaceafter = 0; }
 	print STDERR "BEGIN CHILDREN\n" if ($localDebug || $colorDebug || $treeDebug);
@@ -3942,11 +4037,17 @@ print STDERR "TESTTYPE: $tokenType\n" if ($localDebug);
 
 	my $childctstate = newCTState(\%ctstate, depth => $ctstate{depth} + 1, breakable => $nextbreakable);
 
-	($newstringref, $ctstate{newlen}, $nextbreakable, $ctstate{prespace}, $ctstate{lastnstoken}, $continue, $ctstate{lastTokenType}, $ctstate{spaceSinceLastToken}) = $node->colorTreeSub($childctstate);
+	($newstringref, $ctstate{newlen}, $nextbreakable, $ctstate{prespace}, $ctstate{lastnstoken}, $continue, $ctstate{lastTokenType}, $ctstate{spaceSinceLastToken}, $ctstate{afteradvisoryspace}) = $node->colorTreeSub($childctstate);
 
 	$newstring = ${$newstringref};
 	print STDERR "END CHILDREN\n" if ($localDebug || $colorDebug || $treeDebug);
     }
+
+    if ($self == $ctstate{lastDisplayNode} ) {
+	print STDERR "Node is last node in tree (LDN/AS).  Ending after this node.\n" if ($localDebug || $codePathDebug);
+	$continue = 0;
+    }
+
     $string .= $newstring; $newstring = "";
     print STDERR "SET STRING TO $string\n" if ($localDebug);
 
@@ -4002,8 +4103,9 @@ print STDERR "TESTTYPE: $tokenType\n" if ($localDebug);
 	}
 	print STDERR "CONTINUING TO NODE \"".$node->token."\".\n" if ($localDebug);
 	if ($node) {
-		my $nextctstate = newCTState(\%ctstate, breakable => $nextbreakable);
-		($newstringref, $ctstate{newlen}, $nextbreakable, $ctstate{prespace}, $ctstate{lastnstoken}, $continue, $ctstate{lastTokenType}, $ctstate{spaceSinceLastToken}) = $node->colorTreeSub($nextctstate);
+		my $nextctstate = newCTState(\%ctstate, breakable => $nextbreakable,
+			afteradvisoryspace => $ctstate{afteradvisoryspace});
+		($newstringref, $ctstate{newlen}, $nextbreakable, $ctstate{prespace}, $ctstate{lastnstoken}, $continue, $ctstate{lastTokenType}, $ctstate{spaceSinceLastToken}, $ctstate{afteradvisoryspace}) = $node->colorTreeSub($nextctstate);
 		$newstring = ${$newstringref};
 	}
     }
@@ -4012,7 +4114,7 @@ print STDERR "TESTTYPE: $tokenType\n" if ($localDebug);
 
     # $self->{CTSTRING} = $string;
     # $self->{CTSUB} = ($ctstate{newlen}, $nextbreakable, $ctstate{prespace}, $ctstate{lastnstoken});
-    return (\$string, $ctstate{newlen}, $nextbreakable, $ctstate{prespace}, $ctstate{lastnstoken}, $continue, $ctstate{lastTokenType}, $ctstate{spaceSinceLastToken});
+    return (\$string, $ctstate{newlen}, $nextbreakable, $ctstate{prespace}, $ctstate{lastnstoken}, $continue, $ctstate{lastTokenType}, $ctstate{spaceSinceLastToken}, $ctstate{afteradvisoryspace});
 }
 
 # /*!
@@ -4142,7 +4244,7 @@ sub dbprintrec
 
     if ($self == $lastnode) {
 	my $deb = "";
-	if ($localDebug) { $deb = $lastnode; }
+	if ($localDebug || 1) { $deb = $lastnode; }
 	print STDERR "-=-=-=-=-=-=- EODEC $deb-=-=-=-=-=-=-\n";
     }
 

@@ -18,7 +18,7 @@ $572|/*!
     is an example of this implementing all the functions necessary to drive an
     OHCI controller.
 */
-$0|$13993|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$14101|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -46,9 +46,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/class_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/class_6.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -472,7 +475,7 @@ END OF OBJECT
 
 
 
-$13993|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$14101|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -500,9 +503,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/class_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/class_6.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

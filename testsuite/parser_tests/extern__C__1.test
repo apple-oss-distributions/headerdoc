@@ -2,7 +2,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 int extern_c_foo(int extern_c_foo_a, char *extern_c_foo_b);
 }
 $23|/*! This is a test. */
-$0|$9000|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$9108|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -30,8 +30,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/extern__C__1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/extern__C__1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -343,7 +346,7 @@ END OF OBJECT
 
 
 
-$9000|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$9108|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -371,8 +374,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/extern__C__1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/extern__C__1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

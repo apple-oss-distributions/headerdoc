@@ -18,7 +18,7 @@ $211|/*! @abstract The data structure for a queue head.
         You should always initialize a queue head structure with the
         initialization vector {@link OS_ATOMIC_QUEUE_INIT} before use.
  */
-$0|$15111|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$15219|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -46,8 +46,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/typedef_block_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/typedef_block_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -532,7 +535,7 @@ END OF OBJECT
 
 
 
-$15111|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$15219|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -560,8 +563,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/typedef_block_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/typedef_block_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

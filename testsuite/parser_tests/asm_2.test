@@ -3,7 +3,7 @@ dispatch_call_asm_2(dispatch_queue_t queue,
         dispatch_block_t work,
         dispatch_block_t completion) __asm("_dispatch_call2");
 $30|/*! Tests the use of __asm */
-$0|$11627|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$11735|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -31,8 +31,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/asm_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/asm_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{attributeState} => 0
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
@@ -414,7 +417,7 @@ END OF OBJECT
 
 
 
-$11627|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$11735|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -442,8 +445,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/asm_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/asm_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{attributeState} => 0
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0

@@ -3,7 +3,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
     """
 python_var_junk = 4
 $29|        python_var_4 comment
-$0|$6312|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$6341|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -32,6 +32,7 @@ blockOffset: 0
 fullpath: /test_suite_bogus_path/Python_variable_4.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
 $parserState->{FULLPATH} => /test_suite_bogus_path/Python_variable_4.test
+$parserState->{afterNL} => 2
 $parserState->{autoContinue} => 0
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
@@ -274,4 +275,4 @@ END OF OBJECT
 
 
 
-__$45|testsuite/parser_tests/Python_variable_4.test$6|python$17|Python variable 4$6|python$6|parser
+__$99|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/Python_variable_4.test$6|python$17|Python variable 4$6|python$6|parser

@@ -1,5 +1,5 @@
 # Configuration file for HeaderDoc
-# $Revision: 1.5 $
+# $Revision: 1348608411 $
 ###########################################################
 copyrightOwner =>
 defaultFrameName => index.html
@@ -26,5 +26,5 @@ typeStyle => background:#000000; color:#ffffff;
 paramStyle => background:#808080; color:#00ff00;
 varStyle => background:#ffffff; color:#ff0000;
 templateStyle => background:#ccccff; color:#008000; font-family: sand, comic sans ms, comic sans, script; font-weight: bold; text-decoration: underline;
-cCompiler => /usr/bin/gcc
+cCompiler => /usr/bin/cc
 

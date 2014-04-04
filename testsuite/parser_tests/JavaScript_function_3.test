@@ -6,7 +6,7 @@ var consoleService = Components.classes['@mozilla.org/consoleservice;1']
         
 }       
 $47|/*! Logs something in the FireFox console.  */
-$0|$7553|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$7667|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -34,8 +34,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/JavaScript_function_3.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/JavaScript_function_3.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -114,7 +117,7 @@ $parserState->{variableNameConcat} => 2
 newcount: 7
 typelist: function
 namelist: ff_consolelog
-posstypes: function method
+posstypes: function method class
 value: 
 returntype:  function
 pridec: 

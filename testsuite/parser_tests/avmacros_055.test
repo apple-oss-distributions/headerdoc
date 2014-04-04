@@ -1,6 +1,6 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$49|int cf_available(int a) CF_AVAILABLE(10_7, 3_0);
 $17|/*! test case */
-$0|$7736|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$7844|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -28,8 +28,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/avmacros_055.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/avmacros_055.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{attributeState} => 0
 $parserState->{availability} => 
 $parserState->{availabilityNodesArray} => ARRAY(OBJID)
@@ -302,7 +305,7 @@ END OF OBJECT
 
 
 
-$7736|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$7844|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -330,8 +333,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/avmacros_055.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/avmacros_055.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{attributeState} => 0
 $parserState->{availability} => 
 $parserState->{availabilityNodesArray} => ARRAY(OBJID)

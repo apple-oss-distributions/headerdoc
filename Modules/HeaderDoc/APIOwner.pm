@@ -3,7 +3,7 @@
 # Class name: APIOwner
 # Synopsis: Abstract superclass for Header and OO structures
 #
-# Last Updated: $Date: 2012/06/19 16:53:38 $
+# Last Updated: $Date: 2013/04/26 16:22:31 $
 # 
 # Method additions by SKoT McDonald <skot@tomandandy.com> Aug 2001 
 #
@@ -230,7 +230,7 @@ use vars qw(@ISA);
 #         In the git repository, contains the number of seconds since
 #         January 1, 1970.
 #  */
-$HeaderDoc::APIOwner::VERSION = '$Revision: 1340150018 $';
+$HeaderDoc::APIOwner::VERSION = '$Revision: 1367018551 $';
 
 my $addToDebug = 0;
 
@@ -1466,7 +1466,7 @@ sub tocStringSubForClasses
 			    } elsif ($HeaderDoc::use_iframes) {
 	        		$tocString .= "<nobr>$entrypreface<a href=\"$class_baseref#$urlname\" target=\"_top\">$name</a></nobr><br>\n";
 			    } else {
-	        		$tocString .= "<nobr>$entrypreface<a href=\"$class_baseref#$urlname\" target=\"doc\">$name</a></nobr><br>\n";
+	        		$tocString .= "<nobr>$entrypreface<a href=\"$class_baseref#$urlname\" target=\"_top\">$name</a></nobr><br>\n";
 			    }
 			} else {
 			}
@@ -5805,8 +5805,14 @@ sub _createHTMLOutputFile {
 
 	if ($HeaderDoc::use_iframes || $HeaderDoc::newTOC == 5) {
 	    if (!$HeaderDoc::suppressDefaultStyles) {
+		print OUTFILE $self->styleSheet(1);
 		print OUTFILE "<style><!--\n";
 		if ($HeaderDoc::newTOC == 5) {
+			print OUTFILE "body {\n";
+			print OUTFILE "    padding: 0px;\n";
+			print OUTFILE "    margin: 0px;\n";
+			print OUTFILE "    border: 0px;\n";
+			print OUTFILE "}\n";
 			print OUTFILE ".toc_contents_text {\n";
 			# print OUTFILE "    white-space: nowrap;\n";
 			print OUTFILE "    padding-left: 1em;\n";
@@ -5852,7 +5858,16 @@ sub _createHTMLOutputFile {
 			print OUTFILE ".specbox a {\n";
 			print OUTFILE "		font-size: 12px;\n";
 			print OUTFILE "}\n";
-			print OUTFILE ".disclosure_triangle_td a:hover {\n";
+			print OUTFILE ".disclosure_triangle_td a {\n";
+			print OUTFILE "		text-decoration: none;\n";
+			print OUTFILE "}\n";
+			print OUTFILE ".disclosure_triangle_td a:link {\n";
+			print OUTFILE "		text-decoration: none;\n";
+			print OUTFILE "}\n";
+			print OUTFILE ".disclosure_triangle_td a:active {\n";
+			print OUTFILE "		text-decoration: none;\n";
+			print OUTFILE "}\n";
+			print OUTFILE ".disclosure_triangle_td a:visited:hover {\n";
 			print OUTFILE "		text-decoration: none;\n";
 			print OUTFILE "}\n";
 			print OUTFILE ".disclosure_triangle_td a:hover {\n";
@@ -5901,6 +5916,12 @@ sub _createHTMLOutputFile {
 			print OUTFILE "		color: #808080;\n";
 			print OUTFILE "}\n";
 			print OUTFILE "\n";
+			print OUTFILE "#hd_outermost_table { margin-left: 0px; border-spacing: 0px; margin-top: 0px; padding-left: 0px; padding-top: 0px; border: none; }\n";
+			print OUTFILE "#hd_outermost_table > tr { border-spacing: 0px; margin-left: 0px; margin-top: 0px; padding-left: 0px; padding-top: 0px; border: none; }\n";
+			print OUTFILE "#hd_outermost_table > tr > td { border-spacing: 0px; margin-left: 0px; margin-top: 0px; }\n";
+			print OUTFILE "#hd_outermost_table > tbody > tr { border-spacing: 0px; margin-left: 0px; margin-top: 0px; padding-left: 0px; padding-top: 0px; border: none; }\n";
+			print OUTFILE "#hd_outermost_table > tbody > tr > td { border-spacing: 0px; margin-left: 0px; margin-top: 0px; padding-top: 3px; }\n";
+			print OUTFILE "\n";
 		}
 		print OUTFILE "#tocMenu {\n";
 		if ($HeaderDoc::newTOC == 5) {
@@ -5924,15 +5945,53 @@ sub _createHTMLOutputFile {
 			print OUTFILE "		width: auto;\n";
 			# print OUTFILE "         position: absolute; top: 0px;\n";
 			print OUTFILE "		padding-left: 15px;\n";
+			print OUTFILE "}\n";
 		} else {
 			print OUTFILE "#bodyText {\n";
 			print OUTFILE "		top: 0px;\n";
 			print OUTFILE "		margin-left: 230px;\n";
+			print OUTFILE "}\n";
 		}
-		print OUTFILE "}\n";
 		print OUTFILE "--></style>\n";
+
+
+		if ($HeaderDoc::newTOC == 5) {
+			print OUTFILE "<style id=\"disable_before_iOS_5\"><!--\n";
+			print OUTFILE "#tocMenu {\n";
+			print OUTFILE "		position: fixed;\n";
+			print OUTFILE "		height: 100%;\n";
+			print OUTFILE "		overflow: auto;\n";
+			print OUTFILE "}\n";
+			print OUTFILE "#bodyContents {\n";
+			# print OUTFILE "		float: right;\n"; # Old div layout that proved unworkable
+			print OUTFILE "		width: auto;\n";
+			# print OUTFILE "         position: absolute; top: 0px;\n";
+			print OUTFILE "		left: 235px;\n";
+			print OUTFILE "		right: 0;\n";
+			print OUTFILE "		padding-left: 15px;\n";
+			print OUTFILE "		position: fixed;\n";
+			print OUTFILE "		height: 100%;\n";
+			print OUTFILE "		overflow-y: scroll;\n";
+			print OUTFILE "}\n";
+			print OUTFILE "--></style>\n";
+		}
 	    }
 	    if (!$HeaderDoc::suppressDefaultJavaScript) {
+		if ($HeaderDoc::newTOC == 5) {
+			print OUTFILE "<script language=\"JavaScript\" type=\"text/javascript\"><!--\n";
+			print OUTFILE "    if (navigator.platform && (navigator.platform.match(/iPad/) || navigator.platform.match(/iPhone/) || navigator.platform.match(/iPod/))) {\n";
+			print OUTFILE "        if (navigator.userAgent.match(/OS 1(_\\d)+/) ||\n";
+			print OUTFILE "            navigator.userAgent.match(/OS 2(_\\d)+/) ||\n";
+			print OUTFILE "            navigator.userAgent.match(/OS 3(_\\d)+/) ||\n";
+			print OUTFILE "            navigator.userAgent.match(/OS 4(_\\d)+/)) {\n";
+			print OUTFILE "                /* Earlier iOS versions require different scrolling gestures with position: fixed. */\n";
+			print OUTFILE "                var del_style_elt = document.getElementById(\"disable_before_iOS_5\");\n";
+			print OUTFILE "                if (del_style_elt) del_style_elt.parentNode.removeChild(del_style_elt);\n";
+			print OUTFILE "        }\n";
+			print OUTFILE "    }\n";
+			print OUTFILE "// --></script>\n";
+		}
+
 		if ($newTOC && $newTOC != 5) {
 			# if (!$HeaderDoc::use_iframes) { print OUTFILE "<script language=\"JavaScript\" src=\"/Resources/JavaScript/toc.js\" type=\"text/javascript\"></script>\n"; }
 			print OUTFILE "<meta id=\"toc-file\" name=\"toc-file\" content=\"toc.html\" />\n";

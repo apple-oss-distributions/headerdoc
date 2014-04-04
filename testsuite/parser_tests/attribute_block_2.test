@@ -14,7 +14,7 @@ void foo();
 
 }
 $29|/*! myClass Documentation */
-$0|$10276|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$10384|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -42,9 +42,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/attribute_block_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/attribute_block_2.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -391,7 +394,7 @@ END OF OBJECT
 
 
 
-$10276|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$10384|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -419,9 +422,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/attribute_block_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/attribute_block_2.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

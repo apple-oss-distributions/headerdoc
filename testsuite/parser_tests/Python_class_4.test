@@ -30,7 +30,7 @@ Python_class_4_test_two = [
         "bar"
 ]
 $24|Python_class_4_A class.
-$0|$11969|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$11998|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -59,6 +59,7 @@ blockOffset: 0
 fullpath: /test_suite_bogus_path/Python_class_4.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
 $parserState->{FULLPATH} => /test_suite_bogus_path/Python_class_4.test
+$parserState->{afterNL} => 2
 $parserState->{autoContinue} => 1
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0

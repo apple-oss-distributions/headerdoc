@@ -5,7 +5,7 @@ $558|/*! @function getParentEntry
     @discussion This function will return the parent to which a registry entry was first attached. Since the majority of registry entrys have only one provider, this is a useful simplification.
     @param plane The plane object.
     @result Returns the first parent of the registry entry, or zero if the entry is not attached into the registry in that plane. The parent is retained while the entry is attached, and should not be released by the caller. */
-$0|$9801|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$9909|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -33,8 +33,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/function_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/function_6.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -363,7 +366,7 @@ END OF OBJECT
 
 
 
-$9801|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$9909|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -391,8 +394,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/function_6.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/function_6.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

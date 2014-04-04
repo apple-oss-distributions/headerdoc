@@ -22,7 +22,7 @@ $754|/*!
  * default priority and high priority queues have been
  * scheduled.
  */
-$0|$10589|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$10697|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -50,8 +50,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/enum_3.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/enum_3.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => enum
@@ -444,7 +447,7 @@ END OF OBJECT
 
 
 
-$10589|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$10697|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -472,8 +475,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/enum_3.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/enum_3.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => enum

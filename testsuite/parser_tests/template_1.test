@@ -46,7 +46,7 @@ $239|/*! @class This_Does_Not_Contain_Templates
         as template parameters.
     @updated 2003-04-01
 */
-$0|$44086|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$44194|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -74,9 +74,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/template_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/template_1.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -1683,7 +1686,7 @@ END OF OBJECT
 
 
 
-$44086|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$44194|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 1
 inInterface: 0
@@ -1711,9 +1714,12 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/template_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/template_1.test
 $parserState->{ISFORWARDDECLARATION} => 0
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

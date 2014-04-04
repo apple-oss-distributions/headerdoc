@@ -19,7 +19,7 @@ $206|/*! @define OSDeclareCommonStructors
     @param className Name of class. NO QUOTES.
     @hidecontents
 */
-$0|$16606|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$16714|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -47,8 +47,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/define_5.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/define_5.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -698,7 +701,7 @@ END OF OBJECT
 
 
 
-$16606|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$16714|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -726,8 +729,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/define_5.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/define_5.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

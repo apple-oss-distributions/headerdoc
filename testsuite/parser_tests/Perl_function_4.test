@@ -24,7 +24,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 }
 
 $50|/*! This tests an at sign in a parameter list. */
-$0|$6979|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$7087|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -52,8 +52,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/Perl_function_4.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/Perl_function_4.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -303,7 +306,7 @@ END OF OBJECT
 
 
 
-$6979|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$7087|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -331,8 +334,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/Perl_function_4.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/Perl_function_4.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

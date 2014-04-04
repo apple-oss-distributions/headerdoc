@@ -13,7 +13,7 @@ def baz(x)
         qux(x)
         foo(x - 1)
 $9|Pyfunc_1
-$0|$10843|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$10872|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -42,6 +42,7 @@ blockOffset: 0
 fullpath: /test_suite_bogus_path/Python_function_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
 $parserState->{FULLPATH} => /test_suite_bogus_path/Python_function_1.test
+$parserState->{afterNL} => 2
 $parserState->{autoContinue} => 1
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
@@ -468,4 +469,4 @@ END OF OBJECT
 
 
 _$26|Test of python functions.
-$45|testsuite/parser_tests/Python_function_1.test$6|python$17|Python function 1$6|python$6|parser
+$99|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/Python_function_1.test$6|python$17|Python function 1$6|python$6|parser

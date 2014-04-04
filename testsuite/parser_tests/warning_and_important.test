@@ -15,7 +15,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
     This is also a normal paragraph.
 
  */
-$0|$4310|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$4418|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 1
 inClass: 0
 inInterface: 0
@@ -43,8 +43,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/warning_and_important.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/warning_and_important.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -187,7 +190,7 @@ LONG ATTRIBUTES:
 
 -=: HTML OUTPUT OF PARSE TREES :=-
 
-$4310|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$4418|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 1
 inClass: 0
 inInterface: 0
@@ -215,8 +218,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/warning_and_important.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/warning_and_important.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -359,4 +365,4 @@ LONG ATTRIBUTES:
 
 -=: HTML OUTPUT OF PARSE TREES :=-
 
-_$49|testsuite/parser_tests/warning_and_important.test$1|C$21|warning and important$1|C$6|parser
+_$103|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/warning_and_important.test$1|C$21|warning and important$1|C$6|parser

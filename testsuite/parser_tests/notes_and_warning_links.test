@@ -25,7 +25,7 @@ FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT
 
     This is out of the note again.
  */
-$0|$4693|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$4801|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 1
 inClass: 0
 inInterface: 0
@@ -53,8 +53,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/notes_and_warning_links.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/notes_and_warning_links.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -203,7 +206,7 @@ LONG ATTRIBUTES:
 
 -=: HTML OUTPUT OF PARSE TREES :=-
 
-$4693|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$4801|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 1
 inClass: 0
 inInterface: 0
@@ -231,8 +234,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/notes_and_warning_links.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/notes_and_warning_links.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -381,4 +387,4 @@ LONG ATTRIBUTES:
 
 -=: HTML OUTPUT OF PARSE TREES :=-
 
-_$51|testsuite/parser_tests/notes_and_warning_links.test$1|C$23|notes and warning links$1|C$6|parser
+_$105|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/notes_and_warning_links.test$1|C$23|notes and warning links$1|C$6|parser

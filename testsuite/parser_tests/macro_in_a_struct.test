@@ -12,7 +12,7 @@ $163|/*!
  @field bart   The bart field
  @field cart   The cart field
 */
-$0|$15393|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$15501|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -40,8 +40,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/macro_in_a_struct.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/macro_in_a_struct.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct
@@ -583,7 +586,7 @@ END OF OBJECT
 
 
 
-$15393|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$15501|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -611,8 +614,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/macro_in_a_struct.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/macro_in_a_struct.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => struct

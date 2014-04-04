@@ -3,7 +3,7 @@ $87|/*! @discussion
     This shouldn't generate any
     warning even in paranoid mode.
  */
-$0|$5901|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$6009|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -31,8 +31,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/leading_star_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/leading_star_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -238,7 +241,7 @@ END OF OBJECT
 
 
 
-$5901|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$6009|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -266,8 +269,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/leading_star_2.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/leading_star_2.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

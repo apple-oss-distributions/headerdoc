@@ -8,7 +8,7 @@ $161|/*!
  *      to which the target task has access, along with
  *      the type (set or port) for each name.
  */
-$0|$11418|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$11526|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -36,8 +36,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/MIG_routine_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/MIG_routine_1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 
@@ -431,7 +434,7 @@ END OF OBJECT
 
 
 
-$11418|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$11526|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -459,8 +462,11 @@ inputCounter: 0
 blockOffset: 0
 fullpath: /test_suite_bogus_path/MIG_routine_1.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
+$parserState->{ASLBRACEPRECURSOR} => 
+$parserState->{ASLBRACEPRECURSORTAG} => 
 $parserState->{FULLPATH} => /test_suite_bogus_path/MIG_routine_1.test
 $parserState->{NEXTTOKENNOCPP} => 0
+$parserState->{afterNL} => 2
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
 $parserState->{basetype} => 

@@ -1,7 +1,7 @@
 FrT;@1|>>0|$15|HeaderDoc::Test%22|$4|CODE$7|COMMENT$7|CPPCODE$15|EXPECTED_RESULT$23|EXPECTED_RESULT_ALLDECS$7|FAILMSG$8|FILENAME$4|LANG$4|NAME$7|SUBLANG$4|TYPE$39|python_var_5 = "x"
 python_var_junk = 4
 $29|        python_var_5 comment
-$0|$5848|-=: TOP LEVEL COMMENT PARSE VALUES :=-
+$0|$5877|-=: TOP LEVEL COMMENT PARSE VALUES :=-
 inHeader: 0
 inClass: 0
 inInterface: 0
@@ -30,6 +30,7 @@ blockOffset: 0
 fullpath: /test_suite_bogus_path/Python_variable_5.test
 -=: BLOCKPARSE PARSER STATE KEYS :=-
 $parserState->{FULLPATH} => /test_suite_bogus_path/Python_variable_5.test
+$parserState->{afterNL} => 2
 $parserState->{autoContinue} => 0
 $parserState->{availability} => 
 $parserState->{backslashcount} => 0
@@ -245,4 +246,4 @@ END OF OBJECT
 
 
 
-__$45|testsuite/parser_tests/Python_variable_5.test$6|python$17|Python variable 5$6|python$6|parser
+__$99|/Users/dg/headerdoc-techpubs/Modules/HeaderDoc//../../testsuite/parser_tests/Python_variable_5.test$6|python$17|Python variable 5$6|python$6|parser
