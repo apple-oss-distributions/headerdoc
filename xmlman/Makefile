@@ -32,7 +32,7 @@ else
 endif
 
 
-CFLAGS= ${LOCALCFLAGS} -I/usr/include/libxml2 -Wall ${RC_CFLAGS} ${DEBUG_CFLAGS} ${DARWIN_CFLAGS}
+CFLAGS= ${LOCALCFLAGS} -I${SDKROOT}/usr/include/libxml2 -Wall ${RC_CFLAGS} ${DEBUG_CFLAGS} ${DARWIN_CFLAGS}
 LDFLAGS= ${LOCALLDFLAGS} -lxml2 ${DARWIN_LDFLAGS} ${RC_CFLAGS}
 
 all: xml2man hdxml2manxml resolveLinks doc

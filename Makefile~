@@ -149,7 +149,7 @@ installsub:
 	umask 022 && install -d $(DSTROOT)$(DEVELOPER_DIR)/usr/share/man/man1
 	install -c -m 444 Documentation/man/*.1 $(DSTROOT)$(DEVELOPER_DIR)/usr/share/man/man1
 	umask 022 && install -d $(DSTROOT)$(DEVELOPER_DIR)/usr/share/man/man5
-	# install -c -m 444 Documentation/man/*.5 $(DSTROOT)$(DEVELOPER_DIR)/usr/share/man/man5
+	install -c -m 444 Documentation/man/*.5 $(DSTROOT)$(DEVELOPER_DIR)/usr/share/man/man5
 	cd xmlman ; make clean ; cd ..
 
 installtests:
