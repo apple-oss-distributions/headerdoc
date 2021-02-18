@@ -28,10 +28,10 @@ all: all_internal test apidoc
 
 # Override the default compiler to GCC 4.0 if building for Snow Leopard internally.
 all_internal:
-	cd xmlman ; make all CC=`if [ "$$DEVELOPER_BIN_DIR" != "" -a "$(building_ppc)" != "0" ] ; then echo "gcc-4.0" ; else echo "cc"; fi` ARCH=`uname` VERS=`{ echo "10.8"; sw_vers -productVersion | sed 's/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\..*/\1.\2/'; } | sort | head -n 1` ; cd ..
+	cd xmlman && make all CC=`if [ "$$DEVELOPER_BIN_DIR" != "" -a "$(building_ppc)" != "0" ] ; then echo "gcc-4.0" ; else echo "cc"; fi` ARCH=`uname` VERS=`{ echo "10.8"; sw_vers -productVersion | sed 's/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\..*/\1.\2/'; } | sort | head -n 1`
 
 clean:
-	cd xmlman ; make clean ; cd ..
+	cd xmlman && make clean
 	rm -rf Documentation/hdapi
 
 installsrc:
@@ -150,7 +150,7 @@ installsub:
 	install -c -m 444 Documentation/man/*.1 $(DSTROOT)$(DEVELOPER_DIR)/usr/share/man/man1
 	umask 022 && install -d $(DSTROOT)$(DEVELOPER_DIR)/usr/share/man/man5
 	# install -c -m 444 Documentation/man/*.5 $(DSTROOT)$(DEVELOPER_DIR)/usr/share/man/man5
-	cd xmlman ; make clean ; cd ..
+	cd xmlman && make clean
 
 installtests:
 	# Install test suite
