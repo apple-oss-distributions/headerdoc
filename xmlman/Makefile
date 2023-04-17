@@ -18,7 +18,7 @@ VSTR=
 ifeq (${ARCH},Darwin)
 	DARWIN_CFLAGS=${VSTR}
 	# For older versions of Mac OS X compilers, remove -pie.
-	DARWIN_LDFLAGS=-force_flat_namespace ${VSTR} -pie -Wl,-pie
+	DARWIN_LDFLAGS=${VSTR}
 else
 	ifeq (${ARCH},Linux)
 		DARWIN_CFLAGS= -DUSE_STRCOMPAT -D_GNU_SOURCE
